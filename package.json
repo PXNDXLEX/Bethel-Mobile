@@ -1,0 +1,35 @@
+{
+  "name": "repo",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "electron:dev": "electron .",
+    "electron:build": "vite build && electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "com.dulcebethel.app",
+    "productName": "Dulce Bethel",
+    "directories": {
+      "output": "dist-electron"
+    },
+    "win": {
+      "target": "nsis"
+    }
+  },
+  "devDependencies": {
+    "electron": "^42.3.3",
+    "electron-builder": "^26.15.0",
+    "vite": "^8.0.12"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.4.0",
+    "@capacitor/cli": "^8.4.0",
+    "@capacitor/core": "^8.4.0",
+    "@supabase/supabase-js": "^2.107.0"
+  }
+}
