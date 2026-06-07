@@ -2310,30 +2310,32 @@
                 }
 
                 // CHECK BIOMETRIC FIRST ON OPEN
-                try {
-                    if(window.NativeBiometric && localStorage.getItem('db_huella_enabled') === 'true' && localStorage.getItem('db_huella_u')) {
-                        const verified = await window.NativeBiometric.verifyIdentity({
-                            reason: "Autentícate para ingresar a Bethel",
-                            title: "Desbloqueo Biométrico"
-                        });
-                        
-                        if(verified) {
-                            var hu = localStorage.getItem('db_huella_u');
-                            var hp = localStorage.getItem('db_huella_p');
-                            document.getElementById('login-user').value = hu;
-                            document.getElementById('login-pass').value = hp;
-                            showLogin(); 
-                            attemptLogin();
-                            return; 
-                        } else {
-                            localStorage.removeItem('db_session');
+                (async () => {
+                    try {
+                        if(window.NativeBiometric && localStorage.getItem('db_huella_enabled') === 'true' && localStorage.getItem('db_huella_u')) {
+                            const verified = await window.NativeBiometric.verifyIdentity({
+                                reason: "Autentícate para ingresar a Bethel",
+                                title: "Desbloqueo Biométrico"
+                            });
+                            
+                            if(verified) {
+                                var hu = localStorage.getItem('db_huella_u');
+                                var hp = localStorage.getItem('db_huella_p');
+                                document.getElementById('login-user').value = hu;
+                                document.getElementById('login-pass').value = hp;
+                                showLogin(); 
+                                attemptLogin();
+                                return; 
+                            } else {
+                                localStorage.removeItem('db_session');
+                            }
                         }
+                    } catch(e) { 
+                        console.log("Biometric error or cancelled", e); 
+                        localStorage.removeItem('db_session');
                     }
-                } catch(e) { 
-                    console.log("Biometric error or cancelled", e); 
-                    localStorage.removeItem('db_session');
-                }
-                completeLoad();
+                    completeLoad();
+                })();
 
             }).withFailureHandler(function (err) {
                 document.getElementById('loader').innerHTML = '<div class="bg-red-50 dark:bg-red-900/30 border-2 border-brand-500 p-6 rounded-2xl text-center max-w-sm mx-4 shadow-xl"><i class="fas fa-exclamation-triangle text-5xl text-brand-600 dark:text-brand-400 mb-4"></i><h2 class="text-xl font-black text-slate-800 dark:text-white mb-2">Error de Servidor</h2><p class="text-sm text-slate-700 dark:text-slate-300 font-bold mb-4">' + err.message + '</p></div>';
