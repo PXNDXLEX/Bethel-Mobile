@@ -13,14 +13,16 @@ function createWindow () {
       nodeIntegration: true,
       contextIsolation: false
     },
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      color: '#0f172a',
+      symbolColor: '#ffffff'
+    },
     icon: path.join(__dirname, 'dist', 'favicon.ico')
   })
 
   win.setMenuBarVisibility(false)
   win.loadFile(path.join(__dirname, 'dist', 'index.html'))
-  
-  // Open the DevTools to debug errors
-  win.webContents.openDevTools()
 }
 
 app.whenReady().then(() => {

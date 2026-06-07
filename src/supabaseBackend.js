@@ -19,27 +19,66 @@ const mappers = {
     recetario: (d) => [d.producto, d.ingrediente, d.cantidad, d.unidad, d.usuario_id]
 }
 
+async function db_getBCV() {
+  try {
+    let res = await fetch("https://ve.dolarapi.com/v1/dolares/oficial");
+    if(res.ok) {
+      let data = await res.json();
+      if(data.promedio) return parseFloat(data.promedio);
+    }
+  } catch(e) {}
+  try {
+    let res2 = await fetch("https://pydolarvenezuela-api.vercel.app/api/v1/dollar?page=bcv");
+    if(res2.ok) {
+      let data2 = await res2.json();
+      if(data2.monitors && data2.monitors.usd && data2.monitors.usd.price) return parseFloat(data2.monitors.usd.price);
+    }
+  } catch(e) {}
+  try {
+    let {data} = await supabase.from('config').select('*');
+    if(data && data.length > 0 && data[0].bcv_rate) return parseFloat(data[0].bcv_rate);
+  } catch(e) {}
+  return 0;
+}
+
 async function db_getData() {
-    const [
-        {data: configData}, {data: bcvData}, {data: productosData}, {data: lugaresData}, {data: clientesData},
-        {data: pedidosData}, {data: pagosData}, {data: gastosData}, {data: prodData}, {data: movData},
-        {data: mpData}, {data: usuData}, {data: histData}, {data: recData}
-    ] = await Promise.all([
+    const b1 = await Promise.all([
         supabase.from('config').select('*'),
-        supabase.from('config').select('nombre_negocio'), // Mock for BCV or fetch real
+        db_getBCV(),
         supabase.from('productos').select('*').order('id'),
         supabase.from('lugares').select('*').order('id'),
-        supabase.from('clientes').select('*').order('id'),
+        supabase.from('clientes').select('*').order('id')
+    ]);
+    const b2 = await Promise.all([
         supabase.from('pedidos').select('*').order('id'),
         supabase.from('pagos').select('*').order('id'),
         supabase.from('gastos').select('*').order('id'),
         supabase.from('produccion').select('*').order('id'),
-        supabase.from('movimientos').select('*').order('id'),
+        supabase.from('movimientos').select('*').order('id')
+    ]);
+    const b3 = await Promise.all([
         supabase.from('materia_prima').select('*').order('id'),
         supabase.from('usuarios').select('*'),
         supabase.from('historial_mp').select('*').order('id'),
         supabase.from('recetario').select('*').order('id')
     ]);
+
+    const configData = b1[0].data;
+    const bcvRate = b1[1] || 1;
+    const productosData = b1[2].data;
+    const lugaresData = b1[3].data;
+    const clientesData = b1[4].data;
+
+    const pedidosData = b2[0].data;
+    const pagosData = b2[1].data;
+    const gastosData = b2[2].data;
+    const prodData = b2[3].data;
+    const movData = b2[4].data;
+
+    const mpData = b3[0].data;
+    const usuData = b3[1].data;
+    const histData = b3[2].data;
+    const recData = b3[3].data;
 
     const productos = (productosData || []).map(p => ({
         nombre: p.nombre, precio: p.precio||0, stock: p.stock||0, precioMayor: p.precio_mayor||0
@@ -53,9 +92,6 @@ async function db_getData() {
         confObj.nombre = configData[0].nombre_negocio || "Dulce Bethel";
         confObj.logo = configData[0].logo || "";
     }
-
-    // BCV mock (in original it's fetched from api or config)
-    let bcvRate = 427.93; // Default or fetch from real API if needed
 
     return {
         config: confObj,

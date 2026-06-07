@@ -25,7 +25,7 @@ jobs:
         run: npm run build
 
       - name: Build PC Executable
-        run: npx electron-builder --win nsis
+        run: npx electron-builder --win portable
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 

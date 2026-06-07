@@ -10,20 +10,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        header { -webkit-app-region: drag; }
+        header button, header input, header select, header a { -webkit-app-region: no-drag; }
+    </style>
     <script>
-        window.addEventListener('error', function(e) {
-            const errDiv = document.createElement('div');
-            errDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:red;color:white;z-index:999999;padding:10px;font-family:monospace;white-space:pre-wrap;max-height:50vh;overflow:auto;';
-            errDiv.textContent = `Error: ${e.message}\nLine: ${e.lineno}\nFile: ${e.filename}\n\nStack:\n${e.error && e.error.stack}`;
-            document.body.appendChild(errDiv);
-        });
-        window.addEventListener('unhandledrejection', function(e) {
-            const errDiv = document.createElement('div');
-            errDiv.style.cssText = 'position:fixed;top:0;left:0;right:0;background:orange;color:white;z-index:999999;padding:10px;font-family:monospace;white-space:pre-wrap;max-height:50vh;overflow:auto;';
-            errDiv.textContent = `Unhandled Promise Rejection: ${e.reason}`;
-            document.body.appendChild(errDiv);
-        });
-        
         tailwind.config = {
             darkMode: 'class',
             theme: {
