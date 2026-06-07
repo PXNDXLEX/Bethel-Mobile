@@ -407,6 +407,10 @@
                         <p id="sidebar-user-rol" class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Rol</p>
                     </div>
                 </div>
+                <button onclick="openPerfilModal()"
+                    class="w-full flex items-center gap-3 py-3 px-4 rounded-xl text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors mb-2">
+                    <i class="fas fa-user-circle w-6"></i> Mi Perfil
+                </button>
                 <button onclick="logoutAndForget()"
                     class="w-full flex items-center gap-3 py-3 px-4 rounded-xl text-sm font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors border border-red-100 dark:border-red-800/50">
                     <i class="fas fa-sign-out-alt w-6"></i> Cerrar Sesión
@@ -452,6 +456,12 @@
                     <button onclick="toggleDarkMode()"
                         class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-brand-400 flex items-center justify-center border border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer shadow-sm">
                         <i id="dark-icon" class="fas fa-moon"></i>
+                    </button>
+                    <!-- PERFIL BUTTON -->
+                    <button onclick="openPerfilModal()" id="btn-header-perfil"
+                        class="hidden sm:flex items-center gap-2 h-10 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-brand-50 dark:hover:bg-brand-900/30 hover:text-brand-500 dark:hover:text-brand-400 hover:border-brand-200 dark:hover:border-brand-800 cursor-pointer shadow-sm transition-all group"
+                        title="Mi Perfil">
+                        <i class="fas fa-user-circle text-sm"></i>
                     </button>
                     <!-- LOGOUT BUTTON -->
                     <button onclick="logoutAndForget()" id="btn-header-logout"
@@ -2271,33 +2281,68 @@
                     try {
                         var raw = localStorage.getItem('db_session');
                         if (raw) {
-                            var parsed = JSON.parse(raw);
-                            // Verificar que no haya expirado (7 días)
-                            if (parsed && parsed.expiry && Date.now() < parsed.expiry) {
-                                savedSession = parsed.user;
-                            } else {
-                                localStorage.removeItem('db_session');
-                            }
-                        }
-                    } catch(e) { localStorage.removeItem('db_session'); }
+                
+                function completeLoad() {
+                    setTimeout(function () {
+                        document.getElementById('loader').classList.add('hidden');
 
-                    if (savedSession) {
-                        // Restaurar sesión sin mostrar login
-                        state.currentUser = savedSession;
-                        var mainApp = document.getElementById('main-app');
-                        mainApp.classList.remove('hidden');
-                        showToast('¡Bienvenido de vuelta, ' + savedSession.nombre + '!', 'success');
-                        applyPermissions();
-                    } else {
-                        // Mostrar botón de cerrar sesión guardada si hay algo en localStorage
+                        // --- SESION GUARDADA: intentar auto-login ---
+                        var savedSession = null;
                         try {
-                            if (localStorage.getItem('db_session')) {
-                                document.getElementById('btn-logout-remembered').style.display = 'inline-block';
+                            var raw = localStorage.getItem('db_session');
+                            if (raw) {
+                                var parsed = JSON.parse(raw);
+                                if (parsed && parsed.expiry && Date.now() < parsed.expiry) {
+                                    savedSession = parsed.user;
+                                } else {
+                                    localStorage.removeItem('db_session');
+                                }
                             }
-                        } catch(e) {}
-                        showLogin();
+                        } catch(e) { localStorage.removeItem('db_session'); }
+
+                        if (savedSession) {
+                            state.currentUser = savedSession;
+                            var mainApp = document.getElementById('main-app');
+                            mainApp.classList.remove('hidden');
+                            showToast('¡Bienvenido de vuelta, ' + savedSession.nombre + '!', 'success');
+                            applyPermissions();
+                        } else {
+                            try {
+                                if (localStorage.getItem('db_session')) {
+                                    document.getElementById('btn-logout-remembered').style.display = 'inline-block';
+                                }
+                            } catch(e) {}
+                            showLogin();
+                        }
+                    }, 700);
+                }
+
+                // CHECK BIOMETRIC FIRST ON OPEN
+                try {
+                    if(window.NativeBiometric && localStorage.getItem('db_huella_enabled') === 'true' && localStorage.getItem('db_huella_u')) {
+                        const verified = await window.NativeBiometric.verifyIdentity({
+                            reason: "Autentícate para ingresar a Bethel",
+                            title: "Desbloqueo Biométrico"
+                        });
+                        
+                        if(verified) {
+                            var hu = localStorage.getItem('db_huella_u');
+                            var hp = localStorage.getItem('db_huella_p');
+                            document.getElementById('login-user').value = hu;
+                            document.getElementById('login-pass').value = hp;
+                            showLogin(); 
+                            attemptLogin();
+                            return; 
+                        } else {
+                            localStorage.removeItem('db_session');
+                        }
                     }
-                }, 700);
+                } catch(e) { 
+                    console.log("Biometric error or cancelled", e); 
+                    localStorage.removeItem('db_session');
+                }
+                completeLoad();
+
             }).withFailureHandler(function (err) {
                 document.getElementById('loader').innerHTML = '<div class="bg-red-50 dark:bg-red-900/30 border-2 border-brand-500 p-6 rounded-2xl text-center max-w-sm mx-4 shadow-xl"><i class="fas fa-exclamation-triangle text-5xl text-brand-600 dark:text-brand-400 mb-4"></i><h2 class="text-xl font-black text-slate-800 dark:text-white mb-2">Error de Servidor</h2><p class="text-sm text-slate-700 dark:text-slate-300 font-bold mb-4">' + err.message + '</p></div>';
             }).db_getData();
@@ -2939,10 +2984,30 @@
             document.getElementById('grid-productos').innerHTML = state.productos.filter(function (p) { return String(p.nombre).toLowerCase().includes(term); }).map(function (p) {
                 var price = getProdPrice(p);
                 var clickAction = 'addToCart(' + p.idOriginal + ')';
-                var borderClass = 'border-slate-200 dark:border-slate-700 hover:border-brand-500 dark:hover:border-brand-400 cursor-pointer';
-                var agotadoTag = p.stock <= 0 ? '<span class="absolute top-2 right-2 bg-yellow-500 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-sm">POR HACER</span>' : '';
+                var isAgotado = p.stock === 0;
+                var isPorHacer = p.stock < 0;
+                
+                var bgBorderClass = isAgotado
+                    ? 'border-red-300 dark:border-red-700/50 bg-red-50 dark:bg-red-900/10 hover:border-red-400 cursor-pointer'
+                    : (isPorHacer 
+                        ? 'border-yellow-300 dark:border-yellow-700/50 bg-yellow-50 dark:bg-yellow-900/10 hover:border-yellow-400 cursor-pointer'
+                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-brand-500 dark:hover:border-brand-400 cursor-pointer');
+                
+                var agotadoTag = isAgotado
+                    ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-red-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">AGOTADO</span></div>' 
+                    : (isPorHacer 
+                        ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-yellow-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">POR HACER</span></div>' 
+                        : '');
+                    
                 var stockClassText = p.stock < 0 ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500';
-                return '<div onclick="' + clickAction + '" class="bg-white dark:bg-slate-800 border ' + borderClass + ' rounded-2xl p-4 flex flex-col justify-between min-h-[9rem] h-auto transition-all relative">' + agotadoTag + '<h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm leading-tight">' + p.nombre + '</h4><div class="flex justify-between items-end mt-2 border-t border-slate-100 dark:border-slate-700 pt-2"><span class="text-xs font-bold ' + stockClassText + ' bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-lg">Stock: ' + p.stock + '</span><span class="text-brand-600 dark:text-brand-400 font-black text-lg">$' + price.toFixed(2) + '</span></div></div>';
+                
+                return '<div onclick="' + clickAction + '" class="border ' + bgBorderClass + ' rounded-2xl p-4 flex flex-col justify-between min-h-[9rem] h-auto transition-all relative overflow-hidden">' + 
+                       agotadoTag + 
+                       '<h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm leading-tight relative z-10">' + p.nombre + '</h4>' +
+                       '<div class="flex justify-between items-end mt-2 border-t border-slate-100 dark:border-slate-700/50 pt-2 relative z-10">' +
+                       '<span class="text-xs font-bold ' + stockClassText + ' bg-slate-100 dark:bg-slate-700/50 px-2 py-1 rounded-lg backdrop-blur-sm">Stock: ' + p.stock + '</span>' +
+                       '<span class="text-brand-600 dark:text-brand-400 font-black text-lg">$' + price.toFixed(2) + '</span>' +
+                       '</div></div>';
             }).join('');
         }
 
@@ -3369,7 +3434,7 @@
                         id: p.i,
                         u: p[14]
                     };
-                    cL[mapKey].i.push({ p: p[1], c: p[2] });
+                    cL[mapKey].i.push({ idx: p.i, p: p[1], c: p[2] });
                     // Si al menos uno está entregado, marcar como entregado (para la zona)
                 });
 
@@ -3401,14 +3466,18 @@
                         var uName = state.userNames[entry.u] || 'Sin Usuario';
                         var uTag = '<p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mt-2 italic flex items-center gap-1"><i class="fas fa-user-edit"></i> Registrado por: ' + uName + '</p>';
 
-                        return '<div class="bg-white dark:bg-slate-800/80 rounded-xl p-4 shadow-sm border-l-4 transition-colors duration-500 ease-in-out ' + bCol + '">' +
+                        var btnDelete = (state.currentUser && state.currentUser.permisosDelete === "SI") ? 
+                            '<button onclick="openDeleteRutaModal(\'' + mapKey.replace(/'/g, "\\\\'") + '\')" class="text-xs text-red-500 hover:text-white bg-red-50 hover:bg-red-500 dark:bg-red-900/30 dark:hover:bg-red-600 font-bold px-3 py-1.5 rounded-lg transition-colors shadow-sm flex items-center justify-center h-full"><i class="fas fa-trash-alt"></i></button>' : '';
+
+                        return '<div class="bg-white dark:bg-slate-800/80 rounded-xl p-4 shadow-sm border-l-4 transition-colors duration-500 ease-in-out ' + bCol + '" data-mapkey="' + mapKey.replace(/"/g, '&quot;') + '">' +
                             '<div class="flex justify-between items-start mb-2">' +
                             '<div>' +
                             '<h4 class="font-black text-slate-800 dark:text-white text-base leading-tight">' + c + '</h4>' +
                             '<div class="flex flex-wrap gap-1 mt-1.5">' + fechaChip + lugarChip + '</div>' +
                             '</div>' +
-                            '<button onclick="togE(this, \'' + entry.id + '\', \'' + (entry.e ? 'Pendiente' : 'Entregado') + '\')" class="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-all duration-300 transform active:scale-90 flex items-center justify-center min-w-[100px] outline-none ml-2 flex-shrink-0 ' + btnCol + '">' + btnTxt + '</button>' +
-                            '</div>' +
+                            '<div class="flex gap-2 items-stretch">' + btnDelete +
+                            '<button onclick="togE(this, \'' + entry.id + '\', \'' + (entry.e ? 'Pendiente' : 'Entregado') + '\')" class="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-all duration-300 transform active:scale-90 flex items-center justify-center min-w-[100px] outline-none flex-shrink-0 ' + btnCol + '">' + btnTxt + '</button>' +
+                            '</div></div>' +
                             '<ul class="text-sm mb-3 mt-2 space-y-0.5">' + liHTML + '</ul>' +
                             '<input type="text" value="' + (entry.n || '') + '" onchange="updN(\'' + entry.id + '\', this.value)" placeholder="Añadir nota..." class="w-full text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500 font-semibold transition-all duration-300">' +
                             uTag +
@@ -3532,7 +3601,8 @@
                     if (!dc[c]) dc[c] = { t: 0, i: [] };
                     var fechaPedido = String(p[4]).split('T')[0];
                     dc[c].t += r;
-                    dc[c].i.push({ idx: [i], m: r, items: [p[2] + 'x ' + p[1]], fecha: fechaPedido });
+                    var notaText = p[9] ? (' <span class="text-[10px] text-amber-600 dark:text-amber-400 font-bold ml-1 italic"><i class="fas fa-comment-dots mr-1"></i>' + p[9] + '</span>') : '';
+                    dc[c].i.push({ idx: [i], m: r, items: [p[2] + 'x ' + p[1] + notaText], fecha: fechaPedido });
                 }
             });
             state.deudores = Object.keys(dc);
@@ -3578,7 +3648,7 @@
             var cleanPhone = phone.replace(/\D/g, '');
             if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
 
-            var msg = '\u2728 *\u00A1Hola ' + cliente + '!* Te saludamos de *Dulce Bethel* \uD83C\uDF53\n\nPasamos por aqu\u00ED para recordarte que tienes un saldo pendiente de: *$' + monto.toFixed(2) + '*\n*Monto: ' + montoBs + ' Bs*\n\n----------------------------------\n\uD83D\uDCB3 *DATOS DE PAGO M\u00D3VIL:*\n* *Banco:* Bancamiga (0172)\n* *Tel\u00E9fono:* 04148007840\n* *C\u00E9dula:* 18401182\n----------------------------------\n\n\u00A1Muchas gracias por tu preferencia! \uD83D\uDE4F\n\n\uD83D\uDCF8 \u00A1S\u00EDguenos en Instagram para ver nuestras novedades y promociones exclusivas!\n\ud83d\udc49 https://www.instagram.com/dulcebethel.mgta';
+            var msg = '\u2728 *\u00A1Hola ' + cliente + '!* Te saludamos de *Dulce Bethel* \uD83C\uDF53\n\nPasamos por aqu\u00ED para recordarte que tienes un saldo pendiente de: *$' + monto.toFixed(2) + '*\n*Monto: ' + montoBs + ' Bs*\n\n----------------------------------\n\uD83D\uDCB3 *DATOS DE PAGO M\u00D3VIL:*\n* *Banco:* Bancamiga (0172)\n* *Tel\u00E9fono:* 04148007840\n* *C\u00E9dula:* 18401182\n----------------------------------\n\n\u00A1Muchas gracias por tu preferencia! \uD83D\uDE4F\n\n\u00A1S\u00EDguenos en Instagram para ver nuestras novedades y promociones exclusivas!\n\ud83d\udc49 https://www.instagram.com/dulcebethel.mgta';
             var url = "https://api.whatsapp.com/send?" + (cleanPhone ? "phone=" + cleanPhone + "&" : "") + "text=" + encodeURIComponent(msg); window.open(url, '_blank');
         }
 
@@ -3610,9 +3680,11 @@
 
 
         function deleteGasto(idx) {
-            if (!confirm('¿Estás seguro de eliminar esta compra?\n\nEsta acción es irreversible.')) return;
-            var btns = document.querySelectorAll('button[onclick^="deleteGasto"]'); btns.forEach(b => b.disabled = true);
-            google.script.run.withSuccessHandler(function (d) { procesarData(d); renderGastos(); showToast('Compra eliminada', 'success'); if (!document.getElementById('view-finanzas').classList.contains('hidden')) { renderEstadoCuenta(); } }).db_delGasto(idx, state.currentUser ? state.currentUser.id : "");
+            customConfirm('¿Estás seguro de eliminar esta compra?\n\nEsta acción es irreversible.', function(yes) {
+                if (!yes) return;
+                var btns = document.querySelectorAll('button[onclick^="deleteGasto"]'); btns.forEach(b => b.disabled = true);
+                google.script.run.withSuccessHandler(function (d) { procesarData(d); renderGastos(); showToast('Compra eliminada', 'success'); if (!document.getElementById('view-finanzas').classList.contains('hidden')) { renderEstadoCuenta(); } }).db_delGasto(idx, state.currentUser ? state.currentUser.id : "");
+            });
         }
 
         // --- SISTEMA DE MOVIMIENTOS Y NOTIFICACIONES (ACTUALIZADO AGRUPADO) ---
@@ -4083,7 +4155,8 @@
             if (!newName) return showToast("Debes ingresar un nuevo nombre", "warning");
             if (newName === oldName) return showToast("El nombre es idéntico", "warning");
 
-            if (!confirm(`¿Estás seguro de renombrar todas las ocurrencias de "${oldName}" por "${newName}"?\n\nEsto afectará Pedidos, Producción y Detalles de Pagos.`)) return;
+            customConfirm(`¿Estás seguro de renombrar todas las ocurrencias de "${oldName}" por "${newName}"?\n\nEsto afectará Pedidos, Producción y Detalles de Pagos.`, function(yes) {
+                if (!yes) return;
 
             // === UI OPTIMISTA: Actualización local inmediata ===
             // 1. Pedidos
@@ -4136,6 +4209,7 @@
                     refreshData(); // Revertir cambios locales trayendo data real
                 })
                 .db_updateProductName(oldName, newName, state.currentUser ? state.currentUser.id : "");
+            });
         }
 
         // --- ESTADO DE CUENTA ---
@@ -4349,7 +4423,7 @@
             if (!p.nombre) return; document.getElementById('btn-save-prod').disabled = true;
             google.script.run.withSuccessHandler(function (r) { procesarData(r); closeModal('modal-product'); document.getElementById('btn-save-prod').disabled = false; renderInventario(); renderPosProducts(); showToast("Guardado"); }).db_saveProduct(p, state.currentUser ? state.currentUser.id : "");
         }
-        function deleteProduct(i) { var n = state.productos[i].nombre; if (confirm('¿Eliminar ' + n + '?')) google.script.run.withSuccessHandler(function (r) { procesarData(r); renderInventario(); renderPosProducts(); showToast("Eliminado"); }).db_delProduct(n, state.currentUser ? state.currentUser.id : ""); }
+        function deleteProduct(i) { var n = state.productos[i].nombre; customConfirm('¿Eliminar ' + n + '?', function(yes) { if (yes) google.script.run.withSuccessHandler(function (r) { procesarData(r); renderInventario(); renderPosProducts(); showToast("Eliminado"); }).db_delProduct(n, state.currentUser ? state.currentUser.id : ""); }); }
 
         function renderFinanzasFiltro() {
             var qSet = {};
@@ -4639,7 +4713,8 @@
 
         function deleteMP(nombre) {
             if (state.currentUser && state.currentUser.permisosDelete === "NO") return showToast("No tienes permiso para eliminar", "error");
-            if (!confirm('¿Estás seguro de eliminar "' + nombre + '" del inventario? Esto no borrará las compras realizadas.')) return;
+            customConfirm('¿Estás seguro de eliminar "' + nombre + '" del inventario? Esto no borrará las compras realizadas.', function(yes) {
+                if (!yes) return;
 
             // Optimistic UI: Eliminar localmente de inmediato para que sea fluido
             state.materiaPrima = state.materiaPrima.filter(function (m) { return m.nombre !== nombre; });
@@ -4653,6 +4728,7 @@
                 showToast("Error al eliminar", "error");
                 refreshData(); // Re-sincronizar si falla
             }).db_delMateriaPrima(nombre);
+            });
         }
 
         // --- LOGIN LOGIC ---
@@ -4668,10 +4744,35 @@
             var btn = document.getElementById('btn-login');
             btn.disabled = true; btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> AUTENTICANDO...';
 
-            google.script.run.withSuccessHandler(function (res) {
+            google.script.run.withSuccessHandler(async function (res) {
                 btn.disabled = false; btn.innerHTML = '<span>ENTRAR</span><i class="fas fa-arrow-right"></i>';
                 if (res) {
                     state.currentUser = res;
+
+                    // --- BIOMETRIC CHECK AFTER LOGIN ---
+                    try {
+                        if(window.NativeBiometric) {
+                            var hasAsked = localStorage.getItem('db_huella_asked');
+                            if(!hasAsked) {
+                                const result = await window.NativeBiometric.isAvailable();
+                                if(result.isAvailable) {
+                                    customConfirm('¿Deseas usar tu huella dactilar para iniciar sesión más rápido en el futuro?', function(yes) {
+                                        localStorage.setItem('db_huella_asked', 'true');
+                                        if(yes) {
+                                            localStorage.setItem('db_huella_enabled', 'true');
+                                            localStorage.setItem('db_huella_u', user);
+                                            localStorage.setItem('db_huella_p', pass);
+                                            showToast('Ingreso con huella activado', 'success');
+                                        }
+                                    });
+                                }
+                            } else if (localStorage.getItem('db_huella_enabled') === 'true') {
+                                localStorage.setItem('db_huella_u', user);
+                                localStorage.setItem('db_huella_p', pass);
+                            }
+                        }
+                    } catch(e) { console.log(e); }
+                    // -----------------------------------
 
                     // Guardar sesión si "Recordarme" está marcado
                     try {
@@ -4952,7 +5053,8 @@
 
         function deleteUser(id) {
             if (id === state.currentUser.id) return showToast("No puedes eliminarte a ti mismo", "error");
-            if (!confirm("¿Eliminar usuario?")) return;
+            customConfirm("¿Eliminar usuario?", function(yes) {
+                if (!yes) return;
 
             // OPTIMISTA
             state.usuariosRaw = state.usuariosRaw.filter(u => u[0] !== id);
@@ -4962,10 +5064,264 @@
                 procesarData(d); renderUsuarios();
                 showToast("Usuario eliminado");
             }).db_delUser(id, state.currentUser.id);
+            });
         }
 
     </script>
     <div id="toast-container" class="fixed bottom-4 right-4 z-[150] flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- CUSTOM CONFIRM MODAL -->
+    <div id="custom-confirm-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-100 dark:border-slate-700 animate-welcome">
+            <div class="p-6 text-center">
+                <div class="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-500 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3 class="font-black text-xl text-slate-800 dark:text-white mb-2">¿Estás seguro?</h3>
+                <p id="custom-confirm-msg" class="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-6"></p>
+                <div class="flex gap-3">
+                    <button id="custom-confirm-no" class="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-100 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">NO</button>
+                    <button id="custom-confirm-yes" class="flex-1 py-3 rounded-xl font-black text-white bg-brand-500 hover:bg-brand-600 transition-colors shadow-md">SÍ, CONTINUAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL BORRAR RUTAS -->
+    <div id="modal-delete-ruta" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 dark:border-slate-700 animate-welcome">
+            <div class="p-6 border-b border-slate-100 dark:border-slate-700 relative">
+                <button onclick="closeModal('modal-delete-ruta')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fas fa-times text-xl"></i></button>
+                <h3 class="font-black text-xl text-slate-800 dark:text-white"><i class="fas fa-trash-alt text-red-500 mr-2"></i>Borrar Pedido</h3>
+                <p class="text-xs font-bold text-slate-500 dark:text-slate-400 mt-1">Selecciona los productos que deseas eliminar y devolver al inventario.</p>
+            </div>
+            <div class="p-6 max-h-64 overflow-y-auto custom-scroll space-y-2" id="delete-ruta-list">
+                <!-- Se llena con JS -->
+            </div>
+            <div class="p-6 border-t border-slate-100 dark:border-slate-700 flex flex-col gap-3">
+                <button onclick="selectAllRutaDelete()" class="w-full py-2 rounded-xl font-bold text-slate-600 bg-slate-100 dark:bg-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 text-sm"><i class="fas fa-check-double mr-2"></i>Seleccionar Todos</button>
+                <div class="flex gap-3 mt-2">
+                    <button onclick="closeModal('modal-delete-ruta')" class="flex-1 py-3 rounded-xl font-bold text-slate-600 bg-slate-200 dark:bg-slate-700 dark:text-slate-300">CANCELAR</button>
+                    <button onclick="confirmDeleteRuta()" class="flex-1 py-3 rounded-xl font-black text-white bg-red-500 shadow-md hover:bg-red-600">BORRAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PERFIL -->
+    <div id="modal-perfil" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 dark:border-slate-700 animate-welcome">
+            <div class="p-6 text-center border-b border-slate-100 dark:border-slate-700 relative">
+                <button onclick="closeModal('modal-perfil')" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"><i class="fas fa-times text-xl"></i></button>
+                <div class="w-16 h-16 bg-brand-500 text-white rounded-full mx-auto mb-3 flex items-center justify-center text-2xl shadow-lg">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h3 class="font-black text-xl text-slate-800 dark:text-white">Mi Perfil</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">Nombre Público</label>
+                    <input type="text" id="perfil-nombre" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 dark:text-white rounded-xl outline-none focus:border-brand-500 font-bold">
+                </div>
+                <div class="border-t border-slate-100 dark:border-slate-700 pt-4 mt-2">
+                    <p class="text-xs font-black text-slate-400 uppercase mb-2">Cambiar Contraseña</p>
+                    <input type="password" id="perfil-clave-vieja" placeholder="Contraseña actual" class="w-full px-3 py-2 mb-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 dark:text-white rounded-xl outline-none focus:border-brand-500 font-bold text-sm">
+                    <input type="password" id="perfil-clave-nueva" placeholder="Nueva contraseña (opcional)" class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600 dark:text-white rounded-xl outline-none focus:border-brand-500 font-bold text-sm">
+                </div>
+                <div class="border-t border-slate-100 dark:border-slate-700 pt-4 mt-2 hidden" id="biometric-toggle-container">
+                    <label class="flex items-center justify-between cursor-pointer group">
+                        <span class="text-sm font-bold text-slate-600 dark:text-slate-300"><i class="fas fa-fingerprint text-brand-500 mr-2 text-lg"></i>Ingreso con Huella</span>
+                        <div class="relative">
+                            <input type="checkbox" id="perfil-huella" class="sr-only peer" onchange="toggleHuella(this.checked)">
+                            <div class="w-10 h-5 bg-slate-200 dark:bg-slate-700 rounded-full peer-checked:bg-brand-500 transition-colors"></div>
+                            <div class="absolute left-0.5 top-0.5 bg-white dark:bg-slate-200 w-4 h-4 rounded-full shadow transition-transform peer-checked:translate-x-5"></div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            <div class="p-6 border-t border-slate-100 dark:border-slate-700 flex gap-3">
+                <button onclick="savePerfil()" class="flex-1 py-3 rounded-xl font-black text-white bg-brand-500 hover:bg-brand-600 shadow-md">GUARDAR CAMBIOS</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function openPerfilModal() {
+            if(!state.currentUser) return;
+            document.getElementById('perfil-nombre').value = state.currentUser.nombre || state.currentUser.usuario;
+            document.getElementById('perfil-clave-vieja').value = "";
+            document.getElementById('perfil-clave-nueva').value = "";
+            
+            // Check if biometric is available
+            try {
+                if(window.NativeBiometric) {
+                    const result = await window.NativeBiometric.isAvailable();
+                    if(result.isAvailable) {
+                        document.getElementById('biometric-toggle-container').classList.remove('hidden');
+                        var huellaEnabled = localStorage.getItem('db_huella_enabled') === 'true';
+                        document.getElementById('perfil-huella').checked = huellaEnabled;
+                    }
+                }
+            } catch(e) {
+                console.log("Biometric not available:", e);
+            }
+            
+            document.getElementById('modal-perfil').classList.remove('hidden');
+        }
+
+        function toggleHuella(checkbox) {
+            if(checkbox.checked) {
+                localStorage.setItem('db_huella_enabled', 'true');
+                showToast("Ingreso con huella activado", "success");
+            } else {
+                localStorage.removeItem('db_huella_enabled');
+                showToast("Ingreso con huella desactivado");
+            }
+        }
+
+        function savePerfil() {
+            if(!state.currentUser) return;
+            var nombre = document.getElementById('perfil-nombre').value.trim();
+            var claveVieja = document.getElementById('perfil-clave-vieja').value;
+            var claveNueva = document.getElementById('perfil-clave-nueva').value;
+            
+            if(!nombre) return showToast("El nombre no puede estar vacío", "warning");
+            if(!claveVieja) return showToast("Debes ingresar tu contraseña actual para guardar cambios", "warning");
+            
+            var btn = document.querySelector('#modal-perfil button.bg-brand-500');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...';
+            btn.disabled = true;
+            
+            google.script.run.withSuccessHandler(function(d) {
+                procesarData(d);
+                closeModal('modal-perfil');
+                showToast("Perfil actualizado correctamente", "success");
+                btn.innerHTML = 'GUARDAR CAMBIOS';
+                btn.disabled = false;
+                
+                // Update header natively
+                var me = state.usuariosRaw.find(u => u[0] === state.currentUser.id);
+                if(me) {
+                    state.currentUser.nombre = me[1];
+                    state.currentUser.usuario = me[1];
+                    document.getElementById('header-user-name').innerText = state.currentUser.usuario;
+                    document.getElementById('sidebar-user-name').innerText = state.currentUser.usuario;
+                    
+                    // actualiza sesion si esta recordada
+                    if(localStorage.getItem('db_session')) {
+                        var raw = JSON.parse(localStorage.getItem('db_session'));
+                        raw.user = state.currentUser;
+                        localStorage.setItem('db_session', JSON.stringify(raw));
+                    }
+                }
+            }).withFailureHandler(function(e) {
+                showToast(e.message || "Error al actualizar perfil", "error");
+                btn.innerHTML = 'GUARDAR CAMBIOS';
+                btn.disabled = false;
+            }).db_updateUserPerfil(state.currentUser.id, nombre, claveNueva, claveVieja);
+        }
+
+        var currentDeleteRutaMapKey = "";
+
+        function openDeleteRutaModal(mapKey) {
+            currentDeleteRutaMapKey = mapKey;
+            var listEl = document.getElementById('delete-ruta-list');
+            listEl.innerHTML = '';
+            
+            var cL = {};
+            state.pedidosRaw.forEach(function (p, i) {
+                var c = p[0];
+                if (!c) return;
+                var l = p[3] || 'Sin Zona';
+                var fechaOriginal = String(p[4]).split('T')[0];
+                var mapKeyLocal = l + '|' + fechaOriginal + '|' + c;
+                if(mapKeyLocal === mapKey) {
+                    if (!cL[mapKeyLocal]) cL[mapKeyLocal] = { i: [] };
+                    cL[mapKeyLocal].i.push({ idx: i, p: p[1], c: p[2] });
+                }
+            });
+
+            if(cL[mapKey] && cL[mapKey].i.length > 0) {
+                cL[mapKey].i.forEach(function(it) {
+                    var html = '<label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-600 hover:border-brand-300 dark:hover:border-brand-500 transition-colors">' +
+                               '<input type="checkbox" class="w-5 h-5 text-red-500 rounded border-slate-300 focus:ring-red-500 chk-delete-ruta" value="' + it.idx + '">' +
+                               '<span class="font-bold text-slate-700 dark:text-slate-200 text-sm flex-1">' + it.p + '</span>' +
+                               '<span class="font-black text-brand-600 dark:text-brand-400 text-sm">' + it.c + 'x</span>' +
+                               '</label>';
+                    listEl.insertAdjacentHTML('beforeend', html);
+                });
+            } else {
+                listEl.innerHTML = '<p class="text-center text-sm font-bold text-slate-400 py-4">No se encontraron productos.</p>';
+            }
+            
+            document.getElementById('modal-delete-ruta').classList.remove('hidden');
+        }
+
+        function selectAllRutaDelete() {
+            var chks = document.querySelectorAll('.chk-delete-ruta');
+            var allChecked = Array.from(chks).every(c => c.checked);
+            chks.forEach(c => c.checked = !allChecked);
+        }
+
+        function confirmDeleteRuta() {
+            var chks = document.querySelectorAll('.chk-delete-ruta:checked');
+            if(chks.length === 0) return showToast('Selecciona al menos un producto', 'warning');
+            
+            var indices = Array.from(chks).map(c => parseInt(c.value));
+            
+            customConfirm('¿Estás seguro de eliminar los productos seleccionados? Se devolverán al inventario.', function(yes) {
+                if(!yes) return;
+                
+                closeModal('modal-delete-ruta');
+                
+                // Optimistic UI updates
+                indices.sort((a,b) => b-a).forEach(idx => {
+                    var ped = state.pedidosRaw[idx];
+                    var prodName = ped[1];
+                    var qty = parseFloat(ped[2]) || 0;
+                    
+                    var prod = state.productos.find(p => p.nombre === prodName);
+                    if(prod) prod.stock = (parseFloat(prod.stock)||0) + qty;
+                    
+                    state.pedidosRaw.splice(idx, 1);
+                });
+                
+                renderRutas();
+                if (!document.getElementById('view-inventario').classList.contains('hidden')) renderInventario();
+                
+                google.script.run.withSuccessHandler(function(d) {
+                    procesarData(d);
+                    renderRutas();
+                    if (!document.getElementById('view-inventario').classList.contains('hidden')) renderInventario();
+                    showToast('Productos eliminados del pedido', 'success');
+                }).db_deletePedidosBulk(indices);
+            });
+        }
+
+        function customConfirm(msg, callback) {
+            var modal = document.getElementById('custom-confirm-modal');
+            document.getElementById('custom-confirm-msg').innerText = msg;
+            modal.classList.remove('hidden');
+            
+            var btnYes = document.getElementById('custom-confirm-yes');
+            var btnNo = document.getElementById('custom-confirm-no');
+            
+            // Reemplazar botones para limpiar eventos viejos
+            var newYes = btnYes.cloneNode(true);
+            var newNo = btnNo.cloneNode(true);
+            btnYes.parentNode.replaceChild(newYes, btnYes);
+            btnNo.parentNode.replaceChild(newNo, btnNo);
+            
+            newYes.onclick = function() {
+                modal.classList.add('hidden');
+                if(callback) callback(true);
+            };
+            newNo.onclick = function() {
+                modal.classList.add('hidden');
+                if(callback) callback(false);
+            };
+        }
+    </script>
 </body>
 
 </html>

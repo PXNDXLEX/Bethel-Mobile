@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Dulce Bethel</string>
-    <string name="title_activity_main">Dulce Bethel</string>
+    <string name="app_name">Bethel</string>
+    <string name="title_activity_main">Bethel</string>
     <string name="package_name">com.dulcebethel.app</string>
     <string name="custom_url_scheme">com.dulcebethel.app</string>
 </resources>

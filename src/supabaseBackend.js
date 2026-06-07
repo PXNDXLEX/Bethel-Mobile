@@ -1,4 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
+import { NativeBiometric } from '@capgo/capacitor-native-biometric';
+
+window.NativeBiometric = NativeBiometric;
 
 const supabaseUrl = 'https://mgxkfacmahqzfhqxljzn.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1neGtmYWNtYWhxemZocXhsanpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcyOTg4NjEsImV4cCI6MjA5Mjg3NDg2MX0.7rLYmEayPKuSFQCwM6uFmmcCeRVaC8liE6j076-XRIw'
@@ -135,6 +138,19 @@ async function db_updateClientPhone(clientName, newPhone, userId) {
     return await db_getData();
 }
 
+async function db_updateUserPerfil(userId, nombre, newClave, oldClave) {
+    const {data: user} = await supabase.from('usuarios').select('clave').eq('id', userId).single();
+    if(!user || user.clave !== oldClave) {
+        throw new Error("La contraseña actual es incorrecta");
+    }
+    
+    let payload = { usuario: nombre };
+    if(newClave) payload.clave = newClave;
+    
+    await supabase.from('usuarios').update(payload).eq('id', userId);
+    return await db_getData();
+}
+
 async function db_saveOrder(form, cart, userId) {
     let now = form.fecha ? form.fecha + "T12:00:00.000Z" : new Date().toISOString();
     let abonoRestante = parseFloat(form.abonadoUSD||0);
@@ -206,6 +222,25 @@ async function db_delGasto(idx, userId) {
     const {data} = await supabase.from('gastos').select('id').order('id', {ascending:true});
     if(data && data[idx]) {
         await supabase.from('gastos').delete().eq('id', data[idx].id);
+    }
+    return await db_getData();
+}
+
+async function db_deletePedidosBulk(indices) {
+    const {data} = await supabase.from('pedidos').select('id, producto, cantidad').order('id', {ascending:true});
+    if(!data) return await db_getData();
+    
+    for(const idx of indices) {
+        if(data[idx]) {
+            const row = data[idx];
+            // Restore stock
+            const {data: prod} = await supabase.from('productos').select('stock').eq('nombre', row.producto).single();
+            if(prod) {
+                await supabase.from('productos').update({stock: (parseFloat(prod.stock) || 0) + parseFloat(row.cantidad)}).eq('nombre', row.producto);
+            }
+            // Delete order
+            await supabase.from('pedidos').delete().eq('id', row.id);
+        }
     }
     return await db_getData();
 }
@@ -284,4 +319,6 @@ window.Backend = {
     db_saveReceta: async () => await db_getData(),
     db_delReceta: async () => await db_getData(),
     db_ajustarMateriaPrima: async () => await db_getData(),
+    db_deletePedidosBulk,
+    db_updateUserPerfil,
 };
