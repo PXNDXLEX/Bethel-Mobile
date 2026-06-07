@@ -2273,14 +2273,6 @@
                 renderFinanzasFiltro();
 
                 document.getElementById('loader').classList.add('opacity-0');
-                setTimeout(function () {
-                    document.getElementById('loader').classList.add('hidden');
-
-                    // --- SESION GUARDADA: intentar auto-login ---
-                    var savedSession = null;
-                    try {
-                        var raw = localStorage.getItem('db_session');
-                        if (raw) {
                 
                 function completeLoad() {
                     setTimeout(function () {
