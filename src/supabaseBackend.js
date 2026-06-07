@@ -195,33 +195,36 @@ async function db_delProduct(n, userId) {
     return await db_getData();
 }
 
+function createGoogleScriptRun() {
+    function buildRunner(successCb, failureCb) {
+        return new Proxy({}, {
+            get: function(target, prop) {
+                if (prop === 'withSuccessHandler') {
+                    return function(cb) { return buildRunner(cb, failureCb); };
+                }
+                if (prop === 'withFailureHandler') {
+                    return function(cb) { return buildRunner(successCb, cb); };
+                }
+                return async function(...args) {
+                    try {
+                        const res = await window.Backend[prop](...args);
+                        if (successCb) successCb(res);
+                    } catch(e) {
+                        console.error("Backend Error:", prop, e);
+                        if (failureCb) failureCb(e);
+                        else throw e;
+                    }
+                }
+            }
+        });
+    }
+    return buildRunner(null, null);
+}
+
 // Export google globally
 window.google = {
     script: {
-        run: new Proxy({}, {
-            get: function(target, prop) {
-                if(prop === 'withSuccessHandler') {
-                    return function(callback) {
-                        return new Proxy({}, {
-                            get: function(t, method) {
-                                return async function(...args) {
-                                    try {
-                                        // console.log("Calling", method, args);
-                                        const res = await window.Backend[method](...args);
-                                        if(callback) callback(res);
-                                    } catch(e) {
-                                        console.error("Backend Error:", method, e);
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-                return async function(...args) {
-                    await window.Backend[prop](...args);
-                }
-            }
-        })
+        run: createGoogleScriptRun()
     }
 };
 
