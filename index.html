@@ -4049,7 +4049,8 @@
                         userStats[uId].productos[prodName] += prodQty;
                     }
                 }
-            });
+            }
+        });
 
             // 2. Renderizar lista lateral
             var statsArr = Object.values(userStats).sort((a, b) => b.monto - a.monto);
