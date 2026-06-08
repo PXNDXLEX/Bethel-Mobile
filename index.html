@@ -5282,8 +5282,10 @@
             var chks = document.querySelectorAll('.chk-delete-ruta:checked');
             if(chks.length === 0) return showToast('Selecciona al menos un producto', 'warning');
             
-            var ids = Array.from(chks).map(c => parseInt(c.value));
-            console.log("[FRONTEND] confirmDeleteRuta IDs:", ids);
+            var ids = Array.from(chks).map(c => c.value); // raw strings
+            var idsNum = ids.map(v => Number(v));
+            alert("[DEBUG] IDs raw: " + ids.join(', ') + "\nIDs num: " + idsNum.join(', '));
+            console.log("[FRONTEND] confirmDeleteRuta IDs raw:", ids, "parsed:", idsNum);
             
             // Cerrar el modal de selección antes de mostrar el de confirmación
             closeModal('modal-delete-ruta');
@@ -5294,7 +5296,8 @@
                 
                 // Optimistic UI updates
                 ids.forEach(id => {
-                    var idx = state.pedidosRaw.findIndex(p => p[15] === id);
+                    var idN = Number(id);
+                    var idx = state.pedidosRaw.findIndex(p => p[15] === idN || p[15] === id);
                     if(idx !== -1) {
                         var ped = state.pedidosRaw[idx];
                         var prodName = ped[1];
@@ -5316,11 +5319,12 @@
                     alert("ERROR AL BORRAR: " + err.message);
                     showToast('Error: ' + err.message, 'error');
                 }).withSuccessHandler(function(d) {
+                    alert("[OK] Backend retorno " + (d && d.pedidosRaw ? d.pedidosRaw.length : '?') + " pedidos");
                     procesarData(d);
                     renderRutas();
                     if (!document.getElementById('view-inventario').classList.contains('hidden')) renderInventario();
                     showToast('Productos eliminados del pedido', 'success');
-                }).db_deletePedidosBulk(ids);
+                }).db_deletePedidosBulk(idsNum);
             });
         }
 
