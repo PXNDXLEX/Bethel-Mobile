@@ -394,6 +394,9 @@
                 <button onclick="switchTab('usuarios')" id="sidebar-btn-usuarios"
                     class="tab-btn-mobile w-full text-left py-3 px-4 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors hidden"><i
                         class="fas fa-users-cog w-6"></i> Usuarios</button>
+                <button onclick="switchTab('auditoria')" id="sidebar-btn-auditoria"
+                    class="tab-btn-mobile w-full text-left py-3 px-4 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors hidden"><i
+                        class="fas fa-history w-6"></i> Auditoría</button>
             </nav>
 
             <!-- LOGOUT SECTION SIDEBAR -->
@@ -526,6 +529,9 @@
                 <button onclick="switchTab('usuarios')" id="nav-btn-usuarios"
                     class="tab-btn-desktop py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 whitespace-nowrap"><i
                         class="fas fa-users-cog mr-1"></i> Usuarios</button>
+                <button onclick="switchTab('auditoria')" id="nav-btn-auditoria"
+                    class="tab-btn-desktop py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 whitespace-nowrap hidden"><i
+                        class="fas fa-history mr-1"></i> Auditoría</button>
             </nav>
         </header>
 
@@ -539,6 +545,17 @@
             </div>
             <div id="notif-list" class="max-h-72 overflow-y-auto p-0 custom-scroll space-y-0"></div>
         </div>
+
+        <!-- VISTA: AUDITORÍA -->
+    <div id="view-auditoria" class="view-section hidden max-w-7xl mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-3xl font-black text-slate-800 dark:text-white tracking-tight">Registro de Auditoría</h2>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-1 mb-6 flex bg-slate-100 dark:bg-slate-900 rounded-lg p-1 w-fit">
+            <button class="px-4 py-1.5 text-sm font-bold rounded-md bg-white dark:bg-slate-800 text-brand-600 dark:text-brand-400 shadow shadow-sm">Borrados / Ediciones</button>
+        </div>
+        <div id="lista-auditoria" class="space-y-4"></div>
+    </div>
 
         <!-- MODAL USUARIOS -->
         <div id="modal-user"
@@ -2376,16 +2393,17 @@
         function switchTab(tabId) {
             if (!state.currentUser) return;
 
-            // Bloqueo estricto de la pestaña Usuarios (solo Admin)
-            if (tabId === 'usuarios' && state.currentUser.rol !== 'Admin') {
+            // Bloqueo estricto de la pestaña Usuarios y Auditoria (solo Admin)
+            if ((tabId === 'usuarios' || tabId === 'auditoria') && state.currentUser.rol !== 'Admin') {
                 return showToast("Acceso denegado: Solo administradores", "error");
             }
 
-            if (state.currentUser.permisosTabs !== "*" && state.currentUser.permisosTabs.indexOf(tabId) === -1) {
+            if (state.currentUser.permisosTabs !== "*" && state.currentUser.permisosTabs.indexOf(tabId) === -1 && tabId !== 'auditoria') {
                 return showToast("No tienes permiso para ver esta pestaña", "warning");
             }
             if (tabId === 'usuarios') renderUsuarios();
             if (tabId === 'recetario') renderRecetario();
+            if (tabId === 'auditoria') renderAuditoria();
 
             var sections = document.querySelectorAll('.view-section');
             for (var i = 0; i < sections.length; i++) sections[i].classList.add('hidden');
@@ -3497,10 +3515,10 @@
                             '<div class="flex flex-wrap gap-1 mt-1.5">' + fechaChip + lugarChip + '</div>' +
                             '</div>' +
                             '<div class="flex gap-2 items-stretch">' + btnDelete +
-                            '<button onclick="togE(this, \'' + entry.id + '\', \'' + (entry.e ? 'Pendiente' : 'Entregado') + '\')" class="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-all duration-300 transform active:scale-90 flex items-center justify-center min-w-[100px] outline-none flex-shrink-0 ' + btnCol + '">' + btnTxt + '</button>' +
+                            '<button onclick="togE(this, \'' + entry.id + '\', \'' + (entry.e ? 'Pendiente' : 'Entregado') + '\', \'' + c.replace(/'/g, "\\'") + '\', \'' + entry.fecha + '\', \'' + l.replace(/'/g, "\\'") + '\')" class="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-all duration-300 transform active:scale-90 flex items-center justify-center min-w-[100px] outline-none flex-shrink-0 ' + btnCol + '">' + btnTxt + '</button>' +
                             '</div></div>' +
                             '<ul class="text-sm mb-3 mt-2 space-y-0.5">' + liHTML + '</ul>' +
-                            '<input type="text" value="' + (entry.n || '') + '" onchange="updN(\'' + entry.id + '\', this.value)" placeholder="Añadir nota..." class="w-full text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500 font-semibold transition-all duration-300">' +
+                            '<input type="text" value="' + (entry.n || '') + '" onchange="updN(\'' + entry.id + '\', this.value, \'' + c.replace(/'/g, "\\'") + '\', \'' + entry.fecha + '\', \'' + l.replace(/'/g, "\\'") + '\')" placeholder="Añadir nota..." class="w-full text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500 font-semibold transition-all duration-300">' +
                             uTag +
                             '</div>';
                     }).join('');
@@ -3516,7 +3534,7 @@
             }).join('<hr class="my-6 border-slate-200 dark:border-slate-700">');
         }
 
-        function togE(btn, id, v) {
+        function togE(btn, id, v, cliente, fecha, lugar) {
             var isEntregado = (v === 'Entregado');
 
             // === ACTUALIZACIÓN OPTIMISTA: cambiar UI al instante ===
@@ -3529,11 +3547,21 @@
             btn.innerHTML = isEntregado ? '<i class="fas fa-check mr-1"></i> Entregado' : 'Entregar';
             btn.className = 'text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-all duration-300 transform active:scale-90 flex items-center justify-center min-w-[100px] outline-none ml-2 flex-shrink-0 ' +
                 (isEntregado ? 'bg-slate-400 dark:bg-slate-600' : 'bg-brand-500 hover:bg-brand-600 shadow-md hover:shadow-lg');
-            // Invertir el onclick para el siguiente toque
-            btn.setAttribute('onclick', "togE(this, '" + id + "', '" + (isEntregado ? 'Pendiente' : 'Entregado') + "')");
+            
+            var cEscaped = cliente ? cliente.replace(/'/g, "\\'") : '';
+            var lEscaped = lugar ? lugar.replace(/'/g, "\\'") : '';
+            btn.setAttribute('onclick', "togE(this, '" + id + "', '" + (isEntregado ? 'Pendiente' : 'Entregado') + "', '" + cEscaped + "', '" + fecha + "', '" + lEscaped + "')");
 
-            // Actualizar state.pedidosRaw localmente
-            if (state.pedidosRaw[id]) state.pedidosRaw[id][7] = v;
+            // Actualizar state.pedidosRaw localmente para TODO EL GRUPO
+            if (cliente && fecha && lugar) {
+                state.pedidosRaw.forEach(p => {
+                    if (p[0] === cliente && String(p[4]).startsWith(fecha) && p[3] === lugar) {
+                        p[7] = v;
+                    }
+                });
+            } else if (state.pedidosRaw[id]) {
+                state.pedidosRaw[id][7] = v;
+            }
 
             // Sincronizar con servidor en segundo plano (sin bloquear)
             google.script.run
@@ -3542,10 +3570,22 @@
                     showToast('Error al guardar estado: ' + err.message, 'error');
                     renderRutas(); // revertir si falla
                 })
-                .db_updateCell(id, 8, v);
+                .db_updateCell(id, 8, v, cliente, fecha, lugar);
         }
 
-        function updN(id, t) { google.script.run.db_updateCell(id, 10, t); }
+        function updN(id, t, cliente, fecha, lugar) { 
+            // Actualizar notas localmente
+            if (cliente && fecha && lugar) {
+                state.pedidosRaw.forEach(p => {
+                    if (p[0] === cliente && String(p[4]).startsWith(fecha) && p[3] === lugar) {
+                        p[9] = t; // columna 10 es index 9 en state.pedidosRaw
+                    }
+                });
+            } else if (state.pedidosRaw[id]) {
+                state.pedidosRaw[id][9] = t;
+            }
+            google.script.run.db_updateCell(id, 10, t, cliente, fecha, lugar); 
+        }
 
         function printComandaZona(zona) {
             var d = document.getElementById('ruta-fecha').value;
@@ -4861,11 +4901,20 @@
             if (sidebarName) sidebarName.textContent = state.currentUser.nombre;
             if (sidebarRol) sidebarRol.textContent = rol;
 
-            // 1. Mostrar/Ocultar Botones de Pestaña Principal 'Usuarios'
+            // 1. Mostrar/Ocultar Botones de Pestaña Principal 'Usuarios' y 'Auditoría'
             var btnDesk = document.getElementById('nav-btn-usuarios');
             var btnSide = document.getElementById('sidebar-btn-usuarios');
+            var btnMob = document.getElementById('nav-mobile-usuarios');
             if (btnDesk) btnDesk.classList.toggle('hidden', !isAdmin);
             if (btnSide) btnSide.classList.toggle('hidden', !isAdmin);
+            if (btnMob) btnMob.classList.toggle('hidden', !isAdmin);
+            
+            var audDesk = document.getElementById('nav-btn-auditoria');
+            var audSide = document.getElementById('sidebar-btn-auditoria');
+            var audMob = document.getElementById('nav-mobile-auditoria');
+            if (audDesk) audDesk.classList.toggle('hidden', !isAdmin);
+            if (audSide) audSide.classList.toggle('hidden', !isAdmin);
+            if (audMob) audMob.classList.toggle('hidden', !isAdmin);
 
             // 2. Mostrar/Ocultar Sub-pestañas Administrativas en Finanzas
             var subGestion = document.getElementById('btn-fin-gestion');
@@ -4987,6 +5036,56 @@
                     b.className = 'tag-permiso px-3 py-1.5 rounded-full border text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 transition-all bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-brand-300';
                 });
             }
+        }
+
+        function renderAuditoria() {
+            var container = document.getElementById('lista-auditoria');
+            if (!state.auditoriaRaw || state.auditoriaRaw.length === 0) {
+                container.innerHTML = '<div class="text-center p-10 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700"><p class="font-bold text-slate-500 dark:text-slate-400">No hay registros de auditoría</p></div>';
+                return;
+            }
+            container.innerHTML = state.auditoriaRaw.map(function (a) {
+                var fecha = new Date(a[0]).toLocaleString('es-ES');
+                var user = state.userNames && state.userNames[a[1]] ? state.userNames[a[1]] : (a[1] || 'Sistema');
+                var accion = a[2];
+                var detalleObj = {};
+                try { detalleObj = JSON.parse(a[3]); } catch (e) { }
+                var detalleStr = '';
+                if (accion === 'BORRADO_PEDIDO' && detalleObj.pedidos) {
+                    detalleStr = detalleObj.pedidos.map(p => p.cliente + ' (' + p.producto + ' x' + p.cantidad + ')').join('<br>');
+                } else {
+                    detalleStr = a[3] || '';
+                }
+                
+                var btnRevert = '';
+                if (accion === 'BORRADO_PEDIDO') {
+                    btnRevert = '<button onclick="revertAudit(' + a[4] + ')" class="text-xs bg-yellow-100 hover:bg-yellow-200 text-yellow-700 font-bold px-3 py-1.5 rounded-lg transition-colors ml-auto shadow-sm flex items-center"><i class="fas fa-undo mr-1"></i> Revertir</button>';
+                }
+                
+                return '<div class="bg-white dark:bg-slate-800/80 rounded-xl p-4 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">' +
+                    '<div>' +
+                    '<div class="flex items-center gap-2 mb-1"><span class="text-xs font-bold px-2 py-0.5 rounded bg-brand-100 text-brand-700 dark:bg-brand-900/50 dark:text-brand-400">' + accion + '</span><span class="text-xs text-slate-400 font-bold"><i class="fas fa-clock mr-1"></i> ' + fecha + '</span></div>' +
+                    '<div class="text-sm font-semibold text-slate-700 dark:text-slate-300">Usuario: ' + user + '</div>' +
+                    '<div class="text-xs text-slate-500 dark:text-slate-400 mt-1">' + detalleStr + '</div>' +
+                    '</div>' + btnRevert + '</div>';
+            }).join('');
+        }
+
+        function revertAudit(id) {
+            customConfirm('¿Seguro que deseas revertir este borrado? Los pedidos volverán a estar activos y se descontará el stock nuevamente.', function(yes) {
+                if (!yes) return;
+                showToast("Revertiendo...", "warning");
+                google.script.run.withSuccessHandler(function(d) {
+                    procesarData(d);
+                    renderAuditoria();
+                    renderRutas();
+                    var viewInv2 = document.getElementById('view-inventario');
+                    if (viewInv2 && !viewInv2.classList.contains('hidden')) renderInventario();
+                    showToast("Borrado revertido", "success");
+                }).withFailureHandler(function(err) {
+                    showToast("Error al revertir: " + err.message, "error");
+                }).db_revertAudit(id);
+            });
         }
 
         function renderUsuarios() {
