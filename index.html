@@ -4029,12 +4029,14 @@
                 }
 
                 if (match) {
-                    var uId = p[14] || "";
-                    if (!userStats[uId]) uId = ""; // fallback para ventas sin nombre o usuarios eliminados
-                    if (userStats[uId]) {
-                        userStats[uId].ventas++;
-                        var total = parseFloat(String(p[5]).replace(',', '.')) || 0;
-                        userStats[uId].monto += total;
+                    var abono = parseFloat(p[11]) || 0;
+                    if (abono > 0) {
+                        var uId = p[14] || "";
+                        if (!userStats[uId]) uId = ""; // fallback para ventas sin nombre o usuarios eliminados
+                        if (userStats[uId]) {
+                            userStats[uId].ventas++;
+                            var total = abono; // Usar el abono como el monto real pagado
+                            userStats[uId].monto += total;
 
                         if (period !== 'TODO') {
                             if (!userStats[uId].series[day]) userStats[uId].series[day] = 0;
