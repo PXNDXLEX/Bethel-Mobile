@@ -249,6 +249,7 @@ async function db_deletePedidosBulk(ids) {
             }
         } catch(e) {
             console.error("[BACKEND] Exception processing id:", id, e);
+            throw new Error("Fallo interno al borrar ID " + id + ": " + (e.message || JSON.stringify(e)));
         }
     }
     return await db_getData();

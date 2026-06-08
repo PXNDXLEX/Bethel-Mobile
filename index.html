@@ -5299,7 +5299,10 @@
                 renderRutas();
                 if (!document.getElementById('view-inventario').classList.contains('hidden')) renderInventario();
                 
-                google.script.run.withSuccessHandler(function(d) {
+                google.script.run.withFailureHandler(function(err) {
+                    alert("ERROR AL BORRAR: " + err.message);
+                    showToast('Error: ' + err.message, 'error');
+                }).withSuccessHandler(function(d) {
                     procesarData(d);
                     renderRutas();
                     if (!document.getElementById('view-inventario').classList.contains('hidden')) renderInventario();
