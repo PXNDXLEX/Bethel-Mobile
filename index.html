@@ -2270,10 +2270,7 @@
                 renderMateriaPrima();
                 renderRecetario();
                 renderNotifs();
-                renderFinanzasFiltro();
 
-                document.getElementById('loader').classList.add('opacity-0');
-                
                 function completeLoad() {
                     setTimeout(function () {
                         document.getElementById('loader').classList.add('hidden');
@@ -2299,58 +2296,72 @@
                             showToast('¡Bienvenido de vuelta, ' + savedSession.nombre + '!', 'success');
                             applyPermissions();
                         } else {
-                            try {
-                                if (localStorage.getItem('db_session')) {
-                                    document.getElementById('btn-logout-remembered').style.display = 'inline-block';
-                                }
-                            } catch(e) {}
                             showLogin();
                         }
                     }, 700);
                 }
 
-                // CHECK BIOMETRIC FIRST ON OPEN
+                // --- INICIO: verificar sesion o pedir biometria (solo Android) ---
                 (async () => {
-                    var isNative = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+                    var isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+                    var huellaEnabled = localStorage.getItem('db_huella_enabled') === 'true';
+                    var huellaU = localStorage.getItem('db_huella_u');
+                    var huellaP = localStorage.getItem('db_huella_p');
+
+                    // Verificar si hay sesion guardada valida
+                    var savedSession = null;
                     try {
-                        if(isNative && window.NativeBiometric && localStorage.getItem('db_huella_enabled') === 'true' && localStorage.getItem('db_huella_u')) {
-                            const verified = await window.NativeBiometric.verifyIdentity({
-                                reason: "Autentícate para ingresar a Bethel",
-                                title: "Desbloqueo Biométrico"
-                            });
-                            
-                            if(verified) {
-                                var sessionValid = false;
-                                try {
-                                    var raw = localStorage.getItem('db_session');
-                                    if(raw) {
-                                        var parsed = JSON.parse(raw);
-                                        if (parsed && parsed.expiry && Date.now() < parsed.expiry) {
-                                            sessionValid = true;
-                                        }
-                                    }
-                                } catch(e) {}
-                                
-                                if (sessionValid) {
-                                    completeLoad();
-                                } else {
-                                    var hu = localStorage.getItem('db_huella_u');
-                                    var hp = localStorage.getItem('db_huella_p');
-                                    document.getElementById('login-user').value = hu;
-                                    document.getElementById('login-pass').value = hp;
-                                    document.getElementById('loader').classList.remove('hidden', 'opacity-0');
-                                    attemptLogin();
-                                }
-                                return; 
+                        var raw = localStorage.getItem('db_session');
+                        if (raw) {
+                            var parsed = JSON.parse(raw);
+                            if (parsed && parsed.expiry && Date.now() < parsed.expiry) {
+                                savedSession = parsed.user;
                             } else {
                                 localStorage.removeItem('db_session');
                             }
                         }
-                    } catch(e) { 
-                        console.log("Biometric error or cancelled", e); 
-                        localStorage.removeItem('db_session');
+                    } catch(e) { localStorage.removeItem('db_session'); }
+
+                    if (isNative && window.NativeBiometric && huellaEnabled && huellaU && huellaP) {
+                        try {
+                            await window.NativeBiometric.verifyIdentity({
+                                reason: "Autentícate para ingresar a Bethel",
+                                title: "Desbloqueo Biométrico"
+                            });
+                            // Biometria exitosa
+                            if (savedSession) {
+                                // Sesion valida: entrar directo
+                                completeLoad();
+                            } else {
+                                // Sin sesion valida: login silencioso en segundo plano
+                                document.getElementById('loader').classList.remove('hidden');
+                                document.getElementById('loader').classList.remove('opacity-0');
+                                google.script.run.withSuccessHandler(function(res) {
+                                    document.getElementById('loader').classList.add('hidden');
+                                    if(res) {
+                                        state.currentUser = res;
+                                        try {
+                                            localStorage.setItem('db_session', JSON.stringify({ user: res, expiry: Date.now() + (7*24*60*60*1000) }));
+                                        } catch(e) {}
+                                        var mainApp = document.getElementById('main-app');
+                                        mainApp.classList.remove('hidden');
+                                        mainApp.classList.add('animate-welcome');
+                                        applyPermissions();
+                                        showToast('¡Bienvenido, ' + res.nombre + '!', 'success');
+                                    } else {
+                                        showLogin();
+                                    }
+                                }).withFailureHandler(function() {
+                                    showLogin();
+                                }).db_login(huellaU, huellaP);
+                            }
+                        } catch(bioErr) {
+                            console.log("Biometric cancelled", bioErr);
+                            completeLoad();
+                        }
+                    } else {
+                        completeLoad();
                     }
-                    completeLoad();
                 })();
 
             }).withFailureHandler(function (err) {
@@ -5081,7 +5092,7 @@
     <div id="toast-container" class="fixed bottom-4 right-4 z-[150] flex flex-col gap-2 pointer-events-none"></div>
 
     <!-- CUSTOM CONFIRM MODAL -->
-    <div id="custom-confirm-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[200] hidden flex items-center justify-center p-4">
+    <div id="custom-confirm-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[500] hidden flex items-center justify-center p-4">
         <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-sm overflow-hidden border border-slate-100 dark:border-slate-700 animate-welcome">
             <div class="p-6 text-center">
                 <div class="w-16 h-16 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-500 rounded-full mx-auto mb-4 flex items-center justify-center text-3xl">
@@ -5274,10 +5285,12 @@
             var ids = Array.from(chks).map(c => parseInt(c.value));
             console.log("[FRONTEND] confirmDeleteRuta IDs:", ids);
             
+            // Cerrar el modal de selección antes de mostrar el de confirmación
+            closeModal('modal-delete-ruta');
+            
             customConfirm('¿Estás seguro de eliminar los productos seleccionados? Se devolverán al inventario.', function(yes) {
                 if(!yes) return;
                 
-                closeModal('modal-delete-ruta');
                 
                 // Optimistic UI updates
                 ids.forEach(id => {
