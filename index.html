@@ -2311,7 +2311,7 @@
 
                 // CHECK BIOMETRIC FIRST ON OPEN
                 (async () => {
-                    var isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
+                    var isNative = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
                     try {
                         if(isNative && window.NativeBiometric && localStorage.getItem('db_huella_enabled') === 'true' && localStorage.getItem('db_huella_u')) {
                             const verified = await window.NativeBiometric.verifyIdentity({
@@ -5272,6 +5272,7 @@
             if(chks.length === 0) return showToast('Selecciona al menos un producto', 'warning');
             
             var ids = Array.from(chks).map(c => parseInt(c.value));
+            console.log("[FRONTEND] confirmDeleteRuta IDs:", ids);
             
             customConfirm('¿Estás seguro de eliminar los productos seleccionados? Se devolverán al inventario.', function(yes) {
                 if(!yes) return;
@@ -5290,6 +5291,8 @@
                         if(prod) prod.stock = (parseFloat(prod.stock)||0) + qty;
                         
                         state.pedidosRaw.splice(idx, 1);
+                    } else {
+                        console.warn("[FRONTEND] Could not find row for optimistic update. ID:", id);
                     }
                 });
                 
