@@ -2752,10 +2752,29 @@
             var fechas = Object.keys(grupos).sort().reverse();
             var html = '';
             fechas.forEach(function (f) {
-                var itemsHtml = grupos[f].map(function (p) { return '<tr class="border-b border-slate-50 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"><td class="p-3 text-slate-800 dark:text-slate-200 font-bold pl-6">' + p[1] + '</td><td class="p-3 text-center font-black text-brand-600 dark:text-brand-400 w-40">+' + p[2] + '</td></tr>'; }).join('');
+                var itemsHtml = grupos[f].map(function (p) { 
+                    var delBtn = (state.currentUser && state.currentUser.permisosDelete === 'SI' && p[4]) ? '<button onclick="deleteProduccion(\'' + p[4] + '\', \'' + String(p[1]).replace(/'/g, "\\'") + '\')" class="text-red-500 hover:text-red-700 ml-3"><i class="fas fa-trash-alt"></i></button>' : '';
+                    return '<tr class="border-b border-slate-50 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"><td class="p-3 text-slate-800 dark:text-slate-200 font-bold pl-6">' + p[1] + '</td><td class="p-3 text-center font-black text-brand-600 dark:text-brand-400 w-40">+' + p[2] + delBtn + '</td></tr>'; 
+                }).join('');
                 html += '<div class="mb-6 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><div class="bg-slate-100 dark:bg-slate-900 p-4 flex justify-between items-center"><h3 class="font-bold text-slate-700 dark:text-slate-200"><i class="fas fa-calendar-alt text-brand-500 mr-2"></i>' + f + '</h3><span class="text-xs font-bold bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 px-3 py-1 rounded-lg border border-brand-200 dark:border-brand-700/50 shadow-sm">' + grupos[f].length + ' elaboraciones</span></div><div class="overflow-x-auto"><table class="w-full text-left text-sm"><thead class="text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700"><tr><th class="p-3 pl-6">Producto Elaborado</th><th class="p-3 text-center w-40">Cantidad Total</th></tr></thead><tbody>' + itemsHtml + '</tbody></table></div></div>';
             });
             document.getElementById('lista-produccion-agrupada').innerHTML = html || '<div class="text-center p-10 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700"><p class="font-bold text-slate-500 dark:text-slate-400">Aún no hay producciones registradas</p></div>';
+        }
+
+        function deleteProduccion(id, nombre) {
+            customConfirm('¿Seguro que deseas eliminar la producción de ' + nombre + '? El stock del producto disminuirá y el de la materia prima usada volverá al inventario.', function(yes) {
+                if (!yes) return;
+                showToast("Borrando producción...", "warning");
+                google.script.run.withSuccessHandler(function(d) {
+                    procesarData(d);
+                    renderProduccion();
+                    var viewInv = document.getElementById('view-inventario');
+                    if (viewInv && !viewInv.classList.contains('hidden')) renderInventario();
+                    showToast("Producción eliminada", "success");
+                }).withFailureHandler(function(err) {
+                    showToast("Error: " + err.message, "error");
+                }).db_delProduccion(id, state.currentUser ? state.currentUser.id : null);
+            });
         }
 
         function openProduccionModal() {
@@ -3287,6 +3306,7 @@
             state.usuariosRaw = d.usuariosRaw || [];
             state.historialMPRaw = d.historialMPRaw || [];
             state.recetarioRaw = d.recetarioRaw || [];
+            state.auditoriaRaw = d.auditoriaRaw || [];
 
             state.recetas = {};
             state.recetarioRaw.forEach(function (r) {
@@ -4006,6 +4026,7 @@
 
                 if (match) {
                     var uId = p[14] || "";
+                    if (!userStats[uId]) uId = ""; // fallback para ventas sin nombre o usuarios eliminados
                     if (userStats[uId]) {
                         userStats[uId].ventas++;
                         var total = parseFloat(String(p[5]).replace(',', '.')) || 0;
@@ -5422,7 +5443,7 @@
                     var viewInv2 = document.getElementById('view-inventario');
                     if (viewInv2 && !viewInv2.classList.contains('hidden')) renderInventario();
                     showToast('Productos eliminados del pedido', 'success');
-                }).db_deletePedidosBulk(idsNum);
+                }).db_deletePedidosBulk(idsNum, state.currentUser ? state.currentUser.id : null);
             });
         }
 

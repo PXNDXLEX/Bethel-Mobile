@@ -15,7 +15,7 @@ const mappers = {
     pedidos: (d) => [d.cliente, d.producto, d.cantidad, d.lugar, d.fecha, d.total, d.precio_u, d.estado, d.num_entrega, d.notas, d.bcv, d.abono, d.deuda, d.telefono, d.usuario_id, d.id],
     pagos: (d) => [d.fecha, d.cliente, d.monto_usd, d.monto_bs, d.tasa_bcv, d.ref_pago, d.nota, d.detalles, d.num_entrega, d.usuario_id],
     gastos: (d) => [d.fecha, d.descripcion, d.cantidad, d.precio_unit, d.total, d.unidad, d.usuario_id, d.tipo_empaque, d.cant_por_empaque, d.cant_empaques],
-    produccion: (d) => [d.fecha, d.producto, d.cantidad, d.usuario_id],
+    produccion: (d) => [d.fecha, d.producto, d.cantidad, d.usuario_id, d.id],
     movimientos: (d) => [d.fecha, d.tipo, d.categoria, d.persona, d.descripcion, d.monto_usd, d.usuario_id],
     materia_prima: (d) => [d.nombre, d.tipo, d.unidad, d.stock, d.stock_minimo, d.notificar, d.usuario_id],
     productos: (d) => [d.nombre, d.precio, d.stock, d.precio_mayor, d.usuario_id],
@@ -452,6 +452,56 @@ async function db_saveGastosBatch(gastosCart, userId) {
     return await db_getData();
 }
 
+async function db_delProduccion(id, userId) {
+    // 1. Get the record
+    const { data: pRec } = await supabase.from('produccion').select('*').eq('id', id).maybeSingle();
+    if (!pRec) return await db_getData();
+
+    // 2. Subtract product stock
+    const { data: prod } = await supabase.from('productos').select('stock').eq('nombre', pRec.producto).maybeSingle();
+    if (prod) {
+        await supabase.from('productos').update({ stock: (parseFloat(prod.stock)||0) - (parseFloat(pRec.cantidad)||0) }).eq('nombre', pRec.producto);
+    }
+
+    // 3. Revert MP stock (add back)
+    const { data: recetaRows } = await supabase.from('recetario').select('*').eq('producto', pRec.producto);
+    if (recetaRows && recetaRows.length > 0) {
+        for (const ing of recetaRows) {
+            const required = (parseFloat(ing.cantidad)||0) * (parseFloat(pRec.cantidad)||0);
+            const { data: mp } = await supabase.from('materia_prima').select('stock').eq('nombre', ing.ingrediente).maybeSingle();
+            if (mp) {
+                const stockAnt = parseFloat(mp.stock)||0;
+                const newStock = stockAnt + required;
+                await supabase.from('materia_prima').update({ stock: newStock }).eq('nombre', ing.ingrediente);
+                
+                await supabase.from('historial_mp').insert({
+                    fecha: new Date().toISOString(),
+                    usuario: userId,
+                    insumo: ing.ingrediente,
+                    motivo: `Reversión de Producción eliminada: ${pRec.producto}`,
+                    cantidad: required,
+                    unidad: ing.unidad || '',
+                    stock_ant: stockAnt,
+                    stock_nue: newStock
+                });
+            }
+        }
+    }
+
+    // 4. Delete the record
+    await supabase.from('produccion').delete().eq('id', id);
+
+    // 5. Add audit
+    await supabase.from('auditoria').insert({
+        fecha: new Date().toISOString(),
+        usuario_id: userId,
+        accion: 'BORRADO_PRODUCCION',
+        detalle: `Producción eliminada: ${pRec.producto} (+${pRec.cantidad})`
+    });
+
+    return await db_getData();
+}
+
 async function db_saveMovimiento(m, userId) {
     await supabase.from('movimientos').insert({
         fecha: m.fecha ? (m.fecha + 'T12:00:00.000Z') : new Date().toISOString(),
@@ -577,6 +627,7 @@ window.Backend = {
     db_payDebt,
     db_saveGastosBatch,
     db_saveProduccion,
+    db_delProduccion,
     db_saveMovimiento,
     db_saveMateriaPrima,
     db_delMateriaPrima,
