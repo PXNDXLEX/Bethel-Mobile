@@ -228,24 +228,36 @@ async function db_delGasto(idx, userId) {
 
 async function db_deletePedidosBulk(ids) {
     console.log("[BACKEND] db_deletePedidosBulk called with:", ids);
+    alert("[BACKEND DEBUG] recibiendo ids: " + JSON.stringify(ids));
     for(const id of ids) {
         try {
             console.log("[BACKEND] Processing delete for id:", id);
             const {data: row, error: errRow} = await supabase.from('pedidos').select('producto, cantidad').eq('id', id).maybeSingle();
-            if (errRow) console.error("[BACKEND] Error fetching row:", errRow);
+            if (errRow) {
+                console.error("[BACKEND] Error fetching row:", errRow);
+                alert("[BACKEND ERROR] error fetch " + id + ": " + errRow.message);
+            }
             if(row) {
                 // Restore stock
                 const {data: prod, error: errProd} = await supabase.from('productos').select('stock').eq('nombre', row.producto).maybeSingle();
-                if (errProd) console.error("[BACKEND] Error fetching product:", errProd);
+                if (errProd) {
+                    console.error("[BACKEND] Error fetching product:", errProd);
+                    alert("[BACKEND ERROR] error fetch prod " + row.producto + ": " + errProd.message);
+                }
                 if(prod) {
                     await supabase.from('productos').update({stock: (parseFloat(prod.stock) || 0) + parseFloat(row.cantidad)}).eq('nombre', row.producto);
                 }
                 // Delete order
                 const {error: delErr} = await supabase.from('pedidos').delete().eq('id', id);
-                if (delErr) console.error("[BACKEND] Error deleting order:", delErr);
-                else console.log("[BACKEND] Deleted order successfully:", id);
+                if (delErr) {
+                    console.error("[BACKEND] Error deleting order:", delErr);
+                    alert("[BACKEND ERROR] error delete order " + id + ": " + delErr.message);
+                } else {
+                    console.log("[BACKEND] Deleted order successfully:", id);
+                }
             } else {
                 console.warn("[BACKEND] Order not found for id:", id);
+                alert("[BACKEND WARN] Order not found for id: " + id);
             }
         } catch(e) {
             console.error("[BACKEND] Exception processing id:", id, e);
