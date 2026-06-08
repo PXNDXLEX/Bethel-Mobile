@@ -231,6 +231,7 @@ async function db_delGasto(idx, userId) {
 
 async function db_deletePedidosBulk(ids, userId) {
     const pedidosBorrados = [];
+    const pagosBorrados = [];
     for(const id of ids) {
         try {
             const {data: row} = await supabase.from('pedidos').select('*').eq('id', id).maybeSingle();
@@ -241,12 +242,14 @@ async function db_deletePedidosBulk(ids, userId) {
                 if(prod) {
                     await supabase.from('productos').update({stock: (parseFloat(prod.stock)||0) + parseFloat(row.cantidad||0)}).eq('nombre', row.producto);
                 }
-                // Borrar pagos asociados (mismo cliente, nota contiene el id)
-                const {data: pagosAsoc} = await supabase.from('pagos').select('id, nota').eq('cliente', row.cliente);
+                const {data: pagosAsoc} = await supabase.from('pagos').select('*').eq('cliente', row.cliente);
                 if (pagosAsoc) {
                     for (const pago of pagosAsoc) {
                         if (pago.nota && pago.nota.includes(String(id))) {
-                            await supabase.from('pagos').delete().eq('id', pago.id);
+                            if (!pagosBorrados.some(p => p.id === pago.id)) {
+                                pagosBorrados.push(pago);
+                                await supabase.from('pagos').delete().eq('id', pago.id);
+                            }
                         }
                     }
                 }
@@ -267,7 +270,7 @@ async function db_deletePedidosBulk(ids, userId) {
             fecha: new Date().toISOString(),
             usuario_id: userId || '',
             accion: 'BORRADO_PEDIDO',
-            detalle: JSON.stringify({ pedidos: pedidosBorrados })
+            detalle: JSON.stringify({ pedidos: pedidosBorrados, pagos: pagosBorrados })
         });
     }
     return await db_getData();
@@ -293,6 +296,13 @@ async function db_revertAudit(auditId) {
         }
         await supabase.from('auditoria').delete().eq('id', auditId);
     }
+    if (reg.accion === 'BORRADO_PEDIDO' && Array.isArray(detalle.pagos)) {
+        for (const pago of detalle.pagos) {
+            const pagoPayload = { ...pago };
+            delete pagoPayload.id; // Let Supabase assign a new ID
+            await supabase.from('pagos').insert(pagoPayload);
+        }
+    }
     return await db_getData();
 }
 
@@ -315,20 +325,18 @@ async function db_updateCell(id, col, value, cliente, fecha, lugar) {
     return await db_getData();
 }
 
-async function db_payDebt(indicesStr, montoUSD, ref, nota, bcvRate, numEntrega, userId) {
-    const indices = String(indicesStr).split(',').map(Number).filter(n => !isNaN(n));
+async function db_payDebt(idsStr, montoUSD, ref, nota, bcvRate, numEntrega, userId) {
+    const realIds = String(idsStr).split(',').map(Number).filter(n => !isNaN(n));
     
-    // Fetch all pedidos ordered by id to match frontend array index
-    const { data: todos } = await supabase.from('pedidos').select('*').order('id', { ascending: true });
+    // Fetch all pedidos ordered by id
+    const { data: todos } = await supabase.from('pedidos').select('*').in('id', realIds);
     if (!todos) return await db_getData();
     
     let montoRestante = parseFloat(montoUSD) || 0;
     let clienteName = '';
     let detallesArr = [];
     
-    for (const idx of indices) {
-        const row = todos[idx];
-        if (!row) continue;
+    for (const row of todos) {
         clienteName = row.cliente;
         const deudaActual = parseFloat(row.deuda) || 0;
         if (montoRestante > 0 && deudaActual > 0) {
@@ -342,7 +350,7 @@ async function db_payDebt(indicesStr, montoUSD, ref, nota, bcvRate, numEntrega, 
     }
     
     const bcv = parseFloat(bcvRate) || 0;
-    const finalNota = nota ? (nota + ' | Abono Pedidos: ' + indicesStr) : ('Abono Pedidos: ' + indicesStr);
+    const finalNota = nota ? (nota + ' | Abono Pedidos: ' + idsStr) : ('Abono Pedidos: ' + idsStr);
     await supabase.from('pagos').insert({
         fecha: new Date().toISOString(),
         cliente: clienteName,

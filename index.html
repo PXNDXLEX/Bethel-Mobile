@@ -3046,15 +3046,15 @@
                 var isPorHacer = 0 > p.stock;
                 
                 var bgBorderClass = isAgotado
-                    ? 'border-red-300 dark:border-red-700/50 bg-red-50 dark:bg-red-900/10 hover:border-red-400 cursor-pointer'
+                    ? 'border-pink-300 dark:border-pink-700/50 bg-pink-50 dark:bg-pink-900/10 hover:border-pink-400 cursor-pointer'
                     : (isPorHacer 
-                        ? 'border-yellow-300 dark:border-yellow-700/50 bg-yellow-50 dark:bg-yellow-900/10 hover:border-yellow-400 cursor-pointer'
+                        ? 'border-red-300 dark:border-red-700/50 bg-red-50 dark:bg-red-900/10 hover:border-red-400 cursor-pointer'
                         : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-brand-500 dark:hover:border-brand-400 cursor-pointer');
                 
                 var agotadoTag = isAgotado
-                    ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-red-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">AGOTADO</span></div>' 
+                    ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-pink-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">AGOTADO</span></div>' 
                     : (isPorHacer 
-                        ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-yellow-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">POR HACER</span></div>' 
+                        ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-red-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">EN NEGATIVO</span></div>' 
                         : '');
                     
                 var stockClassText = 0 > p.stock ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500';
@@ -3256,6 +3256,10 @@
                 var indices = indicesStr.split(',').map(Number);
                 var montoRestanteOp = rU;
 
+                // Extraer los IDs reales para pasarlos al backend
+                var realIdsArr = indices.map(function(idx) { return state.pedidosRaw[idx] ? state.pedidosRaw[idx][15] : null; }).filter(Boolean);
+                var realIdsStr = realIdsArr.join(',');
+
                 // Actualizar pedidosRaw localmente: reducir deuda y aumentar abono
                 indices.forEach(function (idx) {
                     var row = state.pedidosRaw[idx];
@@ -3264,15 +3268,15 @@
                     if (montoRestanteOp > 0 && deudaRow > 0) {
                         var aCobrar = Math.min(deudaRow, montoRestanteOp);
                         var abonoAnterior = parseFloat(String(row[11]).replace(',', '.')) || 0;
-                        row[11] = abonoAnterior + aCobrar;
-                        row[12] = deudaRow - aCobrar;
+                        row[11] = (abonoAnterior + aCobrar).toFixed(2);
+                        row[12] = (deudaRow - aCobrar).toFixed(2);
                         montoRestanteOp -= aCobrar;
                     }
                 });
 
                 // Añadir fila a pagosRaw
                 var clienteDeuda = indices.length > 0 && state.pedidosRaw[indices[0]] ? String(state.pedidosRaw[indices[0]][0]).trim() : '';
-                var finalNotaOpt = nota ? (nota + " | Abono Pedidos: " + indicesStr) : ("Abono Pedidos: " + indicesStr);
+                var finalNotaOpt = nota ? (nota + " | Abono Pedidos: " + realIdsStr) : ("Abono Pedidos: " + realIdsStr);
                 state.pagosRaw.push([new Date().toISOString(), clienteDeuda, rU, rU * state.bcv, state.bcv, ref, finalNotaOpt, '', numEntrega, state.currentUser ? state.currentUser.id : ""]);
 
                 // Mostrar resultado al instante
@@ -3294,7 +3298,7 @@
                         showToast('Error al sincronizar abono: ' + err.message, 'error');
                         google.script.run.withSuccessHandler(function (d) { state.pendingOps = 0; procesarData(d); renderDeudas(); renderPagos(); }).db_getData();
                     })
-                    .db_payDebt(indicesStr, rU, ref, nota, state.bcv, numEntrega, state.currentUser ? state.currentUser.id : "");
+                    .db_payDebt(realIdsStr, rU, ref, nota, state.bcv, numEntrega, state.currentUser ? state.currentUser.id : "");
             }
         }
 
@@ -4495,7 +4499,7 @@
 
         function renderInventario() {
             document.getElementById('tabla-inv').innerHTML = state.productos.map(function (p, i) {
-                var stockClass = p.stock < 0 ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : (p.stock <= 5 ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-500' : 'bg-slate-100 dark:bg-slate-700 dark:text-white');
+                var stockClass = p.stock < 0 ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : (p.stock === 0 ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400' : (p.stock <= 5 ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-500' : 'bg-slate-100 dark:bg-slate-700 dark:text-white'));
                 return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700 transition-colors"><td class="p-4 font-bold dark:text-slate-200">' + p.nombre + '</td><td class="p-4 text-center font-black text-brand-600 dark:text-brand-400">$' + p.precio.toFixed(2) + '</td><td class="p-4 text-center font-bold text-slate-500 dark:text-slate-400">$' + (p.precioMayor || 0).toFixed(2) + '</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-lg text-xs font-black ' + stockClass + '">' + p.stock + '</span></td><td class="p-4 text-right"><button onclick="openProductModal(' + i + ')" class="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg mr-1 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteProduct(' + i + ')" class="w-8 h-8 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors"><i class="fas fa-trash text-xs"></i></button></td></tr>';
             }).join('');
         }
