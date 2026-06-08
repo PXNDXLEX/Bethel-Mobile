@@ -2311,23 +2311,34 @@
 
                 // CHECK BIOMETRIC FIRST ON OPEN
                 (async () => {
+                    var isNative = window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform();
                     try {
-                        if(window.NativeBiometric && localStorage.getItem('db_huella_enabled') === 'true' && localStorage.getItem('db_huella_u')) {
+                        if(isNative && window.NativeBiometric && localStorage.getItem('db_huella_enabled') === 'true' && localStorage.getItem('db_huella_u')) {
                             const verified = await window.NativeBiometric.verifyIdentity({
                                 reason: "Autentícate para ingresar a Bethel",
                                 title: "Desbloqueo Biométrico"
                             });
                             
                             if(verified) {
-                                var hu = localStorage.getItem('db_huella_u');
-                                var hp = localStorage.getItem('db_huella_p');
-                                document.getElementById('login-user').value = hu;
-                                document.getElementById('login-pass').value = hp;
+                                var sessionValid = false;
+                                try {
+                                    var raw = localStorage.getItem('db_session');
+                                    if(raw) {
+                                        var parsed = JSON.parse(raw);
+                                        if (parsed && parsed.expiry && Date.now() < parsed.expiry) {
+                                            sessionValid = true;
+                                        }
+                                    }
+                                } catch(e) {}
                                 
-                                if (localStorage.getItem('db_session')) {
+                                if (sessionValid) {
                                     completeLoad();
                                 } else {
-                                    showLogin(); 
+                                    var hu = localStorage.getItem('db_huella_u');
+                                    var hp = localStorage.getItem('db_huella_p');
+                                    document.getElementById('login-user').value = hu;
+                                    document.getElementById('login-pass').value = hp;
+                                    document.getElementById('loader').classList.remove('hidden', 'opacity-0');
                                     attemptLogin();
                                 }
                                 return; 
@@ -3430,10 +3441,10 @@
                         i: [],
                         e: p[7] === 'Entregado',
                         n: p[9],
-                        id: p.i,
+                        id: p[15],
                         u: p[14]
                     };
-                    cL[mapKey].i.push({ idx: p.i, p: p[1], c: p[2] });
+                    cL[mapKey].i.push({ idx: p[15], p: p[1], c: p[2] });
                     // Si al menos uno está entregado, marcar como entregado (para la zona)
                 });
 
@@ -5226,15 +5237,16 @@
             
             var count = 0;
             state.pedidosRaw.forEach(function (p, i) {
-                var c = p[0];
+                var c = p[0] ? String(p[0]).trim() : '';
                 if (!c) return;
-                var l = p[3] || 'Sin Zona';
-                var fechaOriginal = String(p[4]).split('T')[0];
+                var l = p[3] ? String(p[3]).trim() : 'Sin Zona';
+                if (!l) l = 'Sin Zona';
+                var fechaOriginal = p[4] ? String(p[4]).split('T')[0] : '';
                 
                 if (c === cliente && fechaOriginal === fecha && l === lugar) {
                     count++;
                     var html = '<label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-600 hover:border-brand-300 dark:hover:border-brand-500 transition-colors">' +
-                               '<input type="checkbox" class="w-5 h-5 text-red-500 rounded border-slate-300 focus:ring-red-500 chk-delete-ruta" value="' + i + '">' +
+                               '<input type="checkbox" class="w-5 h-5 text-red-500 rounded border-slate-300 focus:ring-red-500 chk-delete-ruta" value="' + p[15] + '">' +
                                '<span class="font-bold text-slate-700 dark:text-slate-200 text-sm flex-1">' + p[1] + '</span>' +
                                '<span class="font-black text-brand-600 dark:text-brand-400 text-sm">' + p[2] + 'x</span>' +
                                '</label>';
@@ -5259,7 +5271,7 @@
             var chks = document.querySelectorAll('.chk-delete-ruta:checked');
             if(chks.length === 0) return showToast('Selecciona al menos un producto', 'warning');
             
-            var indices = Array.from(chks).map(c => parseInt(c.value));
+            var ids = Array.from(chks).map(c => parseInt(c.value));
             
             customConfirm('¿Estás seguro de eliminar los productos seleccionados? Se devolverán al inventario.', function(yes) {
                 if(!yes) return;
@@ -5267,15 +5279,18 @@
                 closeModal('modal-delete-ruta');
                 
                 // Optimistic UI updates
-                indices.sort((a,b) => b-a).forEach(idx => {
-                    var ped = state.pedidosRaw[idx];
-                    var prodName = ped[1];
-                    var qty = parseFloat(ped[2]) || 0;
-                    
-                    var prod = state.productos.find(p => p.nombre === prodName);
-                    if(prod) prod.stock = (parseFloat(prod.stock)||0) + qty;
-                    
-                    state.pedidosRaw.splice(idx, 1);
+                ids.forEach(id => {
+                    var idx = state.pedidosRaw.findIndex(p => p[15] === id);
+                    if(idx !== -1) {
+                        var ped = state.pedidosRaw[idx];
+                        var prodName = ped[1];
+                        var qty = parseFloat(ped[2]) || 0;
+                        
+                        var prod = state.productos.find(p => p.nombre === prodName);
+                        if(prod) prod.stock = (parseFloat(prod.stock)||0) + qty;
+                        
+                        state.pedidosRaw.splice(idx, 1);
+                    }
                 });
                 
                 renderRutas();
@@ -5286,7 +5301,7 @@
                     renderRutas();
                     if (!document.getElementById('view-inventario').classList.contains('hidden')) renderInventario();
                     showToast('Productos eliminados del pedido', 'success');
-                }).db_deletePedidosBulk(indices);
+                }).db_deletePedidosBulk(ids);
             });
         }
 

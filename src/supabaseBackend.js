@@ -12,7 +12,7 @@ const mappers = {
     usuarios: (d) => [d.id, d.nombre, d.usuario, d.clave, d.rol, d.permisos_tabs, d.permisos_delete],
     historial_mp: (d) => [d.fecha, d.usuario, d.insumo, d.motivo, d.cantidad, d.unidad, d.stock_ant, d.stock_nue],
     auditoria: (d) => [d.fecha, d.usuario_id, d.accion, d.detalle],
-    pedidos: (d) => [d.cliente, d.producto, d.cantidad, d.lugar, d.fecha, d.total, d.precio_u, d.estado, d.num_entrega, d.notas, d.bcv, d.abono, d.deuda, d.telefono, d.usuario_id],
+    pedidos: (d) => [d.cliente, d.producto, d.cantidad, d.lugar, d.fecha, d.total, d.precio_u, d.estado, d.num_entrega, d.notas, d.bcv, d.abono, d.deuda, d.telefono, d.usuario_id, d.id],
     pagos: (d) => [d.fecha, d.cliente, d.monto_usd, d.monto_bs, d.tasa_bcv, d.ref_pago, d.nota, d.detalles, d.num_entrega, d.usuario_id],
     gastos: (d) => [d.fecha, d.descripcion, d.cantidad, d.precio_unit, d.total, d.unidad, d.usuario_id, d.tipo_empaque, d.cant_por_empaque, d.cant_empaques],
     produccion: (d) => [d.fecha, d.producto, d.cantidad, d.usuario_id],
@@ -226,20 +226,17 @@ async function db_delGasto(idx, userId) {
     return await db_getData();
 }
 
-async function db_deletePedidosBulk(indices) {
-    const {data} = await supabase.from('pedidos').select('id, producto, cantidad').order('id', {ascending:true});
-    if(!data) return await db_getData();
-    
-    for(const idx of indices) {
-        if(data[idx]) {
-            const row = data[idx];
+async function db_deletePedidosBulk(ids) {
+    for(const id of ids) {
+        const {data: row} = await supabase.from('pedidos').select('producto, cantidad').eq('id', id).single();
+        if(row) {
             // Restore stock
             const {data: prod} = await supabase.from('productos').select('stock').eq('nombre', row.producto).single();
             if(prod) {
                 await supabase.from('productos').update({stock: (parseFloat(prod.stock) || 0) + parseFloat(row.cantidad)}).eq('nombre', row.producto);
             }
             // Delete order
-            await supabase.from('pedidos').delete().eq('id', row.id);
+            await supabase.from('pedidos').delete().eq('id', id);
         }
     }
     return await db_getData();
