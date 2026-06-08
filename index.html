@@ -5313,7 +5313,8 @@
                 });
                 
                 renderRutas();
-                if (!document.getElementById('view-inventario').classList.contains('hidden')) renderInventario();
+                var viewInv = document.getElementById('view-inventario');
+                if (viewInv && !viewInv.classList.contains('hidden')) renderInventario();
                 
                 alert("[FRONTEND] Callback Si, enviando al backend idsNum: " + JSON.stringify(idsNum));
                 google.script.run.withFailureHandler(function(err) {
@@ -5323,7 +5324,8 @@
                     alert("[OK] Backend retorno " + (d && d.pedidosRaw ? d.pedidosRaw.length : '?') + " pedidos");
                     procesarData(d);
                     renderRutas();
-                    if (!document.getElementById('view-inventario').classList.contains('hidden')) renderInventario();
+                    var viewInv2 = document.getElementById('view-inventario');
+                    if (viewInv2 && !viewInv2.classList.contains('hidden')) renderInventario();
                     showToast('Productos eliminados del pedido', 'success');
                 }).db_deletePedidosBulk(idsNum);
             });
