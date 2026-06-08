@@ -250,6 +250,59 @@ async function db_deletePedidosBulk(ids) {
     return await db_getData();
 }
 
+// col 8 => estado, col 10 => notas
+async function db_updateCell(id, col, value) {
+    const colMap = { 8: 'estado', 10: 'notas' };
+    const field = colMap[col];
+    if (!field) return await db_getData();
+    await supabase.from('pedidos').update({ [field]: value }).eq('id', id);
+    return await db_getData();
+}
+
+async function db_payDebt(indicesStr, montoUSD, ref, nota, bcvRate, numEntrega, userId) {
+    const indices = String(indicesStr).split(',').map(Number).filter(n => !isNaN(n));
+    
+    // Fetch all pedidos ordered by id to match frontend array index
+    const { data: todos } = await supabase.from('pedidos').select('*').order('id', { ascending: true });
+    if (!todos) return await db_getData();
+    
+    let montoRestante = parseFloat(montoUSD) || 0;
+    let clienteName = '';
+    let detallesArr = [];
+    
+    for (const idx of indices) {
+        const row = todos[idx];
+        if (!row) continue;
+        clienteName = row.cliente;
+        const deudaActual = parseFloat(row.deuda) || 0;
+        if (montoRestante > 0 && deudaActual > 0) {
+            const aCobrar = Math.min(deudaActual, montoRestante);
+            const nuevoAbono = (parseFloat(row.abono) || 0) + aCobrar;
+            const nuevaDeuda = deudaActual - aCobrar;
+            montoRestante -= aCobrar;
+            await supabase.from('pedidos').update({ abono: nuevoAbono, deuda: nuevaDeuda }).eq('id', row.id);
+            detallesArr.push(row.producto + ' x' + row.cantidad);
+        }
+    }
+    
+    const bcv = parseFloat(bcvRate) || 0;
+    const finalNota = nota ? (nota + ' | Abono Pedidos: ' + indicesStr) : ('Abono Pedidos: ' + indicesStr);
+    await supabase.from('pagos').insert({
+        fecha: new Date().toISOString(),
+        cliente: clienteName,
+        monto_usd: parseFloat(montoUSD) || 0,
+        monto_bs: (parseFloat(montoUSD) || 0) * bcv,
+        tasa_bcv: bcv,
+        ref_pago: ref || '',
+        nota: finalNota,
+        detalles: detallesArr.join(';'),
+        num_entrega: numEntrega || '',
+        usuario_id: userId || ''
+    });
+    
+    return await db_getData();
+}
+
 async function db_saveProduct(p, userId) {
     const payload = {
         nombre: p.nombre,
@@ -314,8 +367,8 @@ window.Backend = {
     db_delProduct,
     // Add other stubs returning db_getData() to prevent UI crash
     db_updateProductName: async () => await db_getData(),
-    db_payDebt: async () => await db_getData(),
-    db_updateCell: async () => await db_getData(),
+    db_updateCell,
+    db_payDebt,
     db_saveGastosBatch: async () => await db_getData(),
     db_saveProduccion: async () => await db_getData(),
     db_saveMovimiento: async () => await db_getData(),
