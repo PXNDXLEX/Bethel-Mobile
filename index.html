@@ -2323,8 +2323,13 @@
                                 var hp = localStorage.getItem('db_huella_p');
                                 document.getElementById('login-user').value = hu;
                                 document.getElementById('login-pass').value = hp;
-                                showLogin(); 
-                                attemptLogin();
+                                
+                                if (localStorage.getItem('db_session')) {
+                                    completeLoad();
+                                } else {
+                                    showLogin(); 
+                                    attemptLogin();
+                                }
                                 return; 
                             } else {
                                 localStorage.removeItem('db_session');
@@ -3461,12 +3466,12 @@
                         var uTag = '<p class="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase mt-2 italic flex items-center gap-1"><i class="fas fa-user-edit"></i> Registrado por: ' + uName + '</p>';
 
                         var btnDelete = (state.currentUser && state.currentUser.permisosDelete === "SI") ? 
-                            '<button onclick="openDeleteRutaModal(\'' + mapKey.replace(/'/g, "\\\\'") + '\')" class="text-xs text-red-500 hover:text-white bg-red-50 hover:bg-red-500 dark:bg-red-900/30 dark:hover:bg-red-600 font-bold px-3 py-1.5 rounded-lg transition-colors shadow-sm flex items-center justify-center h-full"><i class="fas fa-trash-alt"></i></button>' : '';
+                            '<button onclick="openDeleteRutaModal(\'' + c.replace(/'/g, "\\'") + '\', \'' + entry.fecha + '\', \'' + l.replace(/'/g, "\\'") + '\')" class="text-xs text-red-500 hover:text-white bg-red-50 hover:bg-red-500 dark:bg-red-900/30 dark:hover:bg-red-600 font-bold px-3 py-1.5 rounded-lg transition-colors shadow-sm flex items-center justify-center h-full"><i class="fas fa-trash-alt"></i></button>' : '';
 
                         return '<div class="bg-white dark:bg-slate-800/80 rounded-xl p-4 shadow-sm border-l-4 transition-colors duration-500 ease-in-out ' + bCol + '" data-mapkey="' + mapKey.replace(/"/g, '&quot;') + '">' +
                             '<div class="flex justify-between items-start mb-2">' +
                             '<div>' +
-                            '<h4 class="font-black text-slate-800 dark:text-white text-base leading-tight">' + c + '</h4>' +
+                            '<h4 class="font-black text-slate-800 dark:white text-base leading-tight">' + c + '</h4>' +
                             '<div class="flex flex-wrap gap-1 mt-1.5">' + fechaChip + lugarChip + '</div>' +
                             '</div>' +
                             '<div class="flex gap-2 items-stretch">' + btnDelete +
@@ -5215,40 +5220,33 @@
             }).db_updateUserPerfil(state.currentUser.id, nombre, claveNueva, claveVieja);
         }
 
-        var currentDeleteRutaMapKey = "";
-
-        function openDeleteRutaModal(mapKey) {
-            currentDeleteRutaMapKey = mapKey;
+        function openDeleteRutaModal(cliente, fecha, lugar) {
             var listEl = document.getElementById('delete-ruta-list');
             listEl.innerHTML = '';
             
-            var cL = {};
+            var count = 0;
             state.pedidosRaw.forEach(function (p, i) {
                 var c = p[0];
                 if (!c) return;
                 var l = p[3] || 'Sin Zona';
                 var fechaOriginal = String(p[4]).split('T')[0];
-                var mapKeyLocal = l + '|' + fechaOriginal + '|' + c;
-                if(mapKeyLocal === mapKey) {
-                    if (!cL[mapKeyLocal]) cL[mapKeyLocal] = { i: [] };
-                    cL[mapKeyLocal].i.push({ idx: i, p: p[1], c: p[2] });
+                
+                if (c === cliente && fechaOriginal === fecha && l === lugar) {
+                    count++;
+                    var html = '<label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-600 hover:border-brand-300 dark:hover:border-brand-500 transition-colors">' +
+                               '<input type="checkbox" class="w-5 h-5 text-red-500 rounded border-slate-300 focus:ring-red-500 chk-delete-ruta" value="' + i + '">' +
+                               '<span class="font-bold text-slate-700 dark:text-slate-200 text-sm flex-1">' + p[1] + '</span>' +
+                               '<span class="font-black text-brand-600 dark:text-brand-400 text-sm">' + p[2] + 'x</span>' +
+                               '</label>';
+                    listEl.insertAdjacentHTML('beforeend', html);
                 }
             });
 
-            if(cL[mapKey] && cL[mapKey].i.length > 0) {
-                cL[mapKey].i.forEach(function(it) {
-                    var html = '<label class="flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl cursor-pointer border border-slate-200 dark:border-slate-600 hover:border-brand-300 dark:hover:border-brand-500 transition-colors">' +
-                               '<input type="checkbox" class="w-5 h-5 text-red-500 rounded border-slate-300 focus:ring-red-500 chk-delete-ruta" value="' + it.idx + '">' +
-                               '<span class="font-bold text-slate-700 dark:text-slate-200 text-sm flex-1">' + it.p + '</span>' +
-                               '<span class="font-black text-brand-600 dark:text-brand-400 text-sm">' + it.c + 'x</span>' +
-                               '</label>';
-                    listEl.insertAdjacentHTML('beforeend', html);
-                });
-            } else {
+            if(count === 0) {
                 listEl.innerHTML = '<p class="text-center text-sm font-bold text-slate-400 py-4">No se encontraron productos.</p>';
             }
             
-            document.getElementById('modal-delete-ruta').classList.remove('hidden');
+            openModal('modal-delete-ruta');
         }
 
         function selectAllRutaDelete() {
