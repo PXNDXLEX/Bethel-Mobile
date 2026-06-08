@@ -3493,7 +3493,7 @@
                         return '<div class="bg-white dark:bg-slate-800/80 rounded-xl p-4 shadow-sm border-l-4 transition-colors duration-500 ease-in-out ' + bCol + '" data-mapkey="' + mapKey.replace(/"/g, '&quot;') + '">' +
                             '<div class="flex justify-between items-start mb-2">' +
                             '<div>' +
-                            '<h4 class="font-black text-slate-800 dark:white text-base leading-tight">' + c + '</h4>' +
+                            '<h4 class="font-black text-slate-800 dark:text-white text-base leading-tight">' + c + '</h4>' +
                             '<div class="flex flex-wrap gap-1 mt-1.5">' + fechaChip + lugarChip + '</div>' +
                             '</div>' +
                             '<div class="flex gap-2 items-stretch">' + btnDelete +
@@ -4776,8 +4776,9 @@
                             var hasAsked = localStorage.getItem('db_huella_asked');
                             if(!hasAsked) {
                                 const result = await window.NativeBiometric.isAvailable();
-                                if(result.isAvailable) {
-                                    customConfirm('¿Deseas usar tu huella dactilar para iniciar sesión más rápido en el futuro?', function(yes) {
+                            var remember = document.getElementById('login-remember').checked;
+                            if(result.isAvailable && remember) {
+                                customConfirm('¿Deseas habilitar el inicio de sesión con huella dactilar para entrar más rápido la próxima vez?', function(yes) {
                                         localStorage.setItem('db_huella_asked', 'true');
                                         if(yes) {
                                             localStorage.setItem('db_huella_enabled', 'true');
@@ -5282,10 +5283,8 @@
             var chks = document.querySelectorAll('.chk-delete-ruta:checked');
             if(chks.length === 0) return showToast('Selecciona al menos un producto', 'warning');
             
-            var ids = Array.from(chks).map(c => c.value); // raw strings
+            var ids = Array.from(chks).map(c => c.value);
             var idsNum = ids.map(v => Number(v));
-            alert("[DEBUG] IDs raw: " + ids.join(', ') + "\nIDs num: " + idsNum.join(', '));
-            console.log("[FRONTEND] confirmDeleteRuta IDs raw:", ids, "parsed:", idsNum);
             
             // Cerrar el modal de selección antes de mostrar el de confirmación
             closeModal('modal-delete-ruta');
@@ -5316,12 +5315,9 @@
                 var viewInv = document.getElementById('view-inventario');
                 if (viewInv && !viewInv.classList.contains('hidden')) renderInventario();
                 
-                alert("[FRONTEND] Callback Si, enviando al backend idsNum: " + JSON.stringify(idsNum));
                 google.script.run.withFailureHandler(function(err) {
-                    alert("ERROR AL BORRAR: " + err.message);
                     showToast('Error: ' + err.message, 'error');
                 }).withSuccessHandler(function(d) {
-                    alert("[OK] Backend retorno " + (d && d.pedidosRaw ? d.pedidosRaw.length : '?') + " pedidos");
                     procesarData(d);
                     renderRutas();
                     var viewInv2 = document.getElementById('view-inventario');
