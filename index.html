@@ -358,8 +358,11 @@
             </div>
 
             <nav class="flex-1 flex flex-col p-4 gap-2">
-                <button onclick="switchTab('pos')"
+                <button onclick="switchTab('inicio')"
                     class="tab-btn-mobile w-full text-left py-3 px-4 rounded-xl text-sm font-bold bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 transition-colors"><i
+                        class="fas fa-home w-6"></i> Inicio</button>
+                <button onclick="switchTab('pos')"
+                    class="tab-btn-mobile w-full text-left py-3 px-4 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"><i
                         class="fas fa-cash-register w-6"></i> Caja</button>
                 <button onclick="switchTab('produccion')"
                     class="tab-btn-mobile w-full text-left py-3 px-4 rounded-xl text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"><i
@@ -493,8 +496,11 @@
 
             <nav
                 class="hidden sm:flex max-w-7xl mx-auto px-4 gap-6 overflow-x-auto hide-scroll border-t border-slate-100 dark:border-slate-800">
-                <button onclick="switchTab('pos')"
+                <button onclick="switchTab('inicio')"
                     class="tab-btn-desktop active-tab py-3 text-sm font-bold border-b-2 border-brand-500 text-brand-600 dark:text-brand-400 whitespace-nowrap"><i
+                        class="fas fa-home mr-1"></i> Inicio</button>
+                <button onclick="switchTab('pos')"
+                    class="tab-btn-desktop py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 whitespace-nowrap"><i
                         class="fas fa-cash-register mr-1"></i> Caja</button>
                 <button onclick="switchTab('produccion')"
                     class="tab-btn-desktop py-3 text-sm font-semibold border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 whitespace-nowrap"><i
@@ -633,8 +639,145 @@
         <main class="bg-slate-50 dark:bg-slate-900 p-4 relative w-full">
             <div class="max-w-7xl mx-auto">
 
+                <!-- MENÚ PRINCIPAL / INICIO -->
+                <section id="view-inicio" class="view-section flex flex-col gap-6">
+                    <!-- HERO BANNER CON BOTÓN LLAMATIVO -->
+                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-500 via-rose-500 to-salmon-500 p-6 md:p-8 text-white shadow-xl">
+                        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                        <div class="absolute -left-10 -top-10 w-48 h-48 bg-black/10 rounded-full blur-xl pointer-events-none"></div>
+                        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                            <div class="space-y-2 max-w-xl">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider">
+                                    <i class="fas fa-sparkles"></i> Menú Principal
+                                </div>
+                                <h2 class="text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-tight">
+                                    Panel de Control Bethel
+                                </h2>
+                                <p class="text-white/90 text-sm md:text-base font-medium">
+                                    Resumen diario de ventas cobradas, pedidos fiados pendientes y entregas semanales por zona.
+                                </p>
+                            </div>
+                            <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                                <button onclick="iniciarVenta()" id="btn-hero-iniciar-venta"
+                                    class="group px-7 py-4 bg-white hover:bg-brand-50 text-brand-600 rounded-2xl font-black text-base shadow-2xl hover:shadow-brand-900/30 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 cursor-pointer">
+                                    <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center group-hover:rotate-12 transition-transform">
+                                        <i class="fas fa-cash-register text-lg"></i>
+                                    </div>
+                                    <span>INICIAR NUEVA VENTA</span>
+                                    <i class="fas fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RESÚMENES: VENTAS DEL DÍA Y PEDIDOS PENDIENTES (FIADOS) -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- TARJETA: VENTAS DEL DÍA (COBRADAS) -->
+                        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col">
+                            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-4 mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-2xl bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-xl font-bold">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-black text-slate-800 dark:text-white text-lg leading-tight">Ventas del Día</h3>
+                                        <p class="text-xs text-slate-400 dark:text-slate-500 font-bold">Productos que ya han sido cobrados hoy</p>
+                                    </div>
+                                </div>
+                                <span id="inicio-fecha-hoy" class="text-xs font-black px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                                    Hoy
+                                </span>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 mb-4 bg-slate-50 dark:bg-slate-700/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                <div>
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wide block">Total Cobrado USD</span>
+                                    <span id="inicio-ventas-hoy-usd" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">$0.00</span>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wide block">Total Cobrado Bs</span>
+                                    <span id="inicio-ventas-hoy-bs" class="text-base font-black text-slate-700 dark:text-slate-200">Bs. 0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 flex flex-col">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-black uppercase text-slate-500 dark:text-slate-400">Productos Cobrados Hoy</span>
+                                    <span id="inicio-ventas-hoy-count" class="text-xs font-bold text-slate-400">0 unidades</span>
+                                </div>
+                                <div id="inicio-ventas-hoy-lista" class="space-y-2 overflow-y-auto max-h-56 pr-1 custom-scroll">
+                                    <!-- Render dinámico -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- TARJETA: PEDIDOS PENDIENTES POR COBRAR (FIADOS) -->
+                        <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col">
+                            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700/60 pb-4 mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-2xl bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-xl font-bold">
+                                        <i class="fas fa-hand-holding-usd"></i>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-black text-slate-800 dark:text-white text-lg leading-tight">Pedidos por Cobrar</h3>
+                                        <p class="text-xs text-slate-400 dark:text-slate-500 font-bold">Pedidos fiados / cuentas por cobrar</p>
+                                    </div>
+                                </div>
+                                <button onclick="switchTab('deudas')" class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:underline">
+                                    Ver todas <i class="fas fa-arrow-right ml-1"></i>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3 mb-4 bg-slate-50 dark:bg-slate-700/40 p-4 rounded-2xl border border-slate-100 dark:border-slate-700">
+                                <div>
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wide block">Por Cobrar USD</span>
+                                    <span id="inicio-deudas-usd" class="text-2xl font-black text-amber-600 dark:text-amber-400">$0.00</span>
+                                </div>
+                                <div>
+                                    <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wide block">Por Cobrar Bs</span>
+                                    <span id="inicio-deudas-bs" class="text-base font-black text-slate-700 dark:text-slate-200">Bs. 0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="flex-1 flex flex-col">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-black uppercase text-slate-500 dark:text-slate-400">Últimos Pedidos Fiados</span>
+                                    <span id="inicio-deudas-count" class="text-xs font-bold text-slate-400">0 pedidos</span>
+                                </div>
+                                <div id="inicio-deudas-lista" class="space-y-2 overflow-y-auto max-h-56 pr-1 custom-scroll">
+                                    <!-- Render dinámico -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DISTRIBUCIÓN SEMANAL POR ZONA -->
+                    <div class="bg-white dark:bg-slate-800 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-700/60 pb-4 mb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-2xl bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xl font-bold">
+                                    <i class="fas fa-map-marked-alt"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-black text-slate-800 dark:text-white text-lg leading-tight">Distribución Semanal por Zona</h3>
+                                    <p class="text-xs text-slate-400 dark:text-slate-500 font-bold">Resumen de pedidos y tipos de productos por zona de reparto</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span id="inicio-rango-semana" class="text-xs font-black px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-600">
+                                    Esta Semana
+                                </span>
+                            </div>
+                        </div>
+
+                        <div id="inicio-distribucion-zonas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- Render dinámico de zonas -->
+                        </div>
+                    </div>
+                </section>
+
                 <!-- CAJA Y PEDIDOS -->
-                <section id="view-pos" class="view-section flex flex-col lg:flex-row gap-4">
+                <section id="view-pos" class="view-section hidden flex flex-col lg:flex-row gap-4 pb-24 lg:pb-0">
                     <div
                         class="w-full lg:flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col min-h-[400px]">
                         <div id="stock-warning-banner"
@@ -707,6 +850,23 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- CUADRÍCULA DE CATEGORÍAS -->
+                        <div class="p-4 border-b border-slate-100 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/60">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                                    <i class="fas fa-layer-group text-brand-500"></i> Filtrar por Categoría
+                                </span>
+                                <button type="button" id="btn-gestionar-cat" onclick="openCategoriasModal()"
+                                    class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-800/50 transition-colors shadow-sm cursor-pointer">
+                                    <i class="fas fa-tags text-[11px]"></i> <span>Gestionar Categorías</span>
+                                </button>
+                            </div>
+                            <div id="pos-cat-grid" class="flex gap-2 overflow-x-auto pb-1 hide-scroll items-center flex-nowrap sm:flex-wrap">
+                                <!-- Generado por JS -->
+                            </div>
+                        </div>
+
                         <div class="flex-1 p-4 overflow-y-auto">
                             <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-10">
                             </div>
@@ -733,7 +893,7 @@
                             <div class="relative mb-3 z-20">
                                 <input type="text" id="pos-cliente" oninput="showClientSuggestions(this.value)"
                                     placeholder="Nombre del Cliente"
-                                    class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-brand-500 outline-none autocomplete-off">
+                                    class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-brand-500 outline-none autocomplete-off font-semibold">
                                 <div id="suggestions"
                                     class="absolute top-full left-0 right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl mt-1 max-h-40 overflow-y-auto hidden">
                                 </div>
@@ -776,7 +936,7 @@
                                 <span id="cart-count"
                                     class="bg-brand-500 text-white px-2 py-0.5 rounded-full text-xs">0</span>
                             </div>
-                            <div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
+                            <div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2 max-h-72"></div>
                             <div
                                 class="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
                                 <div class="flex justify-between items-end mb-4">
@@ -796,10 +956,35 @@
                                     </div>
                                 </div>
                                 <button onclick="openCheckoutModal('pos')" id="btn-procesar"
-                                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                                     disabled>PROCEDER A PAGAR / GUARDAR</button>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- BARRA FLOTANTE MÓVIL (STICKY BOTTOM EN PANTALLAS PEQUEÑAS) -->
+                    <div id="pos-mobile-bottom-bar"
+                        class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-700 p-3 shadow-2xl flex items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="relative p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200">
+                                <i class="fas fa-shopping-cart text-lg"></i>
+                                <span id="pos-mobile-cart-badge"
+                                    class="absolute -top-1 -right-1 bg-brand-500 text-white font-black text-[10px] w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[11px] font-bold text-slate-400">Total:</span>
+                                    <span id="pos-mobile-total-usd" class="font-black text-brand-600 dark:text-brand-400 text-lg leading-none">$0.00</span>
+                                </div>
+                                <span id="pos-mobile-total-bs" class="text-[10px] font-bold text-slate-400 block leading-tight">Bs. 0.00</span>
+                            </div>
+                        </div>
+                        <button onclick="openCheckoutModal('pos')" id="btn-mobile-procesar"
+                            class="bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-black px-5 py-3 rounded-xl shadow-lg transition-all text-xs flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                            disabled>
+                            <span>PROCEDER A PAGAR</span>
+                            <i class="fas fa-arrow-right text-xs"></i>
+                        </button>
                     </div>
                 </section>
 
@@ -1676,13 +1861,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="flex gap-2 mt-6">
-                    <button onclick="confirmTransaction(true)" id="btn-solo-guardar"
-                        class="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 shadow text-xs transition-colors">SOLO
-                        GUARDAR<br>(FIADO)</button>
-                    <button onclick="confirmTransaction(false)" id="btn-confirm-tx"
-                        class="flex-1 py-3 rounded-xl font-black text-white bg-brand-500 hover:bg-brand-600 shadow-lg text-sm transition-colors">COBRAR
-                        Y<br>FACTURAR</button>
+                <div class="flex flex-col sm:flex-row gap-2 mt-6">
+                    <button onclick="confirmTransaction(true, false)" id="btn-solo-guardar"
+                        class="flex-1 py-3 px-2 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 shadow text-xs transition-colors text-center cursor-pointer">
+                        SOLO GUARDAR<br>(FIADO)
+                    </button>
+                    <button onclick="confirmTransaction(true, true)" id="btn-wapp-tx"
+                        class="flex-1 py-3 px-2 rounded-xl font-bold text-white bg-[#25D366] hover:bg-[#128C7E] shadow text-xs transition-colors text-center flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="fab fa-whatsapp text-base"></i>
+                        <span>GUARDAR Y<br>NOTIFICAR</span>
+                    </button>
+                    <button onclick="confirmTransaction(false, false)" id="btn-confirm-tx"
+                        class="flex-1 py-3 px-2 rounded-xl font-black text-white bg-brand-500 hover:bg-brand-600 shadow-lg text-xs transition-colors text-center cursor-pointer">
+                        COBRAR Y<br>FACTURAR
+                    </button>
                 </div>
                 <input type="hidden" id="checkout-mode"><input type="hidden" id="checkout-indices">
             </div>
@@ -1704,6 +1896,15 @@
                             Exacto</label><input type="text" id="prod-name"
                             class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl outline-none focus:border-brand-500 font-semibold text-slate-700">
                     </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-xs font-bold text-slate-500 dark:text-slate-400">Categoría</label>
+                            <button type="button" onclick="openCategoriasModal()" class="text-xs font-bold text-brand-500 hover:text-brand-600 cursor-pointer">+ Gestionar</button>
+                        </div>
+                        <select id="prod-categoria"
+                            class="w-full px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl outline-none focus:border-brand-500 font-bold text-sm">
+                        </select>
+                    </div>
                     <div class="grid grid-cols-2 gap-3">
                         <div><label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1">PVP
                                 ($)</label><input type="text" id="prod-price"
@@ -1721,9 +1922,57 @@
                 </div>
                 <div class="mt-8 flex gap-3">
                     <button onclick="closeModal('modal-product')"
-                        class="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors">CANCELAR</button>
+                        class="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors cursor-pointer">CANCELAR</button>
                     <button onclick="saveProduct()" id="btn-save-prod"
-                        class="flex-1 py-3 rounded-xl font-black text-white bg-brand-500 hover:bg-brand-600 transition-colors">GUARDAR</button>
+                        class="flex-1 py-3 rounded-xl font-black text-white bg-brand-500 hover:bg-brand-600 transition-colors cursor-pointer">GUARDAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GESTIÓN DE CATEGORÍAS -->
+    <div id="modal-categorias"
+        class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[85] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 dark:border-slate-700 transform scale-95 transition-transform duration-300">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4 border-b border-slate-100 dark:border-slate-700 pb-3">
+                    <h3 class="font-black text-xl text-slate-800 dark:text-white flex items-center gap-2">
+                        <i class="fas fa-tags text-brand-500"></i> Gestión de Categorías
+                    </h3>
+                    <button onclick="closeModal('modal-categorias')" class="text-slate-400 hover:text-brand-500 text-xl cursor-pointer"><i class="fas fa-times"></i></button>
+                </div>
+                
+                <!-- Formulario Agregar / Editar Categoría -->
+                <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 mb-4">
+                    <input type="hidden" id="cat-old-name" value="">
+                    <label id="cat-form-title" class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Nueva Categoría</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="cat-name-input" placeholder="Nombre de categoría..."
+                            class="flex-1 px-3 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl outline-none focus:border-brand-500 font-bold text-sm">
+                        <button onclick="saveCategoria()" id="btn-save-cat"
+                            class="bg-brand-500 hover:bg-brand-600 text-white font-bold px-4 py-2 rounded-xl text-sm transition-colors shadow cursor-pointer">
+                            GUARDAR
+                        </button>
+                        <button onclick="cancelEditCategoria()" id="btn-cancel-cat" style="display:none;"
+                            class="bg-slate-200 dark:bg-slate-600 text-slate-600 dark:text-slate-200 font-bold px-3 py-2 rounded-xl text-xs transition-colors cursor-pointer">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lista de Categorías Existentes -->
+                <div class="space-y-1">
+                    <label class="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 uppercase tracking-wider">Categorías Registradas</label>
+                    <div id="lista-categorias-gestion" class="max-h-60 overflow-y-auto custom-scroll space-y-2 pr-1">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-3 border-t border-slate-100 dark:border-slate-700">
+                    <button onclick="closeModal('modal-categorias')"
+                        class="w-full py-2.5 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-sm cursor-pointer">
+                        CERRAR
+                    </button>
                 </div>
             </div>
         </div>
@@ -2175,6 +2424,8 @@
             config: {},
             bcv: 0,
             productos: [],
+            categorias: [],
+            categoriaSeleccionada: 'TODAS',
             lugares: [],
             clientes: [],
             clientPhones: {},
@@ -2240,6 +2491,7 @@
                 icon.classList.remove('fa-spin');
                 showToast("Datos Sincronizados", "success");
 
+                renderInicio();
                 renderPosProducts();
                 renderProduccion();
                 renderRutasDropdown();
@@ -2276,6 +2528,7 @@
 
                 updateBCVUI();
                 populateDropdowns();
+                renderInicio();
                 renderPosProducts();
                 renderProduccion();
                 renderRutasDropdown();
@@ -2398,9 +2651,11 @@
                 return showToast("Acceso denegado: Solo administradores", "error");
             }
 
-            if (state.currentUser.permisosTabs !== "*" && state.currentUser.permisosTabs.indexOf(tabId) === -1 && tabId !== 'auditoria') {
+            if (state.currentUser.permisosTabs !== "*" && state.currentUser.permisosTabs.indexOf(tabId) === -1 && tabId !== 'auditoria' && tabId !== 'inicio') {
                 return showToast("No tienes permiso para ver esta pestaña", "warning");
             }
+            if (tabId === 'inicio') renderInicio();
+            if (tabId === 'pos') { renderPosCategorias(); renderPosProducts(); renderCart(); }
             if (tabId === 'usuarios') renderUsuarios();
             if (tabId === 'recetario') renderRecetario();
             if (tabId === 'auditoria') renderAuditoria();
@@ -3037,32 +3292,486 @@
             }
         }
 
+        function iniciarVenta() {
+            switchTab('pos');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            setTimeout(function () {
+                var clienteInput = document.getElementById('pos-cliente');
+                if (clienteInput) {
+                    clienteInput.focus();
+                    clienteInput.classList.add('ring-4', 'ring-brand-400/50');
+                    setTimeout(function () {
+                        clienteInput.classList.remove('ring-4', 'ring-brand-400/50');
+                    }, 1200);
+                }
+            }, 200);
+        }
+
+        function renderInicio() {
+            var now = new Date();
+            var yyyy = now.getFullYear();
+            var mm = ('0' + (now.getMonth() + 1)).slice(-2);
+            var dd = ('0' + now.getDate()).slice(-2);
+            var todayStr = yyyy + '-' + mm + '-' + dd;
+
+            var fechaHoyEl = document.getElementById('inicio-fecha-hoy');
+            if (fechaHoyEl) fechaHoyEl.innerText = dd + '/' + mm + '/' + yyyy;
+
+            // 1. VENTAS DEL DÍA (COBRADAS HOY)
+            var totalCobradoUSD = 0;
+            var totalCobradoBs = 0;
+            var pagosHoy = [];
+
+            state.pagosRaw.forEach(function (p) {
+                var f = String(p[0] || '').split('T')[0];
+                if (f === todayStr) {
+                    var usd = parseFloat(String(p[2]).replace(',', '.')) || 0;
+                    var bs = parseFloat(String(p[3]).replace(',', '.')) || (usd * state.bcv);
+                    totalCobradoUSD += usd;
+                    totalCobradoBs += bs;
+                    pagosHoy.push(p);
+                }
+            });
+
+            // Productos cobrados hoy
+            var prodsCobradosMap = {};
+            var totalUnidadesCobradas = 0;
+
+            state.pedidosRaw.forEach(function (ped) {
+                var f = String(ped[4] || '').split('T')[0];
+                var abono = parseFloat(String(ped[11] || 0).replace(',', '.')) || 0;
+                if (f === todayStr && abono > 0) {
+                    var prodName = String(ped[1] || 'Varios').trim();
+                    var cant = parseFloat(String(ped[2] || 0).replace(',', '.')) || 0;
+                    if (!prodsCobradosMap[prodName]) {
+                        prodsCobradosMap[prodName] = { cant: 0, monto: 0 };
+                    }
+                    prodsCobradosMap[prodName].cant += cant;
+                    prodsCobradosMap[prodName].monto += abono;
+                    totalUnidadesCobradas += cant;
+                }
+            });
+
+            var usdHoyEl = document.getElementById('inicio-ventas-hoy-usd');
+            if (usdHoyEl) usdHoyEl.innerText = '$' + totalCobradoUSD.toFixed(2);
+            var bsHoyEl = document.getElementById('inicio-ventas-hoy-bs');
+            if (bsHoyEl) bsHoyEl.innerText = 'Bs. ' + (totalCobradoBs || (totalCobradoUSD * state.bcv)).toFixed(2);
+            var countHoyEl = document.getElementById('inicio-ventas-hoy-count');
+            if (countHoyEl) countHoyEl.innerText = totalUnidadesCobradas + ' unidades';
+
+            var listaHoyEl = document.getElementById('inicio-ventas-hoy-lista');
+            if (listaHoyEl) {
+                var prodKeys = Object.keys(prodsCobradosMap);
+                if (prodKeys.length === 0) {
+                    if (pagosHoy.length > 0) {
+                        listaHoyEl.innerHTML = pagosHoy.map(function (p) {
+                            var u = parseFloat(String(p[2]).replace(',', '.')) || 0;
+                            return '<div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 text-xs">' +
+                                '<div class="flex items-center gap-2">' +
+                                '<i class="fas fa-receipt text-emerald-500"></i>' +
+                                '<span class="font-bold text-slate-700 dark:text-slate-200">' + (p[1] || 'Abono') + '</span>' +
+                                '</div>' +
+                                '<span class="font-black text-emerald-600 dark:text-emerald-400">$' + u.toFixed(2) + '</span>' +
+                            '</div>';
+                        }).join('');
+                    } else {
+                        listaHoyEl.innerHTML = '<div class="py-6 text-center text-slate-400 dark:text-slate-500 text-xs font-bold"><i class="fas fa-shopping-bag opacity-40 text-2xl mb-1 block"></i>No hay ventas cobradas registradas hoy</div>';
+                    }
+                } else {
+                    prodKeys.sort();
+                    listaHoyEl.innerHTML = prodKeys.map(function (k) {
+                        var item = prodsCobradosMap[k];
+                        return '<div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 text-xs">' +
+                            '<div class="flex items-center gap-2">' +
+                            '<span class="w-6 h-6 rounded-lg bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-300 flex items-center justify-center font-black text-[11px]">' + item.cant + '</span>' +
+                            '<span class="font-bold text-slate-700 dark:text-slate-200 truncate max-w-[180px] sm:max-w-[240px]">' + k + '</span>' +
+                            '</div>' +
+                            '<span class="font-black text-emerald-600 dark:text-emerald-400">$' + item.monto.toFixed(2) + '</span>' +
+                        '</div>';
+                    }).join('');
+                }
+            }
+
+            // 2. PEDIDOS POR COBRAR (FIADOS)
+            var totalDeudaUSD = 0;
+            var deudasMap = {};
+
+            state.pedidosRaw.forEach(function (ped) {
+                var deuda = parseFloat(String(ped[12] || 0).replace(',', '.')) || 0;
+                if (deuda > 0.05) {
+                    totalDeudaUSD += deuda;
+                    var cliente = String(ped[0] || 'Cliente').trim();
+                    if (!deudasMap[cliente]) {
+                        deudasMap[cliente] = { total: 0, items: [], fecha: String(ped[4] || '').split('T')[0] };
+                    }
+                    deudasMap[cliente].total += deuda;
+                    deudasMap[cliente].items.push(ped[2] + 'x ' + ped[1]);
+                }
+            });
+
+            var deudasUsdEl = document.getElementById('inicio-deudas-usd');
+            if (deudasUsdEl) deudasUsdEl.innerText = '$' + totalDeudaUSD.toFixed(2);
+            var deudasBsEl = document.getElementById('inicio-deudas-bs');
+            if (deudasBsEl) deudasBsEl.innerText = 'Bs. ' + (totalDeudaUSD * state.bcv).toFixed(2);
+            var deudasCountEl = document.getElementById('inicio-deudas-count');
+            if (deudasCountEl) deudasCountEl.innerText = Object.keys(deudasMap).length + ' clientes fiados';
+
+            var deudasListaEl = document.getElementById('inicio-deudas-lista');
+            if (deudasListaEl) {
+                var dClientes = Object.keys(deudasMap);
+                if (dClientes.length === 0) {
+                    deudasListaEl.innerHTML = '<div class="py-6 text-center text-slate-400 dark:text-slate-500 text-xs font-bold"><i class="fas fa-check-double opacity-40 text-2xl mb-1 block"></i>¡Excelente! No hay deudas pendientes por cobrar</div>';
+                } else {
+                    dClientes.sort(function (a, b) {
+                        return deudasMap[b].total - deudasMap[a].total;
+                    });
+                    deudasListaEl.innerHTML = dClientes.slice(0, 8).map(function (c) {
+                        var dInfo = deudasMap[c];
+                        return '<div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 text-xs">' +
+                            '<div class="flex-1 pr-2 min-w-0">' +
+                            '<div class="flex items-center gap-1.5">' +
+                            '<span class="font-bold text-slate-800 dark:text-white truncate block">' + c + '</span>' +
+                            '<span class="text-[10px] text-slate-400 font-normal">(' + dInfo.fecha + ')</span>' +
+                            '</div>' +
+                            '<span class="text-[11px] text-slate-400 truncate block">' + dInfo.items.join(', ') + '</span>' +
+                            '</div>' +
+                            '<span class="font-black text-amber-600 dark:text-amber-400 leading-none">$' + dInfo.total.toFixed(2) + '</span>' +
+                        '</div>';
+                    }).join('');
+                }
+            }
+
+            // 3. DISTRIBUCIÓN SEMANAL POR ZONA
+            var curr = new Date();
+            var firstDay = curr.getDate() - (curr.getDay() === 0 ? 6 : curr.getDay() - 1);
+            var monday = new Date(curr.setDate(firstDay));
+            monday.setHours(0, 0, 0, 0);
+            var sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+
+            var monStr = monday.toISOString().split('T')[0];
+            var sunStr = sunday.toISOString().split('T')[0];
+
+            var rangoSemanaEl = document.getElementById('inicio-rango-semana');
+            if (rangoSemanaEl) {
+                var fStart = monStr.split('-');
+                var fEnd = sunStr.split('-');
+                rangoSemanaEl.innerText = fStart[2] + '/' + fStart[1] + ' al ' + fEnd[2] + '/' + fEnd[1];
+            }
+
+            var zonasMap = {};
+            state.pedidosRaw.forEach(function (ped) {
+                var f = String(ped[4] || '').split('T')[0];
+                if (f >= monStr && f <= sunStr) {
+                    var zona = String(ped[3] || 'Sin Zona').trim();
+                    if (!zona) zona = 'Sin Zona';
+                    if (!zonasMap[zona]) {
+                        zonasMap[zona] = {
+                            pedidosCount: 0,
+                            totalUSD: 0,
+                            unidades: 0,
+                            productos: {},
+                            entregados: 0,
+                            pendientes: 0
+                        };
+                    }
+                    var cant = parseFloat(String(ped[2] || 0).replace(',', '.')) || 0;
+                    var total = parseFloat(String(ped[5] || 0).replace(',', '.')) || 0;
+                    var prod = String(ped[1] || 'Producto').trim();
+                    var estado = String(ped[7] || '').trim();
+
+                    zonasMap[zona].pedidosCount++;
+                    zonasMap[zona].totalUSD += total;
+                    zonasMap[zona].unidades += cant;
+                    if (!zonasMap[zona].productos[prod]) zonasMap[zona].productos[prod] = 0;
+                    zonasMap[zona].productos[prod] += cant;
+
+                    if (estado === 'Entregado') {
+                        zonasMap[zona].entregados++;
+                    } else {
+                        zonasMap[zona].pendientes++;
+                    }
+                }
+            });
+
+            var zonasGridEl = document.getElementById('inicio-distribucion-zonas');
+            if (zonasGridEl) {
+                var zonaKeys = Object.keys(zonasMap);
+                if (zonaKeys.length === 0) {
+                    zonasGridEl.innerHTML = '<div class="col-span-full py-10 text-center text-slate-400 dark:text-slate-500 font-bold">' +
+                        '<i class="fas fa-map-marked-alt text-4xl mb-2 block opacity-30"></i>' +
+                        'No hay pedidos registrados en la semana actual (' + monStr + ' al ' + sunStr + ')' +
+                    '</div>';
+                } else {
+                    zonaKeys.sort(function (a, b) {
+                        return zonasMap[b].unidades - zonasMap[a].unidades;
+                    });
+
+                    zonasGridEl.innerHTML = zonaKeys.map(function (z) {
+                        var zData = zonasMap[z];
+                        var prodKeys = Object.keys(zData.productos).sort(function (a, b) {
+                            return zData.productos[b] - zData.productos[a];
+                        });
+
+                        var prodsBadgeHtml = prodKeys.map(function (pk) {
+                            return '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-white dark:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">' +
+                                '<span class="font-black text-brand-600 dark:text-brand-400">' + zData.productos[pk] + 'x</span> ' +
+                                '<span class="truncate max-w-[120px]">' + pk + '</span>' +
+                            '</span>';
+                        }).join('');
+
+                        var pctEntregados = zData.pedidosCount > 0 ? Math.round((zData.entregados / zData.pedidosCount) * 100) : 0;
+
+                        return '<div class="bg-white dark:bg-slate-800 rounded-2xl p-5 border border-slate-200 dark:border-slate-700 flex flex-col justify-between hover:shadow-md transition-shadow">' +
+                            '<div>' +
+                            '<div class="flex items-center justify-between mb-2">' +
+                            '<div class="flex items-center gap-2.5">' +
+                            '<div class="w-8 h-8 rounded-xl bg-brand-500 text-white flex items-center justify-center font-bold text-xs shadow-sm">' +
+                            '<i class="fas fa-map-pin"></i>' +
+                            '</div>' +
+                            '<h4 class="font-black text-slate-800 dark:text-white text-base leading-tight">' + z + '</h4>' +
+                            '</div>' +
+                            '<span class="text-xs font-black text-brand-600 dark:text-brand-400">$' + zData.totalUSD.toFixed(2) + '</span>' +
+                            '</div>' +
+                            '<div class="flex items-center gap-2 text-xs text-slate-400 mb-3">' +
+                            '<span><i class="fas fa-box mr-1"></i>' + zData.unidades + ' unidades</span>' +
+                            '<span>•</span>' +
+                            '<span><i class="fas fa-receipt mr-1"></i>' + zData.pedidosCount + ' pedidos</span>' +
+                            '</div>' +
+                            '<div class="mb-3">' +
+                            '<p class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider mb-1.5">Desglose de Productos</p>' +
+                            '<div class="flex flex-wrap gap-1.5">' +
+                            prodsBadgeHtml +
+                            '</div>' +
+                            '</div>' +
+                            '</div>' +
+                            '<div class="pt-3 border-t border-slate-100 dark:border-slate-700/70">' +
+                            '<div class="flex justify-between items-center text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-1">' +
+                            '<span>Progreso de Entrega</span>' +
+                            '<span>' + zData.entregados + '/' + zData.pedidosCount + ' (' + pctEntregados + '%)</span>' +
+                            '</div>' +
+                            '<div class="w-full bg-slate-100 dark:bg-slate-700 rounded-full h-1.5 overflow-hidden">' +
+                            '<div class="bg-emerald-500 h-1.5 rounded-full transition-all" style="width: ' + pctEntregados + '%"></div>' +
+                            '</div>' +
+                            '</div>' +
+                            '</div>';
+                    }).join('');
+                }
+            }
+        }
+
+        // --- GESTIÓN DE CATEGORÍAS ---
+        function openCategoriasModal() {
+            if (!state.currentUser || state.currentUser.rol !== 'Admin') {
+                return showToast("Acceso denegado: Solo administradores pueden gestionar categorías", "error");
+            }
+            cancelEditCategoria();
+            renderCategoriasGestion();
+            openModal('modal-categorias');
+        }
+
+        function renderCategoriasGestion() {
+            var lista = document.getElementById('lista-categorias-gestion');
+            if (!lista) return;
+            var cats = state.categorias || ['General'];
+            cats.sort(function (a, b) { return String(a).localeCompare(String(b)); });
+
+            if (cats.length === 0) {
+                lista.innerHTML = '<p class="text-xs text-slate-400 text-center py-4">No hay categorías registradas.</p>';
+                return;
+            }
+
+            lista.innerHTML = cats.map(function (c) {
+                var count = state.productos.filter(function (p) { return (p.categoria || 'General') === c; }).length;
+                var isGeneral = (c === 'General');
+                var cEsc = escapeJS(c);
+                var deleteBtn = isGeneral
+                    ? '<span class="text-[10px] text-slate-400 italic px-2">Predeterminada</span>'
+                    : '<button onclick="deleteCategoria(\'' + cEsc + '\')" class="w-7 h-7 bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors flex items-center justify-center cursor-pointer" title="Eliminar"><i class="fas fa-trash text-xs"></i></button>';
+
+                return '<div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 text-xs">' +
+                    '<div class="flex items-center gap-2">' +
+                    '<i class="fas fa-tag text-brand-500"></i>' +
+                    '<span class="font-bold text-slate-700 dark:text-slate-200">' + c + '</span>' +
+                    '<span class="px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-600 text-[10px] font-black text-slate-600 dark:text-slate-300">' + count + ' prods</span>' +
+                    '</div>' +
+                    '<div class="flex items-center gap-1">' +
+                    '<button onclick="editCategoria(\'' + cEsc + '\')" class="w-7 h-7 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors flex items-center justify-center cursor-pointer" title="Editar"><i class="fas fa-pen text-xs"></i></button>' +
+                    deleteBtn +
+                    '</div>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function editCategoria(nombre) {
+            document.getElementById('cat-old-name').value = nombre;
+            document.getElementById('cat-name-input').value = nombre;
+            document.getElementById('cat-form-title').innerText = 'Editar Categoría: ' + nombre;
+            document.getElementById('btn-cancel-cat').style.display = 'block';
+            document.getElementById('cat-name-input').focus();
+        }
+
+        function cancelEditCategoria() {
+            document.getElementById('cat-old-name').value = '';
+            document.getElementById('cat-name-input').value = '';
+            document.getElementById('cat-form-title').innerText = 'Nueva Categoría';
+            document.getElementById('btn-cancel-cat').style.display = 'none';
+        }
+
+        function saveCategoria() {
+            var oldName = document.getElementById('cat-old-name').value.trim();
+            var newName = document.getElementById('cat-name-input').value.trim();
+            if (!newName) return showToast("Ingresa el nombre de la categoría", "warning");
+
+            var btn = document.getElementById('btn-save-cat');
+            btn.disabled = true;
+            btn.innerText = "...";
+
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    btn.disabled = false;
+                    btn.innerText = "GUARDAR";
+                    procesarData(r);
+                    renderCategoriasGestion();
+                    renderPosCategorias();
+                    renderPosProducts();
+                    renderInventario();
+                    cancelEditCategoria();
+                    showToast("Categoría guardada");
+                })
+                .withFailureHandler(function (err) {
+                    btn.disabled = false;
+                    btn.innerText = "GUARDAR";
+                    showToast("Error al guardar categoría: " + err.message, "error");
+                })
+                .db_saveCategoria({ old: oldName, nombre: newName }, state.currentUser ? state.currentUser.id : "");
+        }
+
+        function deleteCategoria(nombre) {
+            if (nombre === 'General') return showToast("No se puede eliminar la categoría predeterminada", "warning");
+            customConfirm('¿Eliminar la categoría "' + nombre + '"? Los productos asignados a ella pasarán a la categoría "General".', function (yes) {
+                if (!yes) return;
+                google.script.run
+                    .withSuccessHandler(function (r) {
+                        procesarData(r);
+                        renderCategoriasGestion();
+                        renderPosCategorias();
+                        renderPosProducts();
+                        renderInventario();
+                        showToast("Categoría eliminada");
+                    })
+                    .withFailureHandler(function (err) {
+                        showToast("Error al eliminar categoría: " + err.message, "error");
+                    })
+                    .db_delCategoria(nombre, state.currentUser ? state.currentUser.id : "");
+            });
+        }
+
+        function renderPosCategorias() {
+            var grid = document.getElementById('pos-cat-grid');
+            if (!grid) return;
+            var cats = state.categorias || ['General'];
+            var totalProds = state.productos.length;
+            var isAllActive = !state.categoriaSeleccionada || state.categoriaSeleccionada === 'TODAS';
+
+            var allBtnCls = isAllActive
+                ? 'bg-brand-500 text-white shadow-md font-black border-brand-500'
+                : 'bg-white dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 border-slate-200 dark:border-slate-600 font-bold';
+
+            var html = '<button onclick="selectPosCategoria(\'TODAS\')" class="px-3.5 py-1.5 rounded-xl border text-xs whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ' + allBtnCls + '">' +
+                '<i class="fas fa-th-large text-[11px]"></i>' +
+                '<span>Todas</span>' +
+                '<span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] ' + (isAllActive ? 'bg-white/30 text-white' : 'bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300') + ' font-black">' + totalProds + '</span>' +
+            '</button>';
+
+            cats.forEach(function (c) {
+                var isActive = state.categoriaSeleccionada === c;
+                var count = state.productos.filter(function (p) { return (p.categoria || 'General') === c; }).length;
+                var cls = isActive
+                    ? 'bg-brand-500 text-white shadow-md font-black border-brand-500'
+                    : 'bg-white dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 border-slate-200 dark:border-slate-600 font-bold';
+                html += '<button onclick="selectPosCategoria(\'' + escapeJS(c) + '\')" class="px-3.5 py-1.5 rounded-xl border text-xs whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ' + cls + '">' +
+                    '<span>' + c + '</span>' +
+                    '<span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] ' + (isActive ? 'bg-white/30 text-white' : 'bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300') + ' font-black">' + count + '</span>' +
+                '</button>';
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function selectPosCategoria(cat) {
+            state.categoriaSeleccionada = cat;
+            renderPosCategorias();
+            renderPosProducts();
+        }
+
         function renderPosProducts() {
-            var term = String(document.getElementById('search-prod').value).toLowerCase();
-            document.getElementById('grid-productos').innerHTML = state.productos.filter(function (p) { return String(p.nombre).toLowerCase().includes(term); }).map(function (p) {
+            renderPosCategorias();
+            var term = String(document.getElementById('search-prod') ? document.getElementById('search-prod').value : '').toLowerCase().trim();
+            var list = state.productos.slice();
+
+            // Filtrar por categoría
+            if (state.categoriaSeleccionada && state.categoriaSeleccionada !== 'TODAS') {
+                list = list.filter(function (p) {
+                    return (p.categoria || 'General') === state.categoriaSeleccionada;
+                });
+            }
+
+            // Filtrar por texto de búsqueda
+            if (term) {
+                list = list.filter(function (p) {
+                    return String(p.nombre).toLowerCase().includes(term);
+                });
+            }
+
+            // Orden alfabético
+            list.sort(function (a, b) {
+                return String(a.nombre).localeCompare(String(b.nombre));
+            });
+
+            var grid = document.getElementById('grid-productos');
+            if (!grid) return;
+
+            if (list.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 dark:text-slate-500 font-bold"><i class="fas fa-boxes text-4xl mb-3 block opacity-30"></i>No hay productos disponibles en esta categoría</div>';
+                return;
+            }
+
+            grid.innerHTML = list.map(function (p) {
                 var price = getProdPrice(p);
                 var clickAction = 'addToCart(' + p.idOriginal + ')';
                 var isAgotado = p.stock === 0;
                 var isPorHacer = 0 > p.stock;
-                
+
                 var bgBorderClass = isAgotado
                     ? 'border-pink-300 dark:border-pink-700/50 bg-pink-50 dark:bg-pink-900/10 hover:border-pink-400 cursor-pointer'
-                    : (isPorHacer 
+                    : (isPorHacer
                         ? 'border-red-300 dark:border-red-700/50 bg-red-50 dark:bg-red-900/10 hover:border-red-400 cursor-pointer'
                         : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-brand-500 dark:hover:border-brand-400 cursor-pointer');
-                
+
                 var agotadoTag = isAgotado
-                    ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-pink-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">AGOTADO</span></div>' 
-                    : (isPorHacer 
-                        ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-red-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">EN NEGATIVO</span></div>' 
+                    ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-pink-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">AGOTADO</span></div>'
+                    : (isPorHacer
+                        ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-red-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">EN NEGATIVO</span></div>'
                         : '');
-                    
+
                 var stockClassText = 0 > p.stock ? 'text-red-500 dark:text-red-400' : 'text-slate-400 dark:text-slate-500';
-                
-                return '<div onclick="' + clickAction + '" class="border ' + bgBorderClass + ' rounded-2xl p-4 flex flex-col justify-between min-h-[9rem] h-auto transition-all relative overflow-hidden">' + 
-                       agotadoTag + 
+
+                // Indicador de cantidad en carrito
+                var cartItem = state.carrito.find(function (c) { return c.idOriginal === p.idOriginal; });
+                var cartBadge = cartItem ? '<span class="bg-brand-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">En Carrito (x' + cartItem.cantidad + ')</span>' : '';
+
+                return '<div onclick="' + clickAction + '" class="border ' + bgBorderClass + ' rounded-2xl p-4 flex flex-col justify-between min-h-[9rem] h-auto transition-all relative overflow-hidden group hover:shadow-md">' +
+                       agotadoTag +
+                       '<div>' +
+                       '<div class="flex justify-between items-start gap-1 mb-1">' +
+                       '<span class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider truncate max-w-[120px]">' + (p.categoria || 'General') + '</span>' +
+                       cartBadge +
+                       '</div>' +
                        '<h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm leading-tight relative z-10">' + p.nombre + '</h4>' +
-                       '<div class="flex justify-between items-end mt-2 border-t border-slate-100 dark:border-slate-700/50 pt-2 relative z-10">' +
+                       '</div>' +
+                       '<div class="flex justify-between items-end mt-3 border-t border-slate-100 dark:border-slate-700/50 pt-2 relative z-10">' +
                        '<span class="text-xs font-bold ' + stockClassText + ' bg-slate-100 dark:bg-slate-700/50 px-2 py-1 rounded-lg backdrop-blur-sm">Stock: ' + p.stock + '</span>' +
                        '<span class="text-brand-600 dark:text-brand-400 font-black text-lg">$' + price.toFixed(2) + '</span>' +
                        '</div></div>';
@@ -3126,22 +3835,43 @@
 
         function calculateCartTotals() {
             var t = state.carrito.reduce(function (s, i) { return s + (getProdPrice(state.productos[i.idOriginal]) * i.cantidad); }, 0);
+            var totalBs = t * state.bcv;
             document.getElementById('cart-total-usd').innerText = '$' + t.toFixed(2);
-            document.getElementById('cart-total-bs').innerText = 'Bs. ' + (t * state.bcv).toFixed(2);
+            document.getElementById('cart-total-bs').innerText = 'Bs. ' + totalBs.toFixed(2);
+
+            var mobUsd = document.getElementById('pos-mobile-total-usd');
+            if (mobUsd) mobUsd.innerText = '$' + t.toFixed(2);
+            var mobBs = document.getElementById('pos-mobile-total-bs');
+            if (mobBs) mobBs.innerText = 'Bs. ' + totalBs.toFixed(2);
+            var mobBadge = document.getElementById('pos-mobile-cart-badge');
+            if (mobBadge) {
+                var totalItems = state.carrito.reduce(function (acc, item) { return acc + item.cantidad; }, 0);
+                mobBadge.innerText = totalItems;
+            }
+            var mobBtn = document.getElementById('btn-mobile-procesar');
+            if (mobBtn) mobBtn.disabled = state.carrito.length === 0;
+
             return t;
         }
 
         function openCheckoutModal(mode, indicesDeuda, montoDeuda) {
             mode = mode || 'pos';
-            document.getElementById('checkout-mode').value = mode; document.getElementById('pay-usd').value = ''; document.getElementById('pay-bs').value = ''; document.getElementById('pay-ref').value = ''; document.getElementById('pay-nota').value = '';
+            document.getElementById('checkout-mode').value = mode;
+            document.getElementById('pay-usd').value = '';
+            document.getElementById('pay-bs').value = '';
+            document.getElementById('pay-ref').value = '';
+            document.getElementById('pay-nota').value = '';
             var t = mode === 'pos' ? calculateCartTotals() : parseFloat(String(montoDeuda).replace(',', '.'));
             if (mode === 'pos' && !document.getElementById('pos-cliente').value) return showToast("Ingresa el cliente", "error");
             if (mode !== 'pos') document.getElementById('checkout-indices').value = indicesDeuda;
 
             document.getElementById('btn-solo-guardar').style.display = mode === 'pos' ? 'block' : 'none';
+            var btnWapp = document.getElementById('btn-wapp-tx');
+            if (btnWapp) btnWapp.style.display = mode === 'pos' ? 'flex' : 'none';
             document.getElementById('checkout-total-usd').innerText = '$' + t.toFixed(2);
             document.getElementById('checkout-total-bs').innerText = 'Bs. ' + (t * state.bcv).toFixed(2);
-            calculateCheckout(); openModal('modal-checkout');
+            calculateCheckout();
+            openModal('modal-checkout');
         }
 
         function calculateCheckout() {
@@ -3166,12 +3896,17 @@
             }
         }
 
-        function confirmTransaction(soloGuardar) {
+        function confirmTransaction(soloGuardar, sendWapp) {
             var mode = document.getElementById('checkout-mode').value;
-            if (soloGuardar) { document.getElementById('pay-usd').value = '0'; document.getElementById('pay-bs').value = '0'; calculateCheckout(); }
+            if (soloGuardar || sendWapp) {
+                document.getElementById('pay-usd').value = '0';
+                document.getElementById('pay-bs').value = '0';
+                calculateCheckout();
+            }
 
             var btn1 = document.getElementById('btn-confirm-tx'); btn1.disabled = true; btn1.innerText = "PROC...";
             var btn2 = document.getElementById('btn-solo-guardar'); btn2.disabled = true;
+            var btn3 = document.getElementById('btn-wapp-tx'); if (btn3) btn3.disabled = true;
 
             var pUStr = document.getElementById('pay-usd').value.replace(',', '.');
             var pBStr = document.getElementById('pay-bs').value.replace(',', '.');
@@ -3224,6 +3959,18 @@
                     state.pagosRaw.push([new Date().toISOString(), cName, rU, rU * state.bcv, state.bcv, ref, nota, '', numEntrega, state.currentUser ? state.currentUser.id : ""]);
                 }
                 if (!state.clientPhones[cName] && newPhone) state.clientPhones[cName] = newPhone;
+
+                // Si se solicita notificar por WhatsApp
+                if (sendWapp) {
+                    var montoWapp = form.restante || form.totalUSD;
+                    var montoBsWapp = (montoWapp * state.bcv).toFixed(2);
+                    var cleanPhone = (newPhone || state.clientPhones[cName] || '').replace(/\D/g, '');
+                    if (cleanPhone.startsWith('0')) cleanPhone = '58' + cleanPhone.substring(1);
+                    var msg = '\u2728 *\u00A1Hola ' + cName + '!* Te saludamos de *Dulce Bethel* \uD83C\uDF53\n\nPasamos por aqu\u00ED para recordarte que tienes un saldo pendiente de: *$' + montoWapp.toFixed(2) + '*\n*Monto: ' + montoBsWapp + ' Bs*\n\n----------------------------------\n\uD83D\uDCB3 *DATOS DE PAGO M\u00D3VIL:*\n* *Banco:* Bancamiga (0172)\n* *Tel\u00E9fono:* 04148007840\n* *C\u00E9dula:* 18401182\n----------------------------------\n\n\u00A1Muchas gracias por tu preferencia! \uD83D\uDE4F\n\n\u00A1S\u00EDguenos en Instagram para ver nuestras novedades y promociones exclusivas!\n\ud83d\udc49 https://www.instagram.com/dulcebethel.mgta';
+                    var wappUrl = "https://api.whatsapp.com/send?" + (cleanPhone ? "phone=" + cleanPhone + "&" : "") + "text=" + encodeURIComponent(msg);
+                    window.open(wappUrl, '_blank');
+                }
+
                 // Mostrar resultado al instante
                 state.carrito = [];
                 document.getElementById('pos-cliente').value = '';
@@ -3232,8 +3979,9 @@
                 renderCart();
                 closeModal('modal-checkout');
                 btn1.disabled = false; btn1.innerHTML = "COBRAR Y<br>FACTURAR"; btn2.disabled = false;
+                if (btn3) btn3.disabled = false;
                 showToast(soloGuardar ? "Guardado como deuda." : "¡Venta completada!");
-                renderPosProducts(); renderProduccion(); renderRutas(); renderClientes(); renderDeudas(); renderInventario(); renderPagos(); renderGastos(); renderNotifs();
+                renderPosProducts(); renderProduccion(); renderRutas(); renderClientes(); renderDeudas(); renderInventario(); renderPagos(); renderGastos(); renderNotifs(); renderInicio();
                 if (!document.getElementById('view-finanzas').classList.contains('hidden')) { renderFinanzasFiltro(); renderEstadoCuenta(); }
 
                 // Sincronizar con servidor en segundo plano
@@ -3246,7 +3994,7 @@
                     .withFailureHandler(function (err) {
                         state.pendingOps--;
                         showToast('Error al sincronizar: ' + err.message, 'error');
-                        google.script.run.withSuccessHandler(function (d) { state.pendingOps = 0; procesarData(d); renderPosProducts(); renderRutas(); renderDeudas(); renderInventario(); renderPagos(); }).db_getData();
+                        google.script.run.withSuccessHandler(function (d) { state.pendingOps = 0; procesarData(d); renderPosProducts(); renderRutas(); renderDeudas(); renderInventario(); renderPagos(); renderInicio(); }).db_getData();
                     })
                     .db_saveOrder(form, fullCart, state.currentUser ? state.currentUser.id : "");
 
@@ -3282,8 +4030,9 @@
                 // Mostrar resultado al instante
                 closeModal('modal-checkout');
                 btn1.disabled = false; btn1.innerHTML = "COBRAR Y<br>FACTURAR"; btn2.disabled = false;
+                if (btn3) btn3.disabled = false;
                 showToast("¡Abono registrado!");
-                renderDeudas(); renderPagos(); renderClientes(); renderNotifs();
+                renderDeudas(); renderPagos(); renderClientes(); renderNotifs(); renderInicio();
                 if (!document.getElementById('view-finanzas').classList.contains('hidden')) { renderFinanzasFiltro(); renderEstadoCuenta(); }
 
                 // Sincronizar con servidor en segundo plano
@@ -3296,7 +4045,7 @@
                     .withFailureHandler(function (err) {
                         state.pendingOps--;
                         showToast('Error al sincronizar abono: ' + err.message, 'error');
-                        google.script.run.withSuccessHandler(function (d) { state.pendingOps = 0; procesarData(d); renderDeudas(); renderPagos(); }).db_getData();
+                        google.script.run.withSuccessHandler(function (d) { state.pendingOps = 0; procesarData(d); renderDeudas(); renderPagos(); renderInicio(); }).db_getData();
                     })
                     .db_payDebt(realIdsStr, rU, ref, nota, state.bcv, numEntrega, state.currentUser ? state.currentUser.id : "");
             }
@@ -3340,6 +4089,17 @@
                 return { nombre: r[0], tipo: r[1], unidad: r[2], stock: parseNum(r[3]), stockMinimo: parseNum(r[4]), notificar: String(r[5]).toUpperCase() === "SI" };
             });
 
+            // Categorías
+            state.categorias = (d.categorias && d.categorias.length > 0) ? d.categorias.slice() : [];
+            state.productos.forEach(function (p) {
+                var c = (p.categoria || 'General').trim();
+                if (c && state.categorias.indexOf(c) === -1) state.categorias.push(c);
+            });
+            if (state.categorias.indexOf('General') === -1) state.categorias.push('General');
+            state.categorias.sort(function (a, b) { return String(a).localeCompare(String(b)); });
+
+            // Orden alfabético de productos y reasignación de idOriginal
+            state.productos.sort(function (a, b) { return String(a.nombre).localeCompare(String(b.nombre)); });
             for (var i = 0; i < state.productos.length; i++) state.productos[i].idOriginal = i;
             var uniqueClientes = {};
             state.clientes.forEach(function (c) { if (c) uniqueClientes[c.trim()] = true; });
@@ -3368,13 +4128,15 @@
             var usersSet = {};
             state.movimientosRaw.forEach(m => { if (m[3]) usersSet[String(m[3]).trim()] = true; });
             document.getElementById('mov-users-list').innerHTML = Object.keys(usersSet).map(u => `<option value="${u}">`).join('');
+            renderInicio();
         }
 
         function endTx(msg) {
             closeModal('modal-checkout');
             document.getElementById('btn-confirm-tx').disabled = false; document.getElementById('btn-confirm-tx').innerHTML = "COBRAR Y<br>FACTURAR";
             document.getElementById('btn-solo-guardar').disabled = false;
-            showToast(msg); renderPosProducts(); renderProduccion(); renderRutas(); renderClientes(); renderDeudas(); renderInventario(); renderPagos(); renderGastos(); renderNotifs();
+            if (document.getElementById('btn-wapp-tx')) document.getElementById('btn-wapp-tx').disabled = false;
+            showToast(msg); renderPosProducts(); renderProduccion(); renderRutas(); renderClientes(); renderDeudas(); renderInventario(); renderPagos(); renderGastos(); renderNotifs(); renderInicio();
             if (!document.getElementById('view-finanzas').classList.contains('hidden')) {
                 renderFinanzasFiltro();
                 renderEstadoCuenta();
@@ -4501,18 +5263,98 @@
         }
 
         function renderInventario() {
-            document.getElementById('tabla-inv').innerHTML = state.productos.map(function (p, i) {
+            var list = state.productos.slice();
+            list.sort(function (a, b) { return String(a.nombre).localeCompare(String(b.nombre)); });
+
+            document.getElementById('tabla-inv').innerHTML = list.map(function (p) {
+                var origIdx = p.idOriginal;
                 var stockClass = p.stock < 0 ? 'bg-red-100 dark:bg-red-900/40 text-red-600 dark:text-red-400' : (p.stock === 0 ? 'bg-pink-100 dark:bg-pink-900/40 text-pink-600 dark:text-pink-400' : (p.stock <= 5 ? 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-600 dark:text-yellow-500' : 'bg-slate-100 dark:bg-slate-700 dark:text-white'));
-                return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700 transition-colors"><td class="p-4 font-bold dark:text-slate-200">' + p.nombre + '</td><td class="p-4 text-center font-black text-brand-600 dark:text-brand-400">$' + p.precio.toFixed(2) + '</td><td class="p-4 text-center font-bold text-slate-500 dark:text-slate-400">$' + (p.precioMayor || 0).toFixed(2) + '</td><td class="p-4 text-center"><span class="px-3 py-1 rounded-lg text-xs font-black ' + stockClass + '">' + p.stock + '</span></td><td class="p-4 text-right"><button onclick="openProductModal(' + i + ')" class="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg mr-1 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors"><i class="fas fa-pen text-xs"></i></button><button onclick="deleteProduct(' + i + ')" class="w-8 h-8 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors"><i class="fas fa-trash text-xs"></i></button></td></tr>';
+                var catBadge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 mr-2 border border-slate-200 dark:border-slate-600">' + (p.categoria || 'General') + '</span>';
+
+                return '<tr class="hover:bg-slate-50 dark:hover:bg-slate-700/50 border-b border-slate-100 dark:border-slate-700 transition-colors">' +
+                    '<td class="p-4 font-bold dark:text-slate-200"><div class="flex items-center">' + catBadge + '<span>' + p.nombre + '</span></div></td>' +
+                    '<td class="p-4 text-center font-black text-brand-600 dark:text-brand-400">$' + p.precio.toFixed(2) + '</td>' +
+                    '<td class="p-4 text-center font-bold text-slate-500 dark:text-slate-400">$' + (p.precioMayor || 0).toFixed(2) + '</td>' +
+                    '<td class="p-4 text-center"><span class="px-3 py-1 rounded-lg text-xs font-black ' + stockClass + '">' + p.stock + '</span></td>' +
+                    '<td class="p-4 text-right">' +
+                    '<button onclick="openProductModal(' + origIdx + ')" class="w-8 h-8 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg mr-1 hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors cursor-pointer" title="Editar"><i class="fas fa-pen text-xs"></i></button>' +
+                    '<button onclick="deleteProduct(' + origIdx + ')" class="w-8 h-8 bg-brand-50 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 rounded-lg hover:bg-brand-100 dark:hover:bg-brand-900/50 transition-colors cursor-pointer" title="Eliminar"><i class="fas fa-trash text-xs"></i></button>' +
+                    '</td></tr>';
             }).join('');
         }
-        function openProductModal(i) { document.getElementById('modal-prod-title').innerText = i >= 0 ? "Editar" : "Nuevo"; if (i >= 0) { var p = state.productos[i]; document.getElementById('prod-original-name').value = p.nombre; document.getElementById('prod-name').value = p.nombre; document.getElementById('prod-price').value = p.precio; document.getElementById('prod-mayor').value = p.precioMayor || ''; document.getElementById('prod-stock').value = p.stock; } else { document.getElementById('prod-original-name').value = ''; document.getElementById('prod-name').value = ''; document.getElementById('prod-price').value = ''; document.getElementById('prod-mayor').value = ''; document.getElementById('prod-stock').value = ''; } openModal('modal-product'); }
-        function saveProduct() {
-            var p = { old: document.getElementById('prod-original-name').value, nombre: document.getElementById('prod-name').value, precio: parseFloat(document.getElementById('prod-price').value.replace(',', '.')) || 0, precioMayor: parseFloat(document.getElementById('prod-mayor').value.replace(',', '.')) || 0, stock: parseInt(document.getElementById('prod-stock').value) || 0 };
-            if (!p.nombre) return; document.getElementById('btn-save-prod').disabled = true;
-            google.script.run.withSuccessHandler(function (r) { procesarData(r); closeModal('modal-product'); document.getElementById('btn-save-prod').disabled = false; renderInventario(); renderPosProducts(); showToast("Guardado"); }).db_saveProduct(p, state.currentUser ? state.currentUser.id : "");
+
+        function openProductModal(i) {
+            document.getElementById('modal-prod-title').innerText = i >= 0 ? "Editar Producto" : "Nuevo Producto";
+            var catSel = document.getElementById('prod-categoria');
+            if (catSel) {
+                var cats = (state.categorias && state.categorias.length > 0) ? state.categorias.slice() : ['General'];
+                cats.sort(function (a, b) { return String(a).localeCompare(String(b)); });
+                catSel.innerHTML = cats.map(function (c) {
+                    return '<option value="' + escapeJS(c) + '">' + c + '</option>';
+                }).join('');
+            }
+
+            if (i >= 0) {
+                var p = state.productos[i];
+                document.getElementById('prod-original-name').value = p.nombre;
+                document.getElementById('prod-name').value = p.nombre;
+                if (catSel) catSel.value = p.categoria || 'General';
+                document.getElementById('prod-price').value = p.precio;
+                document.getElementById('prod-mayor').value = p.precioMayor || '';
+                document.getElementById('prod-stock').value = p.stock;
+            } else {
+                document.getElementById('prod-original-name').value = '';
+                document.getElementById('prod-name').value = '';
+                if (catSel) catSel.value = (state.categoriaSeleccionada && state.categoriaSeleccionada !== 'TODAS') ? state.categoriaSeleccionada : 'General';
+                document.getElementById('prod-price').value = '';
+                document.getElementById('prod-mayor').value = '';
+                document.getElementById('prod-stock').value = '';
+            }
+            openModal('modal-product');
         }
-        function deleteProduct(i) { var n = state.productos[i].nombre; customConfirm('¿Eliminar ' + n + '?', function(yes) { if (yes) google.script.run.withSuccessHandler(function (r) { procesarData(r); renderInventario(); renderPosProducts(); showToast("Eliminado"); }).db_delProduct(n, state.currentUser ? state.currentUser.id : ""); }); }
+
+        function saveProduct() {
+            var catSel = document.getElementById('prod-categoria');
+            var catVal = (catSel && catSel.value) ? catSel.value.trim() : 'General';
+            var p = {
+                old: document.getElementById('prod-original-name').value,
+                nombre: document.getElementById('prod-name').value.trim(),
+                categoria: catVal,
+                precio: parseFloat(document.getElementById('prod-price').value.replace(',', '.')) || 0,
+                precioMayor: parseFloat(document.getElementById('prod-mayor').value.replace(',', '.')) || 0,
+                stock: parseInt(document.getElementById('prod-stock').value) || 0
+            };
+            if (!p.nombre) return showToast("Ingresa el nombre del producto", "warning");
+            document.getElementById('btn-save-prod').disabled = true;
+            google.script.run
+                .withSuccessHandler(function (r) {
+                    procesarData(r);
+                    closeModal('modal-product');
+                    document.getElementById('btn-save-prod').disabled = false;
+                    renderInventario();
+                    renderPosCategorias();
+                    renderPosProducts();
+                    showToast("Producto guardado");
+                })
+                .withFailureHandler(function (err) {
+                    document.getElementById('btn-save-prod').disabled = false;
+                    showToast("Error al guardar: " + err.message, "error");
+                })
+                .db_saveProduct(p, state.currentUser ? state.currentUser.id : "");
+        }
+
+        function deleteProduct(i) {
+            var n = state.productos[i].nombre;
+            customConfirm('¿Eliminar ' + n + '?', function (yes) {
+                if (yes) google.script.run.withSuccessHandler(function (r) {
+                    procesarData(r);
+                    renderInventario();
+                    renderPosCategorias();
+                    renderPosProducts();
+                    showToast("Eliminado");
+                }).db_delProduct(n, state.currentUser ? state.currentUser.id : "");
+            });
+        }
 
         function renderFinanzasFiltro() {
             var qSet = {};
@@ -4959,6 +5801,10 @@
                 var match = el.getAttribute('onclick').match(/'([^']+)'/);
                 if (match) {
                     var t = match[1];
+                    if (t === 'inicio') {
+                        el.classList.remove('hidden');
+                        return;
+                    }
                     // Si es la pestaña de usuarios, ya la manejamos arriba por rol, 
                     // pero aquí reforzamos la ocultación si no es admin.
                     if (t === 'usuarios' && !isAdmin) {
@@ -4974,6 +5820,10 @@
                 }
             });
 
+            // Permisos botón Gestionar Categorías (solo Admin)
+            var btnCat = document.getElementById('btn-gestionar-cat');
+            if (btnCat) btnCat.classList.toggle('hidden', !isAdmin);
+
             // 4. Permisos de Borrado
             if (state.currentUser.permisosDelete === "NO") {
                 document.querySelectorAll('.fa-trash, .fa-trash-alt').forEach(function (el) {
@@ -4981,10 +5831,13 @@
                     if (btn) btn.classList.add('hidden');
                 });
             }
+
+            renderInicio();
         }
 
         // --- GESTIÓN DE USUARIOS ---
         const AVAILABLE_TABS = [
+            { id: 'inicio', label: 'Inicio', icon: 'fa-home' },
             { id: 'pos', label: 'Caja', icon: 'fa-cash-register' },
             { id: 'produccion', label: 'Producción', icon: 'fa-hammer' },
             { id: 'ruta', label: 'Rutas', icon: 'fa-motorcycle' },

@@ -18,7 +18,7 @@ const mappers = {
     produccion: (d) => [d.fecha, d.producto, d.cantidad, d.usuario_id, d.id],
     movimientos: (d) => [d.fecha, d.tipo, d.categoria, d.persona, d.descripcion, d.monto_usd, d.usuario_id],
     materia_prima: (d) => [d.nombre, d.tipo, d.unidad, d.stock, d.stock_minimo, d.notificar, d.usuario_id],
-    productos: (d) => [d.nombre, d.precio, d.stock, d.precio_mayor, d.usuario_id],
+    productos: (d) => [d.nombre, d.precio, d.stock, d.precio_mayor, d.usuario_id, d.categoria],
     recetario: (d) => [d.producto, d.ingrediente, d.cantidad, d.unidad, d.usuario_id]
 }
 
@@ -50,7 +50,8 @@ async function db_getData() {
         db_getBCV(),
         supabase.from('productos').select('*').order('id'),
         supabase.from('lugares').select('*').order('id'),
-        supabase.from('clientes').select('*').order('id')
+        supabase.from('clientes').select('*').order('id'),
+        supabase.from('categorias').select('*').order('nombre').then(r => r).catch(() => ({ data: [] }))
     ]);
     const b2 = await Promise.all([
         supabase.from('pedidos').select('*').order('id'),
@@ -72,6 +73,7 @@ async function db_getData() {
     const productosData = b1[2].data;
     const lugaresData = b1[3].data;
     const clientesData = b1[4].data;
+    const categoriasData = (b1[5] && b1[5].data) ? b1[5].data : [];
 
     const pedidosData = b2[0].data;
     const pagosData = b2[1].data;
@@ -86,8 +88,18 @@ async function db_getData() {
     const audData = b3[4].data;
 
     const productos = (productosData || []).map(p => ({
-        nombre: p.nombre, precio: p.precio||0, stock: p.stock||0, precioMayor: p.precio_mayor||0
+        nombre: p.nombre,
+        precio: p.precio || 0,
+        stock: p.stock || 0,
+        precioMayor: p.precio_mayor || 0,
+        categoria: (p.categoria && String(p.categoria).trim()) ? String(p.categoria).trim() : 'General'
     }));
+
+    // Extract all unique categories
+    const catSet = new Set(['General']);
+    categoriasData.forEach(c => { if(c && c.nombre && c.nombre.trim()) catSet.add(c.nombre.trim()); });
+    productos.forEach(p => { if(p.categoria) catSet.add(p.categoria); });
+    const categorias = Array.from(catSet).sort((a,b) => a.localeCompare(b));
 
     const lugares = (lugaresData || []).map(l => l.nombre);
     const clientes = (clientesData || []).map(c => c.nombre);
@@ -102,6 +114,7 @@ async function db_getData() {
         config: confObj,
         bcv: bcvRate,
         productos: productos,
+        categorias: categorias,
         lugares: lugares,
         clientes: clientes,
         pedidosRaw: (pedidosData||[]).map(mappers.pedidos),
@@ -373,6 +386,7 @@ async function db_saveProduct(p, userId) {
         precio: parseFloat(p.precio||0),
         stock: parseFloat(p.stock||0),
         precio_mayor: parseFloat(p.precioMayor||0),
+        categoria: (p.categoria && String(p.categoria).trim()) ? String(p.categoria).trim() : 'General',
         usuario_id: userId
     };
     if(p.old) {
@@ -380,11 +394,43 @@ async function db_saveProduct(p, userId) {
     } else {
         await supabase.from('productos').upsert(payload, {onConflict: 'nombre'});
     }
+    if (payload.categoria && payload.categoria !== 'General') {
+        try {
+            await supabase.from('categorias').upsert({ nombre: payload.categoria, usuario_id: userId }, { onConflict: 'nombre' });
+        } catch(e) {}
+    }
     return await db_getData();
 }
 
 async function db_delProduct(n, userId) {
     await supabase.from('productos').delete().eq('nombre', n);
+    return await db_getData();
+}
+
+async function db_saveCategoria(c, userId) {
+    const nombre = ((c && c.nombre) || '').trim();
+    if (!nombre) return await db_getData();
+    try {
+        if (c.old && c.old !== nombre) {
+            await supabase.from('categorias').update({ nombre: nombre }).eq('nombre', c.old);
+            await supabase.from('productos').update({ categoria: nombre }).eq('categoria', c.old);
+        } else {
+            await supabase.from('categorias').upsert({ nombre: nombre, usuario_id: userId }, { onConflict: 'nombre' });
+        }
+    } catch(e) {
+        console.error("Error in db_saveCategoria:", e);
+    }
+    return await db_getData();
+}
+
+async function db_delCategoria(nombre, userId) {
+    if (!nombre) return await db_getData();
+    try {
+        await supabase.from('categorias').delete().eq('nombre', nombre);
+        await supabase.from('productos').update({ categoria: 'General' }).eq('categoria', nombre);
+    } catch(e) {
+        console.error("Error in db_delCategoria:", e);
+    }
     return await db_getData();
 }
 
@@ -644,5 +690,7 @@ window.Backend = {
     db_ajustarMateriaPrima,
     db_deletePedidosBulk,
     db_updateUserPerfil,
-    db_revertAudit
+    db_revertAudit,
+    db_saveCategoria,
+    db_delCategoria
 };
