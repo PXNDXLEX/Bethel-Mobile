@@ -99,6 +99,10 @@ async function db_getData() {
     const catSet = new Set(['General']);
     categoriasData.forEach(c => { if(c && c.nombre && c.nombre.trim()) catSet.add(c.nombre.trim()); });
     productos.forEach(p => { if(p.categoria) catSet.add(p.categoria); });
+    try {
+        let localCats = JSON.parse(localStorage.getItem('db_custom_categorias') || '[]');
+        localCats.forEach(c => { if(c && c.trim()) catSet.add(c.trim()); });
+    } catch(e) {}
     const categorias = Array.from(catSet).sort((a,b) => a.localeCompare(b));
 
     const lugares = (lugaresData || []).map(l => l.nombre);
@@ -410,26 +414,48 @@ async function db_delProduct(n, userId) {
 async function db_saveCategoria(c, userId) {
     const nombre = ((c && c.nombre) || '').trim();
     if (!nombre) return await db_getData();
+
+    // Guardar en fallback local inmediato para disponibilidad inmediata
+    try {
+        let localCats = JSON.parse(localStorage.getItem('db_custom_categorias') || '[]');
+        if (c.old && c.old !== nombre) {
+            localCats = localCats.map(x => x === c.old ? nombre : x);
+        } else if (!localCats.includes(nombre)) {
+            localCats.push(nombre);
+        }
+        localStorage.setItem('db_custom_categorias', JSON.stringify(localCats));
+    } catch(e) {}
+
     try {
         if (c.old && c.old !== nombre) {
-            await supabase.from('categorias').update({ nombre: nombre }).eq('nombre', c.old);
-            await supabase.from('productos').update({ categoria: nombre }).eq('categoria', c.old);
+            const { error: err1 } = await supabase.from('categorias').update({ nombre: nombre }).eq('nombre', c.old);
+            const { error: err2 } = await supabase.from('productos').update({ categoria: nombre }).eq('categoria', c.old);
+            if (err1) console.warn("Supabase update categoria notice:", err1.message);
         } else {
-            await supabase.from('categorias').upsert({ nombre: nombre, usuario_id: userId }, { onConflict: 'nombre' });
+            const { error } = await supabase.from('categorias').upsert({ nombre: nombre, usuario_id: userId }, { onConflict: 'nombre' });
+            if (error) console.warn("Supabase insert categoria notice:", error.message);
         }
     } catch(e) {
-        console.error("Error in db_saveCategoria:", e);
+        console.warn("Exception in db_saveCategoria:", e);
     }
     return await db_getData();
 }
 
 async function db_delCategoria(nombre, userId) {
     if (!nombre) return await db_getData();
+
+    // Actualizar fallback local
+    try {
+        let localCats = JSON.parse(localStorage.getItem('db_custom_categorias') || '[]');
+        localCats = localCats.filter(x => x !== nombre);
+        localStorage.setItem('db_custom_categorias', JSON.stringify(localCats));
+    } catch(e) {}
+
     try {
         await supabase.from('categorias').delete().eq('nombre', nombre);
         await supabase.from('productos').update({ categoria: 'General' }).eq('categoria', nombre);
     } catch(e) {
-        console.error("Error in db_delCategoria:", e);
+        console.warn("Exception in db_delCategoria:", e);
     }
     return await db_getData();
 }

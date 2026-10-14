@@ -641,33 +641,32 @@
 
                 <!-- MENÚ PRINCIPAL / INICIO -->
                 <section id="view-inicio" class="view-section flex flex-col gap-6">
-                    <!-- HERO BANNER CON BOTÓN LLAMATIVO -->
-                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-brand-500 via-rose-500 to-salmon-500 p-6 md:p-8 text-white shadow-xl">
-                        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-                        <div class="absolute -left-10 -top-10 w-48 h-48 bg-black/10 rounded-full blur-xl pointer-events-none"></div>
-                        <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-                            <div class="space-y-2 max-w-xl">
-                                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-xs font-black uppercase tracking-wider">
-                                    <i class="fas fa-sparkles"></i> Menú Principal
-                                </div>
-                                <h2 class="text-2xl sm:text-3xl md:text-4xl font-black leading-tight tracking-tight">
-                                    Panel de Control Bethel
-                                </h2>
-                                <p class="text-white/90 text-sm md:text-base font-medium">
-                                    Resumen diario de ventas cobradas, pedidos fiados pendientes y entregas semanales por zona.
-                                </p>
+                    <!-- BIENVENIDO AL SISTEMA DE VENTAS (Screenshot 1) -->
+                    <div class="text-center pt-3 pb-2">
+                        <h1 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">Bienvenido al Sistema de Ventas</h1>
+                        <p class="text-slate-500 dark:text-slate-400 font-medium text-sm sm:text-base mt-2">Selecciona una acción para comenzar tu jornada.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto w-full mb-2">
+                        <!-- TARJETA 1: REGISTRAR COMPRA / VENTA -->
+                        <button onclick="iniciarVenta()" id="btn-hero-iniciar-venta"
+                            class="bg-white dark:bg-slate-800 p-8 sm:p-10 rounded-3xl border border-slate-200/90 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-indigo-500 dark:hover:border-indigo-400 transition-all flex flex-col items-center text-center group cursor-pointer active:scale-98">
+                            <div class="w-20 h-20 rounded-full bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform shadow-sm">
+                                <i class="fas fa-shopping-cart"></i>
                             </div>
-                            <div class="w-full md:w-auto flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                                <button onclick="iniciarVenta()" id="btn-hero-iniciar-venta"
-                                    class="group px-7 py-4 bg-white hover:bg-brand-50 text-brand-600 rounded-2xl font-black text-base shadow-2xl hover:shadow-brand-900/30 transition-all duration-300 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3 cursor-pointer">
-                                    <div class="w-10 h-10 rounded-xl bg-brand-100 text-brand-600 flex items-center justify-center group-hover:rotate-12 transition-transform">
-                                        <i class="fas fa-cash-register text-lg"></i>
-                                    </div>
-                                    <span>INICIAR NUEVA VENTA</span>
-                                    <i class="fas fa-arrow-right text-sm group-hover:translate-x-1 transition-transform"></i>
-                                </button>
+                            <h3 class="text-xl font-black text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Registrar Compra / Venta</h3>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 font-bold mt-2">Abre el terminal de punto de venta (POS)</p>
+                        </button>
+
+                        <!-- TARJETA 2: DIRECTORIO DE CLIENTES -->
+                        <button onclick="switchTab('clientes')"
+                            class="bg-white dark:bg-slate-800 p-8 sm:p-10 rounded-3xl border border-slate-200/90 dark:border-slate-700 shadow-sm hover:shadow-xl hover:border-slate-400 dark:hover:border-slate-600 transition-all flex flex-col items-center text-center group cursor-pointer active:scale-98">
+                            <div class="w-20 h-20 rounded-full bg-slate-100 dark:bg-slate-700/60 text-slate-400 dark:text-slate-400 flex items-center justify-center text-3xl mb-5 group-hover:scale-110 transition-transform shadow-sm">
+                                <i class="fas fa-user-friends"></i>
                             </div>
-                        </div>
+                            <h3 class="text-xl font-black text-slate-500 dark:text-slate-300">Directorio de Clientes</h3>
+                            <p class="text-xs text-slate-400 dark:text-slate-500 font-bold mt-2">Gestionar cuentas (Próximamente)</p>
+                        </button>
                     </div>
 
                     <!-- RESÚMENES: VENTAS DEL DÍA Y PEDIDOS PENDIENTES (FIADOS) -->
@@ -776,188 +775,170 @@
                     </div>
                 </section>
 
-                <!-- CAJA Y PEDIDOS -->
-                <section id="view-pos" class="view-section hidden flex flex-col lg:flex-row gap-4 pb-24 lg:pb-0">
-                    <div
-                        class="w-full lg:flex-1 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col min-h-[400px]">
-                        <div id="stock-warning-banner"
-                            class="hidden m-4 mb-0 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700/50 text-yellow-800 dark:text-yellow-400 p-4 rounded-xl shadow-sm flex items-center gap-3 transition-all duration-300">
-                            <i class="fas fa-exclamation-triangle text-2xl text-yellow-500"></i>
-                            <div class="flex-1">
-                                <h4 class="font-bold text-sm">¡Atención! Tienes pedidos pendientes por preparar</h4>
-                                <p id="stock-warning-list"
-                                    class="text-xs font-semibold mt-1 text-yellow-700 dark:text-yellow-500/80">
-                                </p>
+                <!-- CAJA Y PEDIDOS (POS) -->
+                <section id="view-pos" class="view-section hidden flex flex-col gap-4 pb-24 lg:pb-6">
+                    <!-- HEADER BAR FACTURAPP (Screenshot 3 & 4) -->
+                    <div class="flex items-center justify-between bg-white dark:bg-slate-800 px-5 py-3 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center text-sm font-black shadow-md shadow-indigo-500/20">
+                                <i class="fas fa-cube"></i>
                             </div>
+                            <span class="font-black text-lg text-slate-800 dark:text-white tracking-tight">FacturApp</span>
                         </div>
-                        <div
-                            class="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div class="relative w-full sm:flex-1 flex items-center">
-                                <i class="fas fa-search absolute left-3 top-3.5 text-slate-400 dark:text-slate-500"></i>
-                                <input type="text" id="search-prod" onkeyup="renderPosProducts()"
-                                    placeholder="Buscar producto en caja..."
-                                    class="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-all">
-                            </div>
-                            <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
-                                <button onclick="openMenuModal()"
-                                    class="bg-[#25D366]/10 dark:bg-[#25D366]/20 text-[#128C7E] dark:text-[#25D366] px-4 py-2 rounded-xl text-sm font-black shadow-sm hover:bg-[#25D366]/20 dark:hover:bg-[#25D366]/30 transition-colors flex items-center gap-2 border border-[#25D366]/30">
-                                    <i class="fab fa-whatsapp text-lg"></i> <span class="hidden md:inline">Menú
-                                        Día</span>
-                                    <div class="group relative inline-flex items-center ml-1 align-middle"><i
-                                            class="fas fa-question-circle text-[#128C7E]/70 dark:text-[#25D366]/70 hover:text-[#128C7E] cursor-help text-xs"></i>
-                                        <div
-                                            class="hidden group-hover:block absolute z-[150] w-48 p-2.5 bottom-full mb-2 left-1/2 -translate-x-1/2 text-xs font-normal text-white bg-slate-800 dark:bg-slate-700 rounded-xl shadow-xl pointer-events-none leading-relaxed text-center whitespace-normal">
-                                            Arma un mensaje predeterminado con los productos del día para enviar por
-                                            WhatsApp.<div
-                                                class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </button>
-                                <button onclick="openProduccionModal()"
-                                    class="bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 px-3 py-2 rounded-xl text-sm font-bold shadow-sm hover:bg-brand-200 dark:hover:bg-brand-800 transition-colors flex items-center gap-2 border border-brand-200 dark:border-brand-700">
-                                    <i class="fas fa-hammer"></i> <span class="hidden sm:inline">Producir</span>
-                                    <div class="group relative inline-flex items-center ml-1 align-middle"><i
-                                            class="fas fa-question-circle text-brand-500/70 hover:text-brand-600 cursor-help text-xs"></i>
-                                        <div
-                                            class="hidden group-hover:block absolute z-[150] w-48 p-2.5 bottom-full mb-2 right-0 md:left-1/2 md:-translate-x-1/2 text-xs font-normal text-white bg-slate-800 dark:bg-slate-700 rounded-xl shadow-xl pointer-events-none leading-relaxed text-center whitespace-normal">
-                                            Suma unidades al inventario de productos terminados.<div
-                                                class="absolute -bottom-1 right-3 md:left-1/2 md:-translate-x-1/2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </button>
-                                <div
-                                    class="flex items-center gap-2 border-l border-slate-200 dark:border-slate-700 pl-3">
-                                    <span class="text-sm font-bold text-slate-600 dark:text-slate-300">Mayor:</span>
-                                    <div
-                                        class="relative inline-block w-10 mr-1 align-middle select-none transition duration-200 ease-in">
-                                        <input type="checkbox" id="toggle-mayor"
-                                            onchange="renderPosProducts(); renderCart();"
-                                            class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white dark:bg-slate-200 border-4 appearance-none cursor-pointer" />
-                                        <label for="toggle-mayor"
-                                            class="toggle-label block overflow-hidden h-5 rounded-full cursor-pointer"></label>
-                                    </div>
-                                    <div class="group relative inline-flex items-center align-middle"><i
-                                            class="fas fa-question-circle text-slate-400 hover:text-brand-500 cursor-help text-xs"></i>
-                                        <div
-                                            class="hidden group-hover:block absolute z-[150] w-48 p-2.5 bottom-full mb-2 right-0 text-xs font-normal text-white bg-slate-800 dark:bg-slate-700 rounded-xl shadow-xl pointer-events-none leading-relaxed text-center whitespace-normal">
-                                            Cambia todos los precios de la caja a su valor 'Al Mayor'.<div
-                                                class="absolute -bottom-1 right-2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- CUADRÍCULA DE CATEGORÍAS -->
-                        <div class="p-4 border-b border-slate-100 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/60">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                                    <i class="fas fa-layer-group text-brand-500"></i> Filtrar por Categoría
-                                </span>
-                                <button type="button" id="btn-gestionar-cat" onclick="openCategoriasModal()"
-                                    class="text-xs font-bold text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-brand-50 dark:bg-brand-900/30 border border-brand-200 dark:border-brand-800/50 transition-colors shadow-sm cursor-pointer">
-                                    <i class="fas fa-tags text-[11px]"></i> <span>Gestionar Categorías</span>
-                                </button>
-                            </div>
-                            <div id="pos-cat-grid" class="flex gap-2 overflow-x-auto pb-1 hide-scroll items-center flex-nowrap sm:flex-wrap">
-                                <!-- Generado por JS -->
-                            </div>
-                        </div>
-
-                        <div class="flex-1 p-4 overflow-y-auto">
-                            <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-10">
-                            </div>
-                        </div>
+                        <button type="button" onclick="switchTab('inicio')"
+                            class="text-xs font-bold text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-1.5 transition-colors cursor-pointer">
+                            <span>Volver al Inicio</span>
+                        </button>
                     </div>
 
-                    <div class="w-full lg:w-[400px] flex flex-col gap-4 flex-shrink-0 pb-6 lg:pb-0">
-                        <div
-                            class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 p-4">
-                            <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-3 flex items-center">
-                                <i class="fas fa-user-edit text-brand-500 mr-2"></i>Datos del Cliente
-                                <div class="group relative inline-flex items-center ml-2 align-middle"><i
-                                        class="fas fa-question-circle text-slate-400 hover:text-brand-500 cursor-help text-xs"></i>
-                                    <div
-                                        class="hidden group-hover:block absolute z-[150] w-48 p-2.5 bottom-full mb-2 left-1/2 -translate-x-1/2 text-xs font-normal text-white bg-slate-800 dark:bg-slate-700 rounded-xl shadow-xl pointer-events-none leading-relaxed text-center whitespace-normal">
-                                        Ingresa los datos para registrar la venta y la ruta de entrega. Si el cliente ya
-                                        existe, se
-                                        autocompletará su teléfono.<div
-                                            class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45">
+                    <div class="flex flex-col lg:flex-row gap-5">
+                        <!-- COLUMNA IZQUIERDA: CUADRÍCULA DE CATEGORÍAS Y PRODUCTOS -->
+                        <div class="w-full lg:flex-1 bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col min-h-[550px] overflow-hidden">
+                            
+                            <!-- ALERTA DE STOCK NEGATIVO (SI HAY) -->
+                            <div id="stock-warning-banner"
+                                class="hidden m-4 mb-0 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700/50 text-yellow-800 dark:text-yellow-400 p-4 rounded-2xl shadow-sm flex items-center gap-3 transition-all duration-300">
+                                <i class="fas fa-exclamation-triangle text-2xl text-yellow-500"></i>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-sm">¡Atención! Tienes pedidos pendientes por preparar</h4>
+                                    <p id="stock-warning-list" class="text-xs font-semibold mt-1 text-yellow-700 dark:text-yellow-500/80"></p>
+                                </div>
+                            </div>
+
+                            <!-- BARRA SUPERIOR DE NAVEGACIÓN Y BÚSQUEDA -->
+                            <div class="p-4 md:p-5 border-b border-slate-100 dark:border-slate-700/80 bg-slate-50/70 dark:bg-slate-800/60 flex flex-col sm:flex-row justify-between items-center gap-3">
+                                <div class="flex items-center gap-3 w-full sm:w-auto">
+                                    <!-- Botón Volver a Categorías (visible solo en vista de productos) -->
+                                    <button type="button" id="pos-btn-back-categories" onclick="posBackToCategories()"
+                                        class="hidden text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 font-black text-sm flex items-center gap-1.5 transition-colors cursor-pointer">
+                                        <i class="fas fa-chevron-left text-xs"></i> <span>Volver a Categorías</span>
+                                    </button>
+                                    
+                                    <h3 id="pos-header-title" class="text-lg md:text-xl font-black text-slate-800 dark:text-white flex items-center gap-2">
+                                        Selecciona una Categoría
+                                    </h3>
+                                </div>
+
+                                <!-- Búsqueda, Mayorista y Acciones -->
+                                <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end flex-wrap">
+                                    <div class="relative flex-1 sm:w-56">
+                                        <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 dark:text-slate-500 text-xs"></i>
+                                        <input type="text" id="search-prod" onkeyup="handlePosSearch(this.value)"
+                                            placeholder="Buscar..."
+                                            class="w-full pl-9 pr-3 py-2 text-xs bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm">
+                                    </div>
+
+                                    <!-- Toggle Mayorista -->
+                                    <div class="flex items-center gap-2 bg-white dark:bg-slate-700 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-600 shadow-sm" title="Cambia todos los precios de la caja a su valor 'Al Mayor'">
+                                        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Mayor:</span>
+                                        <div class="relative inline-block w-8 align-middle select-none">
+                                            <input type="checkbox" id="toggle-mayor" onchange="renderPosProducts(); renderCart();"
+                                                class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 appearance-none cursor-pointer" />
+                                            <label for="toggle-mayor" class="toggle-label block overflow-hidden h-4 rounded-full cursor-pointer bg-slate-300"></label>
                                         </div>
                                     </div>
-                                </div>
-                            </h3>
-                            <div class="relative mb-3 z-20">
-                                <input type="text" id="pos-cliente" oninput="showClientSuggestions(this.value)"
-                                    placeholder="Nombre del Cliente"
-                                    class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-brand-500 outline-none autocomplete-off font-semibold">
-                                <div id="suggestions"
-                                    class="absolute top-full left-0 right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl mt-1 max-h-40 overflow-y-auto hidden">
+
+                                    <!-- Botón Menú Día WhatsApp -->
+                                    <button onclick="openMenuModal()" title="Menú del Día por WhatsApp"
+                                        class="p-2 rounded-xl bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366]/20 transition-colors border border-[#25D366]/30 text-sm cursor-pointer">
+                                        <i class="fab fa-whatsapp"></i>
+                                    </button>
+
+                                    <!-- Botón Producir -->
+                                    <button onclick="openProduccionModal()" title="Suma unidades al inventario terminado"
+                                        class="p-2 rounded-xl bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 hover:bg-brand-200 transition-colors border border-brand-200 dark:border-brand-700 text-sm cursor-pointer">
+                                        <i class="fas fa-hammer"></i>
+                                    </button>
+
+                                    <!-- Botón Gestionar Categorías -->
+                                    <button type="button" id="btn-gestionar-cat" onclick="openCategoriasModal()" title="Gestionar Categorías"
+                                        class="btn-gestionar-cat p-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-brand-600 transition-colors border border-slate-200 dark:border-slate-600 text-sm cursor-pointer">
+                                        <i class="fas fa-tags"></i>
+                                    </button>
                                 </div>
                             </div>
-                            <div class="mb-3">
-                                <div class="relative">
-                                    <i class="fas fa-phone-alt absolute left-3 top-2.5 text-slate-400"></i>
-                                    <input type="tel" id="pos-telefono" placeholder="Teléfono (Ej: 0414...)"
-                                        class="w-full pl-9 pr-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-lg focus:ring-2 focus:ring-brand-500 outline-none">
+
+                            <!-- VISTA 1: CUADRÍCULA DE CATEGORÍAS (Screenshot 3) -->
+                            <div id="pos-view-categorias" class="flex-1 p-5 overflow-y-auto custom-scroll">
+                                <div id="pos-cat-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                    <!-- Generado dinámicamente por renderPosCategoriesGrid() -->
                                 </div>
                             </div>
-                            <div class="grid grid-cols-2 gap-2 mb-3">
-                                <select id="pos-lugar"
-                                    class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-lg outline-none focus:ring-2 focus:ring-brand-500"></select>
-                                <input type="date" id="pos-fecha"
-                                    class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-lg outline-none focus:ring-2 focus:ring-brand-500"
-                                    style="color-scheme: dark;">
+
+                            <!-- VISTA 2: CUADRÍCULA DE PRODUCTOS (Screenshot 4) -->
+                            <div id="pos-view-productos" class="hidden flex-1 p-5 overflow-y-auto custom-scroll">
+                                <div id="grid-productos" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                    <!-- Generado dinámicamente por renderPosProducts() -->
+                                </div>
                             </div>
-                            <textarea id="pos-notas" placeholder="Notas adicionales..."
-                                class="w-full px-3 py-2 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-lg resize-none h-16 outline-none focus:ring-2 focus:ring-brand-500"></textarea>
                         </div>
 
-                        <div
-                            class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col h-auto overflow-hidden">
-                            <div
-                                class="p-3 border-b border-slate-100 dark:border-slate-700 bg-slate-800 dark:bg-slate-900 text-white font-bold text-sm flex justify-between items-center">
-                                <div class="flex items-center">
-                                    Carrito
-                                    <div class="group relative inline-flex items-center ml-2 align-middle"><i
-                                            class="fas fa-question-circle text-slate-400 hover:text-brand-500 cursor-help text-xs"></i>
-                                        <div
-                                            class="hidden group-hover:block absolute z-[150] w-48 p-2.5 bottom-full mb-2 left-1/2 -translate-x-1/2 text-xs font-normal text-white bg-slate-800 dark:bg-slate-700 rounded-xl shadow-xl pointer-events-none leading-relaxed text-center whitespace-normal">
-                                            Haz clic en los productos a la izquierda para añadirlos aquí. Puedes ajustar
-                                            la cantidad.<div
-                                                class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-800 dark:bg-slate-700 transform rotate-45">
-                                            </div>
+                        <!-- COLUMNA DERECHA: TICKET DE VENTA (Screenshot 3 y 4) -->
+                        <div class="w-full lg:w-[380px] xl:w-[420px] flex flex-col gap-4 flex-shrink-0">
+                            <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-700 flex flex-col overflow-hidden">
+                                
+                                <!-- ENCABEZADO DEL TICKET (Screenshot 3 & 4) -->
+                                <div class="p-4 border-b border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex justify-between items-center">
+                                    <div class="flex items-center gap-2">
+                                        <i class="far fa-file-alt text-slate-500 dark:text-slate-400 text-base"></i>
+                                        <h3 class="font-bold text-sm text-slate-800 dark:text-white">Ticket de Venta</h3>
+                                    </div>
+                                    <button type="button" onclick="openPosClientModal()" 
+                                        class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline font-bold px-2 py-1 rounded-lg transition-colors flex items-center gap-1 cursor-pointer">
+                                        <i class="fas fa-user-edit text-[11px]"></i> <span>Editar</span>
+                                    </button>
+                                </div>
+
+                                <!-- DATOS DEL CLIENTE EN EL TICKET (Screenshot 3 & 4) -->
+                                <div class="px-4 py-3 bg-slate-50/70 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-700 text-xs space-y-1">
+                                    <div class="text-slate-700 dark:text-slate-200">
+                                        <span class="font-normal text-slate-500 dark:text-slate-400">Cliente:</span> 
+                                        <span id="pos-ticket-cliente-display" class="font-bold">Cliente General</span>
+                                    </div>
+                                    <div class="text-slate-700 dark:text-slate-200">
+                                        <span class="font-normal text-slate-500 dark:text-slate-400">CI/RUC:</span> 
+                                        <span id="pos-ticket-cedula-display" class="font-semibold text-slate-600 dark:text-slate-300">Sin registrar</span>
+                                    </div>
+                                </div>
+
+                                <!-- CAMPOS DE COMPATIBILIDAD CON FUNCIONES POS EXISTENTES -->
+                                <input type="hidden" id="pos-cliente" value="Cliente General">
+                                <input type="hidden" id="pos-cedula" value="">
+                                <input type="hidden" id="pos-telefono" value="">
+                                <select id="pos-lugar" class="hidden"></select>
+                                <input type="date" id="pos-fecha" class="hidden">
+                                <textarea id="pos-notas" class="hidden"></textarea>
+                                <div id="suggestions" class="hidden"></div>
+
+                                <!-- LISTA DE PRODUCTOS EN EL CARRITO -->
+                                <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-2.5 max-h-[360px] min-h-[160px] custom-scroll">
+                                    <!-- Generado por renderCart() -->
+                                </div>
+
+                                <!-- TOTALES Y ACCIÓN DE PAGO -->
+                                <div class="p-4 md:p-5 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+                                    <div class="space-y-1.5 mb-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                        <div class="flex justify-between items-center">
+                                            <span>Subtotal</span>
+                                            <span id="cart-subtotal-usd" class="font-bold text-slate-700 dark:text-slate-200">$0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-center">
+                                            <span>Total Bs (Tasa BCV):</span>
+                                            <span id="cart-total-bs" class="font-bold text-slate-700 dark:text-slate-200">Bs. 0.00</span>
+                                        </div>
+                                        <div class="flex justify-between items-baseline pt-2 border-t border-slate-200 dark:border-slate-700">
+                                            <span class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Total</span>
+                                            <span id="cart-total-usd" class="text-2xl font-black text-indigo-600 dark:text-indigo-400">$0.00</span>
                                         </div>
                                     </div>
+
+                                    <button onclick="openCheckoutModal('pos')" id="btn-procesar"
+                                        class="w-full bg-indigo-600 hover:bg-indigo-700 active:scale-98 text-white font-black py-3.5 rounded-2xl shadow-lg hover:shadow-indigo-500/25 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                                        disabled>
+                                        <i class="fas fa-credit-card text-xs"></i>
+                                        <span>Proceder al Pago</span>
+                                    </button>
                                 </div>
-                                <span id="cart-count"
-                                    class="bg-brand-500 text-white px-2 py-0.5 rounded-full text-xs">0</span>
-                            </div>
-                            <div id="cart-items" class="flex-1 overflow-y-auto p-3 space-y-2 max-h-72"></div>
-                            <div
-                                class="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
-                                <div class="flex justify-between items-end mb-4">
-                                    <div>
-                                        <p class="text-xs text-slate-500 dark:text-slate-400 font-bold">Total Bs</p>
-                                        <p id="cart-total-bs"
-                                            class="text-sm font-semibold text-slate-600 dark:text-slate-300">Bs. 0.00
-                                        </p>
-                                    </div>
-                                    <div class="text-right">
-                                        <p class="text-xs text-slate-500 dark:text-slate-400 font-bold mb-1">Total USD
-                                        </p>
-                                        <p id="cart-total-usd"
-                                            class="text-2xl font-black text-slate-800 dark:text-white leading-none">
-                                            $0.00
-                                        </p>
-                                    </div>
-                                </div>
-                                <button onclick="openCheckoutModal('pos')" id="btn-procesar"
-                                    class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-                                    disabled>PROCEDER A PAGAR / GUARDAR</button>
                             </div>
                         </div>
                     </div>
@@ -982,7 +963,7 @@
                         <button onclick="openCheckoutModal('pos')" id="btn-mobile-procesar"
                             class="bg-brand-600 hover:bg-brand-700 active:scale-95 text-white font-black px-5 py-3 rounded-xl shadow-lg transition-all text-xs flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                             disabled>
-                            <span>PROCEDER A PAGAR</span>
+                            <span>Proceder al Pago</span>
                             <i class="fas fa-arrow-right text-xs"></i>
                         </button>
                     </div>
@@ -1234,9 +1215,16 @@
                                 </div>
                             </div>
                         </h2>
-                        <button onclick="openProductModal(-1)"
-                            class="w-full sm:w-auto bg-slate-800 dark:bg-brand-600 hover:bg-slate-900 dark:hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-md"><i
-                                class="fas fa-plus"></i> NUEVO</button>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <button onclick="openCategoriasModal()"
+                                class="btn-gestionar-cat w-full sm:w-auto bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-xl font-bold shadow-sm flex items-center justify-center gap-2 border border-slate-200 dark:border-slate-600 cursor-pointer">
+                                <i class="fas fa-tags text-brand-500"></i> CATEGORÍAS
+                            </button>
+                            <button onclick="openProductModal(-1)"
+                                class="w-full sm:w-auto bg-slate-800 dark:bg-brand-600 hover:bg-slate-900 dark:hover:bg-brand-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                                <i class="fas fa-plus"></i> NUEVO
+                            </button>
+                        </div>
                     </div>
                     <div
                         class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-x-auto">
@@ -1978,6 +1966,98 @@
         </div>
     </div>
 
+    <!-- MODAL DATOS DEL CLIENTE (Screenshot 2) -->
+    <div id="modal-pos-cliente"
+        class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[90] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-md overflow-hidden border border-slate-100 dark:border-slate-700 transform scale-95 transition-transform duration-300">
+            <!-- Barra superior estilo Screenshot 2 -->
+            <div class="bg-indigo-600 dark:bg-indigo-700 p-4 text-white flex items-center gap-2.5">
+                <i class="fas fa-user-friends text-lg"></i>
+                <h3 class="font-black text-lg">Datos del Cliente</h3>
+            </div>
+            <div class="p-6 space-y-4">
+                <!-- Nombre Completo o Empresa -->
+                <div class="relative">
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Nombre Completo o Empresa</label>
+                    <input type="text" id="modal-cli-nombre" oninput="showModalClientSuggestions(this.value)"
+                        placeholder="Ej: Alexander"
+                        class="w-full px-3.5 py-2.5 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold">
+                    <div id="modal-cli-suggestions"
+                        class="absolute top-full left-0 right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl mt-1 max-h-40 overflow-y-auto hidden z-30">
+                    </div>
+                </div>
+
+                <!-- Cédula / RUC -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Cédula / RUC</label>
+                    <input type="text" id="modal-cli-cedula" placeholder="Ej: 25156888"
+                        class="w-full px-3.5 py-2.5 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+
+                <!-- Teléfono -->
+                <div>
+                    <label class="block text-xs font-bold text-slate-600 dark:text-slate-300 mb-1">Teléfono</label>
+                    <input type="tel" id="modal-cli-telefono" placeholder="Ej: 04248520402"
+                        class="w-full px-3.5 py-2.5 text-sm bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none">
+                </div>
+
+                <!-- Opciones adicionales colapsables de Ruta y Fecha -->
+                <details class="text-xs group border border-slate-200 dark:border-slate-700 rounded-xl p-2.5 bg-slate-50 dark:bg-slate-750">
+                    <summary class="font-bold text-slate-500 dark:text-slate-400 cursor-pointer flex items-center justify-between">
+                        <span>Opciones de Entrega (Ruta / Fecha)</span>
+                        <i class="fas fa-chevron-down text-[10px] group-open:rotate-180 transition-transform"></i>
+                    </summary>
+                    <div class="grid grid-cols-2 gap-3 mt-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">Lugar / Ruta</label>
+                            <select id="modal-cli-lugar" class="w-full px-3 py-2 text-xs bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-semibold"></select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">Fecha Entrega</label>
+                            <input type="date" id="modal-cli-fecha" class="w-full px-3 py-2 text-xs bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl outline-none focus:ring-2 focus:ring-indigo-500" style="color-scheme: dark;">
+                        </div>
+                    </div>
+                </details>
+
+                <div class="pt-3 flex gap-3">
+                    <button type="button" onclick="closeModal('modal-pos-cliente')"
+                        class="flex-1 py-3 rounded-xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-sm cursor-pointer">
+                        Cancelar
+                    </button>
+                    <button type="button" onclick="submitPosClientModal()"
+                        class="flex-1 py-3 rounded-xl font-black text-white bg-indigo-600 hover:bg-indigo-700 transition-colors text-sm flex items-center justify-center gap-2 shadow-lg hover:shadow-indigo-500/25 cursor-pointer">
+                        <span>Continuar</span>
+                        <i class="fas fa-arrow-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL OPERACIÓN EXITOSA (Screenshot 5) -->
+    <div id="modal-pos-success"
+        class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[95] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl w-full max-w-sm p-8 text-center border border-slate-100 dark:border-slate-700 transform scale-95 transition-transform duration-300 flex flex-col items-center">
+            <!-- Círculo animado verde con Checkmark (Screenshot 5) -->
+            <div class="w-24 h-24 rounded-full border-4 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-500 flex items-center justify-center text-4xl mb-5 shadow-xl shadow-emerald-500/20">
+                <i class="fas fa-check"></i>
+            </div>
+            <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-2">¡Operación Exitosa!</h3>
+            <p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-6">La transacción ha sido registrada.</p>
+            <div class="flex flex-col gap-2.5 w-full">
+                <button type="button" onclick="nuevaVentaDesdeExito()"
+                    class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-lg hover:shadow-indigo-500/25 transition-all text-sm cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i>
+                    <span>Nueva Venta</span>
+                </button>
+                <button type="button" onclick="volverInicioDesdeExito()"
+                    class="w-full py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-2xl transition-all text-xs cursor-pointer">
+                    Volver al Inicio
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL COMPRA (MATERIA PRIMA) -->
     <div id="modal-gasto"
         class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-[80] hidden flex items-center justify-center p-4 transition-all duration-300 opacity-0">
@@ -2492,7 +2572,7 @@
                 showToast("Datos Sincronizados", "success");
 
                 renderInicio();
-                renderPosProducts();
+                renderPosView();
                 renderProduccion();
                 renderRutasDropdown();
                 renderClientes();
@@ -2529,7 +2609,7 @@
                 updateBCVUI();
                 populateDropdowns();
                 renderInicio();
-                renderPosProducts();
+                renderPosView();
                 renderProduccion();
                 renderRutasDropdown();
                 renderClientes();
@@ -2655,7 +2735,7 @@
                 return showToast("No tienes permiso para ver esta pestaña", "warning");
             }
             if (tabId === 'inicio') renderInicio();
-            if (tabId === 'pos') { renderPosCategorias(); renderPosProducts(); renderCart(); }
+            if (tabId === 'pos') { renderPosView(); }
             if (tabId === 'usuarios') renderUsuarios();
             if (tabId === 'recetario') renderRecetario();
             if (tabId === 'auditoria') renderAuditoria();
@@ -3293,18 +3373,7 @@
         }
 
         function iniciarVenta() {
-            switchTab('pos');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            setTimeout(function () {
-                var clienteInput = document.getElementById('pos-cliente');
-                if (clienteInput) {
-                    clienteInput.focus();
-                    clienteInput.classList.add('ring-4', 'ring-brand-400/50');
-                    setTimeout(function () {
-                        clienteInput.classList.remove('ring-4', 'ring-brand-400/50');
-                    }, 1200);
-                }
-            }, 200);
+            openPosClientModal();
         }
 
         function renderInicio() {
@@ -3563,8 +3632,8 @@
 
         // --- GESTIÓN DE CATEGORÍAS ---
         function openCategoriasModal() {
-            if (!state.currentUser || state.currentUser.rol !== 'Admin') {
-                return showToast("Acceso denegado: Solo administradores pueden gestionar categorías", "error");
+            if (!canManageCategories()) {
+                return showToast("Acceso denegado: No tienes permiso para gestionar categorías", "error");
             }
             cancelEditCategoria();
             renderCategoriasGestion();
@@ -3668,57 +3737,145 @@
             });
         }
 
-        function renderPosCategorias() {
-            var grid = document.getElementById('pos-cat-grid');
-            if (!grid) return;
-            var cats = state.categorias || ['General'];
-            var totalProds = state.productos.length;
-            var isAllActive = !state.categoriaSeleccionada || state.categoriaSeleccionada === 'TODAS';
+        function getCategoryVisual(name) {
+            var c = String(name || '').toLowerCase().trim();
+            if (c.includes('bebida') || c.includes('jugo') || c.includes('refresco') || c.includes('soda')) {
+                return { emoji: '🥤', icon: 'fa-wine-bottle', bg: 'bg-red-50 text-red-500 dark:bg-red-950/40 dark:text-red-400' };
+            }
+            if (c.includes('snack') || c.includes('papas') || c.includes('frito') || c.includes('nacho')) {
+                return { emoji: '🍟', icon: 'fa-french-fries', bg: 'bg-amber-50 text-amber-500 dark:bg-amber-950/40 dark:text-amber-400' };
+            }
+            if (c.includes('lacteo') || c.includes('leche') || c.includes('queso') || c.includes('yogurt')) {
+                return { emoji: '🥛', icon: 'fa-cheese', bg: 'bg-blue-50 text-blue-500 dark:bg-blue-950/40 dark:text-blue-400' };
+            }
+            if (c.includes('pan') || c.includes('croissant') || c.includes('panaderia')) {
+                return { emoji: '🥐', icon: 'fa-bread-slice', bg: 'bg-orange-50 text-orange-500 dark:bg-orange-950/40 dark:text-orange-400' };
+            }
+            if (c.includes('torta') || c.includes('pastel') || c.includes('cake') || c.includes('cumple')) {
+                return { emoji: '🎂', icon: 'fa-birthday-cake', bg: 'bg-pink-50 text-pink-500 dark:bg-pink-950/40 dark:text-pink-400' };
+            }
+            if (c.includes('galleta') || c.includes('cookie') || c.includes('polvoron')) {
+                return { emoji: '🍪', icon: 'fa-cookie', bg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300' };
+            }
+            if (c.includes('dulce') || c.includes('postre') || c.includes('chocolate') || c.includes('bombon')) {
+                return { emoji: '🍫', icon: 'fa-candy-cane', bg: 'bg-purple-50 text-purple-500 dark:bg-purple-950/40 dark:text-purple-400' };
+            }
+            if (c.includes('helado') || c.includes('ice cream')) {
+                return { emoji: '🍦', icon: 'fa-ice-cream', bg: 'bg-cyan-50 text-cyan-500 dark:bg-cyan-950/40 dark:text-cyan-400' };
+            }
+            if (c.includes('salado') || c.includes('combo') || c.includes('comida') || c.includes('empanada')) {
+                return { emoji: '🍔', icon: 'fa-utensils', bg: 'bg-emerald-50 text-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-400' };
+            }
+            return { emoji: '🏷️', icon: 'fa-tag', bg: 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300' };
+        }
 
-            var allBtnCls = isAllActive
-                ? 'bg-brand-500 text-white shadow-md font-black border-brand-500'
-                : 'bg-white dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 border-slate-200 dark:border-slate-600 font-bold';
+        function posBackToCategories() {
+            state.posCurrentView = 'categories';
+            state.categoriaSeleccionada = null;
+            var searchInput = document.getElementById('search-prod');
+            if (searchInput) searchInput.value = '';
+            renderPosView();
+        }
 
-            var html = '<button onclick="selectPosCategoria(\'TODAS\')" class="px-3.5 py-1.5 rounded-xl border text-xs whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ' + allBtnCls + '">' +
-                '<i class="fas fa-th-large text-[11px]"></i>' +
-                '<span>Todas</span>' +
-                '<span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] ' + (isAllActive ? 'bg-white/30 text-white' : 'bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300') + ' font-black">' + totalProds + '</span>' +
-            '</button>';
-
-            cats.forEach(function (c) {
-                var isActive = state.categoriaSeleccionada === c;
-                var count = state.productos.filter(function (p) { return (p.categoria || 'General') === c; }).length;
-                var cls = isActive
-                    ? 'bg-brand-500 text-white shadow-md font-black border-brand-500'
-                    : 'bg-white dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-600 border-slate-200 dark:border-slate-600 font-bold';
-                html += '<button onclick="selectPosCategoria(\'' + escapeJS(c) + '\')" class="px-3.5 py-1.5 rounded-xl border text-xs whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer ' + cls + '">' +
-                    '<span>' + c + '</span>' +
-                    '<span class="ml-1 px-1.5 py-0.5 rounded-full text-[10px] ' + (isActive ? 'bg-white/30 text-white' : 'bg-slate-100 dark:bg-slate-600 text-slate-500 dark:text-slate-300') + ' font-black">' + count + '</span>' +
-                '</button>';
-            });
-
-            grid.innerHTML = html;
+        function selectPosCategory(cat) {
+            state.categoriaSeleccionada = cat;
+            state.posCurrentView = 'products';
+            var searchInput = document.getElementById('search-prod');
+            if (searchInput) searchInput.value = '';
+            renderPosView();
         }
 
         function selectPosCategoria(cat) {
-            state.categoriaSeleccionada = cat;
-            renderPosCategorias();
-            renderPosProducts();
+            selectPosCategory(cat);
         }
 
-        function renderPosProducts() {
-            renderPosCategorias();
-            var term = String(document.getElementById('search-prod') ? document.getElementById('search-prod').value : '').toLowerCase().trim();
+        function handlePosSearch(term) {
+            term = String(term || '').trim().toLowerCase();
+            if (state.posCurrentView === 'categories') {
+                renderPosCategoriesGrid(term);
+            } else {
+                renderPosProducts(term);
+            }
+        }
+
+        function renderPosView() {
+            var viewCat = document.getElementById('pos-view-categorias');
+            var viewProd = document.getElementById('pos-view-productos');
+            var btnBack = document.getElementById('pos-btn-back-categories');
+            var headerTitle = document.getElementById('pos-header-title');
+
+            if (!viewCat || !viewProd) return;
+
+            if (state.posCurrentView === 'products' && state.categoriaSeleccionada) {
+                viewCat.classList.add('hidden');
+                viewProd.classList.remove('hidden');
+                if (btnBack) btnBack.classList.remove('hidden');
+                if (headerTitle) headerTitle.classList.add('hidden');
+                renderPosProducts();
+            } else {
+                state.posCurrentView = 'categories';
+                viewCat.classList.remove('hidden');
+                viewProd.classList.add('hidden');
+                if (btnBack) btnBack.classList.add('hidden');
+                if (headerTitle) {
+                    headerTitle.classList.remove('hidden');
+                    headerTitle.innerHTML = 'Selecciona una Categoría';
+                }
+                renderPosCategoriesGrid();
+            }
+            updatePosTicketClientDisplay();
+            renderCart();
+        }
+
+        function renderPosCategoriesGrid(filterTerm) {
+            var grid = document.getElementById('pos-cat-grid');
+            if (!grid) return;
+            var cats = (state.categorias && state.categorias.length > 0) ? state.categorias.slice() : ['General'];
+            cats.sort(function (a, b) { return String(a).localeCompare(String(b)); });
+
+            if (filterTerm) {
+                cats = cats.filter(function (c) { return c.toLowerCase().includes(filterTerm); });
+            }
+
+            if (cats.length === 0) {
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 dark:text-slate-500 font-bold"><i class="fas fa-search text-3xl mb-2 block opacity-40"></i>No se encontraron categorías</div>';
+                return;
+            }
+
+            grid.innerHTML = cats.map(function (c) {
+                var count = state.productos.filter(function (p) { return (p.categoria || 'General') === c; }).length;
+                var visual = getCategoryVisual(c);
+                var cEsc = escapeJS(c);
+                return '<div onclick="selectPosCategory(\'' + cEsc + '\')" ' +
+                    'class="bg-white dark:bg-slate-800 rounded-3xl p-5 md:p-6 border border-slate-200/80 dark:border-slate-700 shadow-sm hover:shadow-md hover:border-brand-400 dark:hover:border-brand-500 transition-all flex flex-col items-center justify-center cursor-pointer group active:scale-95 text-center min-h-[140px]">' +
+                    '<div class="w-16 h-16 rounded-full ' + visual.bg + ' flex items-center justify-center text-3xl mb-3 group-hover:scale-110 transition-transform shadow-sm">' +
+                    visual.emoji +
+                    '</div>' +
+                    '<span class="font-black text-slate-800 dark:text-white text-sm md:text-base group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors line-clamp-1">' + c + '</span>' +
+                    '<span class="text-[11px] font-bold text-slate-400 mt-1">' + count + ' productos</span>' +
+                    '</div>';
+            }).join('');
+        }
+
+        function renderPosCategorias() {
+            renderPosCategoriesGrid();
+        }
+
+        function renderPosProducts(filterTerm) {
+            var grid = document.getElementById('grid-productos');
+            if (!grid) return;
+
+            var term = filterTerm !== undefined ? filterTerm : String(document.getElementById('search-prod') ? document.getElementById('search-prod').value : '').toLowerCase().trim();
             var list = state.productos.slice();
 
-            // Filtrar por categoría
+            // Filtrar por categoría seleccionada
             if (state.categoriaSeleccionada && state.categoriaSeleccionada !== 'TODAS') {
                 list = list.filter(function (p) {
                     return (p.categoria || 'General') === state.categoriaSeleccionada;
                 });
             }
 
-            // Filtrar por texto de búsqueda
+            // Filtrar por término de búsqueda
             if (term) {
                 list = list.filter(function (p) {
                     return String(p.nombre).toLowerCase().includes(term);
@@ -3730,11 +3887,8 @@
                 return String(a.nombre).localeCompare(String(b.nombre));
             });
 
-            var grid = document.getElementById('grid-productos');
-            if (!grid) return;
-
             if (list.length === 0) {
-                grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 dark:text-slate-500 font-bold"><i class="fas fa-boxes text-4xl mb-3 block opacity-30"></i>No hay productos disponibles en esta categoría</div>';
+                grid.innerHTML = '<div class="col-span-full py-12 text-center text-slate-400 dark:text-slate-500 font-bold"><i class="fas fa-boxes text-4xl mb-3 block opacity-30"></i>No hay productos disponibles</div>';
                 return;
             }
 
@@ -3748,7 +3902,7 @@
                     ? 'border-pink-300 dark:border-pink-700/50 bg-pink-50 dark:bg-pink-900/10 hover:border-pink-400 cursor-pointer'
                     : (isPorHacer
                         ? 'border-red-300 dark:border-red-700/50 bg-red-50 dark:bg-red-900/10 hover:border-red-400 cursor-pointer'
-                        : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-brand-500 dark:hover:border-brand-400 cursor-pointer');
+                        : 'border-slate-200/90 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 cursor-pointer');
 
                 var agotadoTag = isAgotado
                     ? '<div class="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none overflow-hidden"><span class="text-pink-500 font-black text-4xl -rotate-12 whitespace-nowrap select-none">AGOTADO</span></div>'
@@ -3760,26 +3914,26 @@
 
                 // Indicador de cantidad en carrito
                 var cartItem = state.carrito.find(function (c) { return c.idOriginal === p.idOriginal; });
-                var cartBadge = cartItem ? '<span class="bg-brand-500 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">En Carrito (x' + cartItem.cantidad + ')</span>' : '';
+                var cartBadge = cartItem ? '<span class="bg-indigo-600 text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow-sm">x' + cartItem.cantidad + '</span>' : '';
 
-                return '<div onclick="' + clickAction + '" class="border ' + bgBorderClass + ' rounded-2xl p-4 flex flex-col justify-between min-h-[9rem] h-auto transition-all relative overflow-hidden group hover:shadow-md">' +
+                return '<div onclick="' + clickAction + '" class="border ' + bgBorderClass + ' rounded-2xl p-4 md:p-5 flex flex-col justify-between min-h-[6.5rem] transition-all relative overflow-hidden group hover:shadow-md active:scale-95">' +
                        agotadoTag +
                        '<div>' +
                        '<div class="flex justify-between items-start gap-1 mb-1">' +
-                       '<span class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider truncate max-w-[120px]">' + (p.categoria || 'General') + '</span>' +
+                       '<h4 class="font-bold text-slate-800 dark:text-slate-200 text-sm md:text-base leading-tight relative z-10 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">' + p.nombre + '</h4>' +
                        cartBadge +
                        '</div>' +
-                       '<h4 class="font-bold text-slate-700 dark:text-slate-200 text-sm leading-tight relative z-10">' + p.nombre + '</h4>' +
                        '</div>' +
                        '<div class="flex justify-between items-end mt-3 border-t border-slate-100 dark:border-slate-700/50 pt-2 relative z-10">' +
-                       '<span class="text-xs font-bold ' + stockClassText + ' bg-slate-100 dark:bg-slate-700/50 px-2 py-1 rounded-lg backdrop-blur-sm">Stock: ' + p.stock + '</span>' +
-                       '<span class="text-brand-600 dark:text-brand-400 font-black text-lg">$' + price.toFixed(2) + '</span>' +
+                       '<span class="text-emerald-600 dark:text-emerald-400 font-black text-lg md:text-xl">$' + price.toFixed(2) + '</span>' +
+                       '<span class="text-[10px] font-bold ' + stockClassText + ' bg-slate-100 dark:bg-slate-700/50 px-2 py-0.5 rounded-md">Stock: ' + p.stock + '</span>' +
                        '</div></div>';
             }).join('');
         }
 
         function showClientSuggestions(val) {
             var box = document.getElementById('suggestions');
+            if (!box) return;
             var cMatch = state.clientes.find(function (c) { return String(c).trim().toLowerCase() === val.trim().toLowerCase(); });
             if (cMatch && state.clientPhones[cMatch]) document.getElementById('pos-telefono').value = state.clientPhones[cMatch];
 
@@ -3795,8 +3949,165 @@
         }
 
         function selectClient(idx) {
-            var cName = state.clientes[idx]; document.getElementById('pos-cliente').value = cName;
-            document.getElementById('pos-telefono').value = state.clientPhones[cName] || ''; document.getElementById('suggestions').classList.add('hidden');
+            var cName = state.clientes[idx];
+            document.getElementById('pos-cliente').value = cName;
+            document.getElementById('pos-telefono').value = state.clientPhones[cName] || '';
+            updatePosTicketClientDisplay();
+            var box = document.getElementById('suggestions');
+            if (box) box.classList.add('hidden');
+        }
+
+        function showModalClientSuggestions(val) {
+            var box = document.getElementById('modal-cli-suggestions');
+            if (!box) return;
+            var cMatch = state.clientes.find(function (c) { return String(c).trim().toLowerCase() === val.trim().toLowerCase(); });
+            if (cMatch && state.clientPhones[cMatch]) {
+                document.getElementById('modal-cli-telefono').value = state.clientPhones[cMatch];
+            }
+            if (val.length < 1) return box.classList.add('hidden');
+            var matches = [];
+            for (var i = 0; i < state.clientes.length; i++) {
+                if (String(state.clientes[i]).toLowerCase().includes(val.toLowerCase())) {
+                    matches.push({ n: state.clientes[i], idx: i });
+                }
+            }
+            matches = matches.slice(0, 30);
+            if (matches.length > 0) {
+                box.innerHTML = matches.map(function (m) {
+                    return '<div onclick="selectModalClient(' + m.idx + ')" class="px-4 py-2.5 hover:bg-indigo-50 dark:hover:bg-slate-700 cursor-pointer border-b border-slate-100 dark:border-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200">' + m.n + '</div>';
+                }).join('');
+                box.classList.remove('hidden');
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        function selectModalClient(idx) {
+            var cName = state.clientes[idx];
+            document.getElementById('modal-cli-nombre').value = cName;
+            document.getElementById('modal-cli-telefono').value = state.clientPhones[cName] || '';
+            var box = document.getElementById('modal-cli-suggestions');
+            if (box) box.classList.add('hidden');
+        }
+
+        function openPosClientModal() {
+            var curName = document.getElementById('pos-cliente') ? document.getElementById('pos-cliente').value : '';
+            var curTel = document.getElementById('pos-telefono') ? document.getElementById('pos-telefono').value : '';
+            var curCed = document.getElementById('pos-cedula') ? document.getElementById('pos-cedula').value : '';
+            var curLugar = document.getElementById('pos-lugar') ? document.getElementById('pos-lugar').value : '';
+            var curFecha = document.getElementById('pos-fecha') ? document.getElementById('pos-fecha').value : '';
+
+            if (document.getElementById('modal-cli-nombre')) document.getElementById('modal-cli-nombre').value = curName === 'Cliente General' ? '' : curName;
+            if (document.getElementById('modal-cli-cedula')) document.getElementById('modal-cli-cedula').value = curCed;
+            if (document.getElementById('modal-cli-telefono')) document.getElementById('modal-cli-telefono').value = curTel;
+
+            var sel = document.getElementById('modal-cli-lugar');
+            if (sel) {
+                sel.innerHTML = state.lugares.map(function(l) {
+                    return '<option value="' + l + '" ' + (l === curLugar ? 'selected' : '') + '>' + l + '</option>';
+                }).join('');
+            }
+
+            if (document.getElementById('modal-cli-fecha')) {
+                if (!curFecha) {
+                    var now = new Date();
+                    var yyyy = now.getFullYear();
+                    var mm = ('0' + (now.getMonth() + 1)).slice(-2);
+                    var dd = ('0' + now.getDate()).slice(-2);
+                    curFecha = yyyy + '-' + mm + '-' + dd;
+                }
+                document.getElementById('modal-cli-fecha').value = curFecha;
+            }
+
+            openModal('modal-pos-cliente');
+            setTimeout(function() {
+                var inp = document.getElementById('modal-cli-nombre');
+                if (inp) inp.focus();
+            }, 150);
+        }
+
+        function submitPosClientModal() {
+            var nom = (document.getElementById('modal-cli-nombre').value || '').trim();
+            var ced = (document.getElementById('modal-cli-cedula').value || '').trim();
+            var tel = (document.getElementById('modal-cli-telefono').value || '').trim();
+            var lug = document.getElementById('modal-cli-lugar') ? document.getElementById('modal-cli-lugar').value : '';
+            var fec = document.getElementById('modal-cli-fecha') ? document.getElementById('modal-cli-fecha').value : '';
+
+            if (!nom) nom = 'Cliente General';
+
+            if (document.getElementById('pos-cliente')) document.getElementById('pos-cliente').value = nom;
+            if (document.getElementById('pos-cedula')) document.getElementById('pos-cedula').value = ced;
+            if (document.getElementById('pos-telefono')) document.getElementById('pos-telefono').value = tel;
+            if (document.getElementById('pos-lugar')) document.getElementById('pos-lugar').value = lug;
+            if (document.getElementById('pos-fecha')) document.getElementById('pos-fecha').value = fec;
+
+            updatePosTicketClientDisplay();
+            closeModal('modal-pos-cliente');
+            switchTab('pos');
+            posBackToCategories();
+        }
+
+        function updatePosTicketClientDisplay() {
+            var nom = document.getElementById('pos-cliente') ? document.getElementById('pos-cliente').value : 'Cliente General';
+            var ced = document.getElementById('pos-cedula') ? document.getElementById('pos-cedula').value : '';
+            var tel = document.getElementById('pos-telefono') ? document.getElementById('pos-telefono').value : '';
+            var lug = document.getElementById('pos-lugar') ? document.getElementById('pos-lugar').value : '';
+            var fec = document.getElementById('pos-fecha') ? document.getElementById('pos-fecha').value : '';
+
+            var dispNom = document.getElementById('pos-ticket-cliente-display');
+            if (dispNom) dispNom.innerText = nom || 'Cliente General';
+
+            var dispCed = document.getElementById('pos-ticket-cedula-display');
+            if (dispCed) dispCed.innerText = ced || (tel ? tel : 'Sin registrar');
+
+            var dispPhone = document.getElementById('pos-ticket-phone-display');
+            if (dispPhone) {
+                var parts = [];
+                if (ced) parts.push('CI: ' + ced);
+                if (tel) parts.push('Tel: ' + tel);
+                dispPhone.innerText = parts.length > 0 ? parts.join(' • ') : 'Sin registrar';
+            }
+
+            var dispLugar = document.getElementById('pos-ticket-lugar-display');
+            if (dispLugar) {
+                dispLugar.innerText = (lug || 'Inmediata') + (fec ? ' • ' + fec : '');
+            }
+        }
+
+        function openOperacionExitosa() {
+            openModal('modal-pos-success');
+        }
+
+        function closeOperacionExitosa() {
+            closeModal('modal-pos-success');
+            state.carrito = [];
+            renderCart();
+            posBackToCategories();
+            renderPosView();
+        }
+
+        function nuevaVentaDesdeExito() {
+            closeModal('modal-pos-success');
+            state.carrito = [];
+            if (document.getElementById('pos-cliente')) document.getElementById('pos-cliente').value = 'Cliente General';
+            if (document.getElementById('pos-cedula')) document.getElementById('pos-cedula').value = '';
+            if (document.getElementById('pos-telefono')) document.getElementById('pos-telefono').value = '';
+            updatePosTicketClientDisplay();
+            renderCart();
+            posBackToCategories();
+            openPosClientModal();
+        }
+
+        function volverInicioDesdeExito() {
+            closeModal('modal-pos-success');
+            state.carrito = [];
+            if (document.getElementById('pos-cliente')) document.getElementById('pos-cliente').value = 'Cliente General';
+            if (document.getElementById('pos-cedula')) document.getElementById('pos-cedula').value = '';
+            if (document.getElementById('pos-telefono')) document.getElementById('pos-telefono').value = '';
+            updatePosTicketClientDisplay();
+            renderCart();
+            posBackToCategories();
+            switchTab('inicio');
         }
 
         function addToCart(idx) {
@@ -3807,27 +4118,73 @@
 
             if (existing) existing.cantidad++; else state.carrito.push({ idOriginal: prod.idOriginal, cantidad: 1 });
             renderCart();
+            renderPosProducts();
         }
 
         function updateCartQty(idx, delta) {
-            var item = state.carrito[idx]; var prod = state.productos[item.idOriginal];
+            var item = state.carrito[idx];
+            if (!item) return;
+            var prod = state.productos[item.idOriginal];
             item.cantidad += delta;
-            if (item.cantidad > prod.stock && delta > 0) showToast("Falta Stock: Se registrará como pedido por preparar", "warning");
+            if (prod && item.cantidad > prod.stock && delta > 0) showToast("Falta Stock: Se registrará como pedido por preparar", "warning");
             if (item.cantidad <= 0) state.carrito.splice(idx, 1);
             renderCart();
+            renderPosProducts();
+        }
+
+        function removeCartItem(idx) {
+            state.carrito.splice(idx, 1);
+            renderCart();
+            renderPosProducts();
         }
 
         function renderCart() {
-            document.getElementById('cart-count').innerText = state.carrito.length;
+            var cartCountEl = document.getElementById('cart-count');
+            if (cartCountEl) cartCountEl.innerText = state.carrito.length;
+            var cartBadgeEl = document.getElementById('cart-count-badge');
+            if (cartBadgeEl) {
+                var totalQty = state.carrito.reduce(function(acc, i) { return acc + i.cantidad; }, 0);
+                cartBadgeEl.innerText = totalQty + (totalQty === 1 ? ' item' : ' items');
+            }
+
+            var itemsContainer = document.getElementById('cart-items');
+            var btnProcesar = document.getElementById('btn-procesar');
+
+            if (!itemsContainer) return;
+
             if (state.carrito.length === 0) {
-                document.getElementById('cart-items').innerHTML = '<div class="flex flex-col items-center justify-center h-full text-slate-300 dark:text-slate-600"><i class="fas fa-shopping-basket text-5xl mb-3"></i><p class="font-bold text-sm">Vacío</p></div>';
-                document.getElementById('btn-procesar').disabled = true;
+                itemsContainer.innerHTML = '<div class="flex flex-col items-center justify-center py-12 text-slate-300 dark:text-slate-600">' +
+                    '<div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-700/50 flex items-center justify-center text-slate-300 dark:text-slate-500 text-3xl mb-3">' +
+                    '<i class="fas fa-shopping-cart"></i>' +
+                    '</div>' +
+                    '<p class="font-bold text-sm text-slate-400">El carrito está vacío</p>' +
+                    '</div>';
+                if (btnProcesar) btnProcesar.disabled = true;
             } else {
-                document.getElementById('btn-procesar').disabled = false;
-                document.getElementById('cart-items').innerHTML = state.carrito.map(function (item, idx) {
+                if (btnProcesar) btnProcesar.disabled = false;
+                itemsContainer.innerHTML = state.carrito.map(function (item, idx) {
                     var p = state.productos[item.idOriginal];
                     var price = getProdPrice(p);
-                    return '<div class="flex justify-between items-center bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm"><div class="flex-1 pr-2"><p class="font-bold text-sm text-slate-800 dark:text-white leading-tight">' + p.nombre + '</p><p class="text-xs text-brand-500 font-bold">$' + price.toFixed(2) + '</p></div><div class="flex items-center gap-2 bg-slate-100 dark:bg-slate-700 rounded-lg p-1"><button onclick="updateCartQty(' + idx + ', -1)" class="w-7 h-7 bg-white dark:bg-slate-600 rounded shadow hover:text-brand-600 dark:hover:text-brand-400 dark:text-white"><i class="fas fa-minus text-xs"></i></button><span class="w-6 text-center text-sm font-black text-slate-800 dark:text-white">' + item.cantidad + '</span><button onclick="updateCartQty(' + idx + ', 1)" class="w-7 h-7 bg-white dark:bg-slate-600 rounded shadow hover:text-brand-600 dark:hover:text-brand-400 dark:text-white"><i class="fas fa-plus text-xs"></i></button></div></div>';
+                    return '<div class="bg-white dark:bg-slate-800 p-3 rounded-2xl border border-slate-200/90 dark:border-slate-700 shadow-sm">' +
+                        '<div class="flex items-center justify-between gap-2">' +
+                        '<p class="font-bold text-xs md:text-sm text-slate-800 dark:text-white truncate flex-1">' + p.nombre + '</p>' +
+                        '<div class="flex items-center gap-1.5">' +
+                        '<div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-700/60 rounded-xl px-1.5 py-0.5">' +
+                        '<button type="button" onclick="updateCartQty(' + idx + ', -1)" class="w-6 h-6 rounded-lg text-slate-600 dark:text-slate-300 hover:text-indigo-600 flex items-center justify-center font-bold cursor-pointer">' +
+                        '<i class="fas fa-minus text-[10px]"></i>' +
+                        '</button>' +
+                        '<span class="w-5 text-center text-xs font-black text-slate-800 dark:text-white">' + item.cantidad + '</span>' +
+                        '<button type="button" onclick="updateCartQty(' + idx + ', 1)" class="w-6 h-6 rounded-lg text-slate-600 dark:text-slate-300 hover:text-indigo-600 flex items-center justify-center font-bold cursor-pointer">' +
+                        '<i class="fas fa-plus text-[10px]"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '<button type="button" onclick="removeCartItem(' + idx + ')" class="w-7 h-7 text-red-400 hover:text-red-500 flex items-center justify-center cursor-pointer transition-colors" title="Eliminar">' +
+                        '<i class="far fa-trash-alt text-xs"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '</div>' +
+                        '<p class="text-xs text-emerald-600 dark:text-emerald-400 font-black mt-1">$' + price.toFixed(2) + '</p>' +
+                        '</div>';
                 }).join('');
             }
             calculateCartTotals();
@@ -3836,8 +4193,15 @@
         function calculateCartTotals() {
             var t = state.carrito.reduce(function (s, i) { return s + (getProdPrice(state.productos[i.idOriginal]) * i.cantidad); }, 0);
             var totalBs = t * state.bcv;
-            document.getElementById('cart-total-usd').innerText = '$' + t.toFixed(2);
-            document.getElementById('cart-total-bs').innerText = 'Bs. ' + totalBs.toFixed(2);
+
+            var cartUsd = document.getElementById('cart-total-usd');
+            if (cartUsd) cartUsd.innerText = '$' + t.toFixed(2);
+
+            var subtotalUsd = document.getElementById('cart-subtotal-usd');
+            if (subtotalUsd) subtotalUsd.innerText = '$' + t.toFixed(2);
+
+            var cartBs = document.getElementById('cart-total-bs');
+            if (cartBs) cartBs.innerText = 'Bs. ' + totalBs.toFixed(2);
 
             var mobUsd = document.getElementById('pos-mobile-total-usd');
             if (mobUsd) mobUsd.innerText = '$' + t.toFixed(2);
@@ -3973,15 +4337,18 @@
 
                 // Mostrar resultado al instante
                 state.carrito = [];
-                document.getElementById('pos-cliente').value = '';
+                document.getElementById('pos-cliente').value = 'Cliente General';
+                if (document.getElementById('pos-cedula')) document.getElementById('pos-cedula').value = '';
                 document.getElementById('pos-telefono').value = '';
                 document.getElementById('pos-notas').value = '';
+                updatePosTicketClientDisplay();
                 renderCart();
                 closeModal('modal-checkout');
                 btn1.disabled = false; btn1.innerHTML = "COBRAR Y<br>FACTURAR"; btn2.disabled = false;
                 if (btn3) btn3.disabled = false;
-                showToast(soloGuardar ? "Guardado como deuda." : "¡Venta completada!");
-                renderPosProducts(); renderProduccion(); renderRutas(); renderClientes(); renderDeudas(); renderInventario(); renderPagos(); renderGastos(); renderNotifs(); renderInicio();
+                openOperacionExitosa();
+                posBackToCategories();
+                renderPosView(); renderProduccion(); renderRutas(); renderClientes(); renderDeudas(); renderInventario(); renderPagos(); renderGastos(); renderNotifs(); renderInicio();
                 if (!document.getElementById('view-finanzas').classList.contains('hidden')) { renderFinanzasFiltro(); renderEstadoCuenta(); }
 
                 // Sincronizar con servidor en segundo plano
@@ -3994,7 +4361,7 @@
                     .withFailureHandler(function (err) {
                         state.pendingOps--;
                         showToast('Error al sincronizar: ' + err.message, 'error');
-                        google.script.run.withSuccessHandler(function (d) { state.pendingOps = 0; procesarData(d); renderPosProducts(); renderRutas(); renderDeudas(); renderInventario(); renderPagos(); renderInicio(); }).db_getData();
+                        google.script.run.withSuccessHandler(function (d) { state.pendingOps = 0; procesarData(d); renderPosView(); renderRutas(); renderDeudas(); renderInventario(); renderPagos(); renderInicio(); }).db_getData();
                     })
                     .db_saveOrder(form, fullCart, state.currentUser ? state.currentUser.id : "");
 
@@ -4136,7 +4503,7 @@
             document.getElementById('btn-confirm-tx').disabled = false; document.getElementById('btn-confirm-tx').innerHTML = "COBRAR Y<br>FACTURAR";
             document.getElementById('btn-solo-guardar').disabled = false;
             if (document.getElementById('btn-wapp-tx')) document.getElementById('btn-wapp-tx').disabled = false;
-            showToast(msg); renderPosProducts(); renderProduccion(); renderRutas(); renderClientes(); renderDeudas(); renderInventario(); renderPagos(); renderGastos(); renderNotifs(); renderInicio();
+            showToast(msg); renderPosView(); renderProduccion(); renderRutas(); renderClientes(); renderDeudas(); renderInventario(); renderPagos(); renderGastos(); renderNotifs(); renderInicio();
             if (!document.getElementById('view-finanzas').classList.contains('hidden')) {
                 renderFinanzasFiltro();
                 renderEstadoCuenta();
@@ -5820,9 +6187,11 @@
                 }
             });
 
-            // Permisos botón Gestionar Categorías (solo Admin)
-            var btnCat = document.getElementById('btn-gestionar-cat');
-            if (btnCat) btnCat.classList.toggle('hidden', !isAdmin);
+            // Permisos botón Gestionar Categorías
+            var canCat = canManageCategories();
+            document.querySelectorAll('.btn-gestionar-cat, #btn-gestionar-cat').forEach(function (btn) {
+                btn.classList.toggle('hidden', !canCat);
+            });
 
             // 4. Permisos de Borrado
             if (state.currentUser.permisosDelete === "NO") {
@@ -5833,6 +6202,13 @@
             }
 
             renderInicio();
+        }
+
+        function canManageCategories() {
+            if (!state.currentUser) return false;
+            if (state.currentUser.rol === 'Admin') return true;
+            var userTabs = state.currentUser.permisosTabs || "";
+            return userTabs === "*" || userTabs.split(',').map(s => s.trim()).includes('categorias');
         }
 
         // --- GESTIÓN DE USUARIOS ---
@@ -5846,6 +6222,7 @@
             { id: 'pagos', label: 'Pagos', icon: 'fa-receipt' },
             { id: 'compras', label: 'Compras', icon: 'fa-shopping-cart' },
             { id: 'inv', label: 'Inventario', icon: 'fa-boxes' },
+            { id: 'categorias', label: 'Categorías', icon: 'fa-tags' },
             { id: 'materiaprima', label: 'Materia Prima', icon: 'fa-seedling' },
             { id: 'finanzas', label: 'Finanzas', icon: 'fa-chart-line' },
             { id: 'fin_ventas', label: 'F: Ventas', icon: 'fa-chart-bar' },
