@@ -65,7 +65,7 @@
         html.overflow-hidden, body.overflow-hidden {
             overflow: hidden !important;
             height: 100% !important;
-            touch-action: none;
+            overscroll-behavior: contain;
             -ms-overflow-style: none;
             scrollbar-width: none !important;
         }
@@ -2875,6 +2875,14 @@
             if (state.currentUser.permisosTabs !== "*" && state.currentUser.permisosTabs.indexOf(tabId) === -1 && tabId !== 'auditoria' && tabId !== 'inicio') {
                 return showToast("No tienes permiso para ver esta pestaña", "warning");
             }
+            // Si se navega a otra pestaña y el modal de POS estaba activo, cerrarlo limpiamente
+            if (tabId !== 'pos') {
+                var posModal = document.getElementById('modal-pos');
+                if (posModal && !posModal.classList.contains('hidden')) {
+                    closePosModal();
+                }
+            }
+
             if (tabId === 'inicio') renderInicio();
             if (tabId === 'pos') { openPosModal(); return; }
             if (tabId === 'usuarios') renderUsuarios();
@@ -2920,6 +2928,8 @@
                 renderEstadoCuenta();
                 renderMovimientosTab();
             }
+
+            updateModalOverflowLock();
         }
 
         // --- SUBMENU FINANZAS ---
@@ -2959,6 +2969,19 @@
             setTimeout(function () { container.innerHTML = ''; }, 3000);
         }
 
+        function updateModalOverflowLock() {
+            var anyOpen = Array.from(document.querySelectorAll('div.fixed.inset-0[id^="modal-"]')).filter(function (el) {
+                return !el.classList.contains('hidden') && !el.classList.contains('opacity-0');
+            });
+            if (anyOpen.length === 0) {
+                document.body.classList.remove('overflow-hidden');
+                document.documentElement.classList.remove('overflow-hidden');
+            } else {
+                document.body.classList.add('overflow-hidden');
+                document.documentElement.classList.add('overflow-hidden');
+            }
+        }
+
         function openModal(id) {
             var m = document.getElementById(id);
             if (!m) return;
@@ -2967,22 +2990,19 @@
             m.classList.remove('opacity-0');
             var card = m.querySelector('div');
             if (card) { card.classList.remove('scale-95'); card.classList.add('scale-100'); }
-            document.body.classList.add('overflow-hidden');
-            document.documentElement.classList.add('overflow-hidden');
+            updateModalOverflowLock();
         }
+
         function closeModal(id) {
             var m = document.getElementById(id);
             if (!m) return;
             m.classList.add('opacity-0');
             var card = m.querySelector('div');
             if (card) { card.classList.remove('scale-100'); card.classList.add('scale-95'); }
+            updateModalOverflowLock();
             setTimeout(function () {
                 m.classList.add('hidden');
-                var anyOpen = document.querySelectorAll('[id^="modal-"]:not(.hidden)');
-                if (!anyOpen || anyOpen.length === 0) {
-                    document.body.classList.remove('overflow-hidden');
-                    document.documentElement.classList.remove('overflow-hidden');
-                }
+                updateModalOverflowLock();
             }, 300);
         }
 
