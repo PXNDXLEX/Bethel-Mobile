@@ -1933,11 +1933,17 @@
                                     </div>
                                 </div>
 
-                                <!-- Notas del Pedido -->
+                                <!-- Notas u Observaciones del Pedido (Rutas y Deudas) -->
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Notas o Instrucciones (Opcional)</label>
+                                    <div class="flex items-center justify-between mb-1.5">
+                                        <label for="pos-cli-notas" class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 cursor-pointer">
+                                            <i class="far fa-sticky-note text-amber-500 text-sm"></i>
+                                            <span>Observaciones / Nota de la Venta</span>
+                                        </label>
+                                        <span class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800/60">Visible en Rutas & Deudas</span>
+                                    </div>
                                     <textarea id="pos-cli-notas" rows="2" oninput="syncPosNotas(this.value)"
-                                        placeholder="Dedicatoria, detalles de empaque o entrega..."
+                                        placeholder="Ej: Paga el viernes / Cobrar en efectivo / Entregar antes de las 3pm / Dejar con el vigilante..."
                                         class="w-full px-3.5 py-2.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none shadow-sm transition-all"></textarea>
                                 </div>
                             </div>
@@ -2039,6 +2045,10 @@
                                     <i class="far fa-calendar-alt text-slate-400 text-[11px]"></i>
                                     <span id="pos-summary-fecha">Hoy</span>
                                 </div>
+                                <div id="pos-summary-nota-container" class="hidden xl:flex items-center gap-1.5 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-xl border border-amber-200/80 dark:border-amber-800/60 max-w-[200px] truncate shadow-xs">
+                                    <i class="far fa-sticky-note text-amber-500 text-xs shrink-0"></i>
+                                    <span id="pos-summary-nota" class="text-xs font-bold truncate"></span>
+                                </div>
                             </div>
                             <button type="button" onclick="switchPosMenu('cliente')"
                                 class="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-bold flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-lg bg-brand-50 dark:bg-brand-900/30 hover:bg-brand-100 transition-colors cursor-pointer">
@@ -2100,6 +2110,23 @@
                         <!-- Lista de Ítems en Carrito -->
                         <div id="cart-items" class="flex-1 overflow-y-auto p-3.5 space-y-2.5 max-h-[220px] lg:max-h-none min-h-[140px] custom-scroll">
                             <!-- Generado por renderCart() -->
+                        </div>
+
+                        <!-- Observaciones / Nota de Venta (Visible en Rutas y Deudas) -->
+                        <div class="px-3.5 py-2.5 bg-slate-100/70 dark:bg-slate-800/70 border-t border-slate-200/80 dark:border-slate-750">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label for="pos-ticket-notas" class="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5 cursor-pointer">
+                                    <i class="far fa-sticky-note text-amber-500 text-sm"></i>
+                                    <span>Observaciones de la Venta</span>
+                                </label>
+                                <span class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800/60">Rutas & Deudas</span>
+                            </div>
+                            <div class="relative">
+                                <input type="text" id="pos-ticket-notas" oninput="syncPosNotas(this.value)"
+                                    placeholder="Añadir nota u observación para esta venta..."
+                                    class="w-full pl-3 pr-8 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold transition-all shadow-sm">
+                                <i class="fas fa-edit absolute right-2.5 top-2.5 text-slate-400 text-xs pointer-events-none"></i>
+                            </div>
                         </div>
 
                         <!-- Totales y Acción de Pago -->
@@ -2598,6 +2625,7 @@
             return isNaN(num) ? 0 : num;
         }
         function escapeJS(str) { return str ? String(str).replace(/\\/g, "\\\\").replace(/'/g, "\\'").replace(/"/g, "&quot;") : ''; }
+        function escapeHTML(str) { return str ? String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;') : ''; }
 
         var state = {
             config: {},
@@ -3570,10 +3598,13 @@
                     totalDeudaUSD += deuda;
                     var cliente = String(ped[0] || 'Cliente').trim();
                     if (!deudasMap[cliente]) {
-                        deudasMap[cliente] = { total: 0, items: [], fecha: String(ped[4] || '').split('T')[0] };
+                        deudasMap[cliente] = { total: 0, items: [], fecha: String(ped[4] || '').split('T')[0], nota: '' };
                     }
                     deudasMap[cliente].total += deuda;
                     deudasMap[cliente].items.push(ped[2] + 'x ' + ped[1]);
+                    if (ped[9] && !deudasMap[cliente].nota) {
+                        deudasMap[cliente].nota = String(ped[9]).trim();
+                    }
                 }
             });
 
@@ -3595,6 +3626,7 @@
                     });
                     deudasListaEl.innerHTML = dClientes.slice(0, 8).map(function (c) {
                         var dInfo = deudasMap[c];
+                        var notaBadge = dInfo.nota ? '<span class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold truncate block mt-0.5"><i class="far fa-sticky-note mr-1"></i>' + escapeHTML(dInfo.nota) + '</span>' : '';
                         return '<div class="flex justify-between items-center p-2.5 rounded-xl bg-slate-50 dark:bg-slate-700/50 border border-slate-100 dark:border-slate-700 text-xs">' +
                             '<div class="flex-1 pr-2 min-w-0">' +
                             '<div class="flex items-center gap-1.5">' +
@@ -3602,6 +3634,7 @@
                             '<span class="text-[10px] text-slate-400 font-normal">(' + dInfo.fecha + ')</span>' +
                             '</div>' +
                             '<span class="text-[11px] text-slate-400 truncate block">' + dInfo.items.join(', ') + '</span>' +
+                            notaBadge +
                             '</div>' +
                             '<span class="font-black text-amber-600 dark:text-amber-400 leading-none">$' + dInfo.total.toFixed(2) + '</span>' +
                         '</div>';
@@ -4156,7 +4189,16 @@
         }
 
         function syncPosNotas(val) {
-            if (document.getElementById('pos-notas')) document.getElementById('pos-notas').value = (val || '').trim();
+            var v = (val || '').trim();
+            if (document.getElementById('pos-notas')) document.getElementById('pos-notas').value = v;
+
+            var cNot = document.getElementById('pos-cli-notas');
+            if (cNot && cNot.value !== val) cNot.value = val;
+
+            var tNot = document.getElementById('pos-ticket-notas');
+            if (tNot && tNot.value !== val) tNot.value = val;
+
+            updatePosSummaryDisplay();
         }
 
         function setPosDateQuick(offsetDays) {
@@ -4246,6 +4288,7 @@
             var tel = (document.getElementById('pos-telefono') ? document.getElementById('pos-telefono').value : '') || '';
             var lug = (document.getElementById('pos-lugar') ? document.getElementById('pos-lugar').value : '') || 'Porlamar';
             var fec = (document.getElementById('pos-fecha') ? document.getElementById('pos-fecha').value : '') || '';
+            var not = (document.getElementById('pos-notas') ? document.getElementById('pos-notas').value : '') || '';
 
             var sNom = document.getElementById('pos-summary-name');
             if (sNom) sNom.innerText = nom;
@@ -4258,6 +4301,24 @@
 
             var sFec = document.getElementById('pos-summary-fecha');
             if (sFec) sFec.innerText = fec || 'Hoy';
+
+            var sNot = document.getElementById('pos-summary-nota');
+            var sNotCont = document.getElementById('pos-summary-nota-container');
+            if (sNot && sNotCont) {
+                if (not.trim()) {
+                    sNot.innerText = not;
+                    sNotCont.classList.remove('hidden');
+                } else {
+                    sNot.innerText = '';
+                    sNotCont.classList.add('hidden');
+                }
+            }
+
+            var tNot = document.getElementById('pos-ticket-notas');
+            if (tNot && tNot.value !== not) tNot.value = not;
+
+            var cNot = document.getElementById('pos-cli-notas');
+            if (cNot && cNot.value !== not) cNot.value = not;
 
             // Actualizar tickets de venta si existen
             var tNom = document.getElementById('pos-ticket-cliente-display');
@@ -4328,6 +4389,8 @@
             var notasInp = document.getElementById('pos-cli-notas');
             var notas = notasInp ? notasInp.value.trim() : '';
             if (document.getElementById('pos-notas')) document.getElementById('pos-notas').value = notas;
+            var tNot = document.getElementById('pos-ticket-notas');
+            if (tNot) tNot.value = notas;
 
             switchPosMenu('catalogo');
         }
@@ -4347,6 +4410,9 @@
 
             var inpNotas = document.getElementById('pos-cli-notas');
             if (inpNotas) inpNotas.value = curNotas;
+
+            var tNot = document.getElementById('pos-ticket-notas');
+            if (tNot) tNot.value = curNotas;
 
             if (!curFecha) {
                 var now = new Date();
@@ -4418,6 +4484,8 @@
             if (document.getElementById('pos-cliente')) document.getElementById('pos-cliente').value = 'Cliente General';
             if (document.getElementById('pos-telefono')) document.getElementById('pos-telefono').value = '';
             if (document.getElementById('pos-notas')) document.getElementById('pos-notas').value = '';
+            if (document.getElementById('pos-cli-notas')) document.getElementById('pos-cli-notas').value = '';
+            if (document.getElementById('pos-ticket-notas')) document.getElementById('pos-ticket-notas').value = '';
             updatePosSummaryDisplay();
             renderCart();
             posBackToCategories();
@@ -4431,6 +4499,8 @@
             if (document.getElementById('pos-cliente')) document.getElementById('pos-cliente').value = 'Cliente General';
             if (document.getElementById('pos-telefono')) document.getElementById('pos-telefono').value = '';
             if (document.getElementById('pos-notas')) document.getElementById('pos-notas').value = '';
+            if (document.getElementById('pos-cli-notas')) document.getElementById('pos-cli-notas').value = '';
+            if (document.getElementById('pos-ticket-notas')) document.getElementById('pos-ticket-notas').value = '';
             updatePosSummaryDisplay();
             renderCart();
             posBackToCategories();
@@ -4566,7 +4636,12 @@
             document.getElementById('pay-usd').value = '';
             document.getElementById('pay-bs').value = '';
             document.getElementById('pay-ref').value = '';
-            document.getElementById('pay-nota').value = '';
+            if (mode === 'pos') {
+                var curNotas = (document.getElementById('pos-notas') ? document.getElementById('pos-notas').value : '');
+                document.getElementById('pay-nota').value = curNotas;
+            } else {
+                document.getElementById('pay-nota').value = '';
+            }
             var t = mode === 'pos' ? calculateCartTotals() : parseFloat(String(montoDeuda).replace(',', '.'));
             if (mode === 'pos' && !document.getElementById('pos-cliente').value) return showToast("Ingresa el cliente", "error");
             if (mode !== 'pos') document.getElementById('checkout-indices').value = indicesDeuda;
@@ -4642,7 +4717,15 @@
                 var fullCart = state.carrito.map(function (i) { return { nombre: state.productos[i.idOriginal].nombre, precio: getProdPrice(state.productos[i.idOriginal]), cantidad: i.cantidad }; });
                 var posLugar = document.getElementById('pos-lugar').value;
                 var posFecha = document.getElementById('pos-fecha').value;
-                var posNotas = document.getElementById('pos-notas').value;
+                var posNotas = (document.getElementById('pos-notas') ? document.getElementById('pos-notas').value : '').trim();
+                var notaTrim = (nota || '').trim();
+                if (notaTrim) {
+                    if (!posNotas) {
+                        posNotas = notaTrim;
+                    } else if (notaTrim !== posNotas && !posNotas.includes(notaTrim)) {
+                        posNotas = posNotas + ' - ' + notaTrim;
+                    }
+                }
                 var form = { cliente: cName, lugar: posLugar, fecha: posFecha, notas: posNotas, totalUSD: calculateCartTotals(), abonadoUSD: rU, restante: Math.max(0, calculateCartTotals() - rU), ref: ref, notaPago: nota, bcvRate: state.bcv, telefono: dbPhone, numEntrega: numEntrega };
 
                 // === ACTUALIZACIÓN OPTIMISTA ===
@@ -4682,6 +4765,8 @@
                 document.getElementById('pos-cliente').value = 'Cliente General';
                 document.getElementById('pos-telefono').value = '';
                 document.getElementById('pos-notas').value = '';
+                if (document.getElementById('pos-cli-notas')) document.getElementById('pos-cli-notas').value = '';
+                if (document.getElementById('pos-ticket-notas')) document.getElementById('pos-ticket-notas').value = '';
                 updatePosTicketClientDisplay();
                 renderCart();
                 closeModal('modal-checkout');
@@ -5004,6 +5089,15 @@
                         var btnDelete = (state.currentUser && state.currentUser.permisosDelete === "SI") ? 
                             '<button onclick="openDeleteRutaModal(\'' + c.replace(/'/g, "\\'") + '\', \'' + entry.fecha + '\', \'' + l.replace(/'/g, "\\'") + '\')" class="text-xs text-red-500 hover:text-white bg-red-50 hover:bg-red-500 dark:bg-red-900/30 dark:hover:bg-red-600 font-bold px-3 py-1.5 rounded-lg transition-colors shadow-sm flex items-center justify-center h-full"><i class="fas fa-trash-alt"></i></button>' : '';
 
+                        var isNote = Boolean(entry.n && String(entry.n).trim());
+                        var noteClass = isNote
+                            ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-300 dark:border-amber-700 text-amber-900 dark:text-amber-200 ring-1 ring-amber-400/40'
+                            : 'bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-white';
+                        var noteInput = '<div class="relative mt-2">' +
+                            '<i class="far fa-sticky-note absolute left-3 top-2.5 text-xs ' + (isNote ? 'text-amber-500' : 'text-slate-400') + '"></i>' +
+                            '<input type="text" value="' + escapeHTML(entry.n || '') + '" onchange="updN(\'' + entry.id + '\', this.value, \'' + c.replace(/'/g, "\\'") + '\', \'' + entry.fecha + '\', \'' + l.replace(/'/g, "\\'") + '\')" placeholder="Observaciones / Nota de entrega..." class="w-full text-xs pl-8 pr-3 py-2 border rounded-xl outline-none focus:ring-2 focus:ring-brand-500 font-semibold transition-all duration-300 ' + noteClass + '">' +
+                            '</div>';
+
                         return '<div class="bg-white dark:bg-slate-800/80 rounded-xl p-4 shadow-sm border-l-4 transition-colors duration-500 ease-in-out ' + bCol + '" data-mapkey="' + mapKey.replace(/"/g, '&quot;') + '">' +
                             '<div class="flex justify-between items-start mb-2">' +
                             '<div>' +
@@ -5014,7 +5108,7 @@
                             '<button onclick="togE(this, \'' + entry.id + '\', \'' + (entry.e ? 'Pendiente' : 'Entregado') + '\', \'' + c.replace(/'/g, "\\'") + '\', \'' + entry.fecha + '\', \'' + l.replace(/'/g, "\\'") + '\')" class="text-xs font-bold px-3 py-1.5 rounded-lg text-white transition-all duration-300 transform active:scale-90 flex items-center justify-center min-w-[100px] outline-none flex-shrink-0 ' + btnCol + '">' + btnTxt + '</button>' +
                             '</div></div>' +
                             '<ul class="text-sm mb-3 mt-2 space-y-0.5">' + liHTML + '</ul>' +
-                            '<input type="text" value="' + (entry.n || '') + '" onchange="updN(\'' + entry.id + '\', this.value, \'' + c.replace(/'/g, "\\'") + '\', \'' + entry.fecha + '\', \'' + l.replace(/'/g, "\\'") + '\')" placeholder="Añadir nota..." class="w-full text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-brand-500 font-semibold transition-all duration-300">' +
+                            noteInput +
                             uTag +
                             '</div>';
                     }).join('');
@@ -5158,8 +5252,15 @@
                     if (!dc[c]) dc[c] = { t: 0, i: [] };
                     var fechaPedido = String(p[4]).split('T')[0];
                     dc[c].t += r;
-                    var notaText = p[9] ? (' <span class="text-[10px] text-amber-600 dark:text-amber-400 font-bold ml-1 italic"><i class="fas fa-comment-dots mr-1"></i>' + p[9] + '</span>') : '';
-                    dc[c].i.push({ idx: [i], m: r, items: [p[2] + 'x ' + p[1] + notaText], fecha: fechaPedido });
+                    dc[c].i.push({
+                        idx: [i],
+                        m: r,
+                        prod: p[2] + 'x ' + p[1],
+                        nota: p[9] ? String(p[9]).trim() : '',
+                        fecha: fechaPedido,
+                        id: p[15],
+                        lugar: p[3]
+                    });
                 }
             });
             state.deudores = Object.keys(dc);
@@ -5167,14 +5268,75 @@
             for (var i = 0; i < state.deudores.length; i++) {
                 var c = state.deudores[i];
                 if (term && c.toLowerCase().indexOf(term) === -1) continue;
-                var itemsHTML = dc[c].i.map(function (it) {
-                    var desc = it.items.join(', ') + ' <span class="text-[10px] bg-slate-200 dark:bg-slate-600 px-1 rounded ml-1 text-slate-500 dark:text-slate-300">' + it.fecha + '</span>';
-                    return '<label class="flex justify-between items-center text-sm p-2 bg-slate-50 dark:bg-slate-700/50 rounded-lg cursor-pointer border border-transparent hover:border-brand-200 dark:hover:border-brand-700 transition-colors"><div class="flex items-center gap-3"><input type="checkbox" class="chk-d-' + i + ' w-4 h-4 text-brand-600 rounded" data-idx="' + it.idx.join(',') + '" data-monto="' + it.m.toFixed(2) + '" checked onchange="calcD(' + i + ')"><span class="font-bold text-slate-600 dark:text-slate-300 flex items-center">' + desc + '</span></div><span class="font-black dark:text-white">$' + it.m.toFixed(2) + '</span></label>';
-                }).join('');
                 var cEscaped = c.replace(/'/g, "\\'");
-                htmlFinal += '<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden"><div class="bg-slate-800 dark:bg-slate-900 text-white p-4 flex justify-between items-start"><div><h3 class="font-bold text-lg leading-tight">' + c + '</h3><div class="flex items-center gap-2 mt-1"><i class="fas fa-phone-alt text-[10px] text-slate-400"></i><span class="text-xs text-slate-300 font-mono" id="phone-label-' + i + '">' + (state.clientPhones[c] || 'Sin registrar') + '</span><button onclick="editPhone(\'' + cEscaped + '\', ' + i + ')" class="text-brand-400 hover:text-brand-300 transition-colors ml-1" title="Editar Teléfono"><i class="fas fa-edit text-[12px]"></i></button></div></div><span class="font-black text-xl text-brand-400">$' + dc[c].t.toFixed(2) + '</span></div><div class="p-4 space-y-2">' + itemsHTML + '</div><div class="p-4 bg-slate-50 dark:bg-slate-800 border-t dark:border-slate-700 flex gap-2"><button onclick="sendWhatsApp(' + i + ')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-md text-sm transition-colors"><i class="fab fa-whatsapp mr-1"></i> Recordar</button><button id="btn-cobrar-' + i + '" onclick="trigD(' + i + ')" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl shadow-md text-sm transition-colors">Cobrar ($' + dc[c].t.toFixed(2) + ')</button></div></div>';
+                var itemsHTML = dc[c].i.map(function (it) {
+                    var notaHTML = '';
+                    if (it.nota) {
+                        notaHTML = '<div class="mt-1.5 ml-7 flex items-start gap-1.5 bg-amber-50 dark:bg-amber-950/40 border border-amber-200/90 dark:border-amber-800/60 text-amber-800 dark:text-amber-300 px-2.5 py-1 rounded-xl text-xs">' +
+                            '<i class="far fa-sticky-note text-amber-500 text-xs mt-0.5 shrink-0"></i>' +
+                            '<span class="font-semibold break-words flex-1"><b class="text-amber-700 dark:text-amber-400 uppercase text-[10px] tracking-wide mr-1">Obs:</b>' + escapeHTML(it.nota) + '</span>' +
+                            '<button type="button" onclick="editDeudaNota(' + it.idx[0] + ', \'' + (it.id || '') + '\', \'' + cEscaped + '\', \'' + it.fecha + '\', \'' + (it.lugar ? it.lugar.replace(/'/g, "\\'") : '') + '\')" class="text-amber-600 dark:text-amber-400 hover:text-amber-800 text-[11px] ml-1 shrink-0 cursor-pointer" title="Editar observación">' +
+                            '<i class="fas fa-edit"></i>' +
+                            '</button>' +
+                            '</div>';
+                    } else {
+                        notaHTML = '<div class="mt-1 ml-7">' +
+                            '<button type="button" onclick="editDeudaNota(' + it.idx[0] + ', \'' + (it.id || '') + '\', \'' + cEscaped + '\', \'' + it.fecha + '\', \'' + (it.lugar ? it.lugar.replace(/'/g, "\\'") : '') + '\')" class="text-[11px] text-slate-400 hover:text-brand-500 transition-colors flex items-center gap-1 cursor-pointer">' +
+                            '<i class="far fa-comment-dots text-[10px]"></i> <span>+ Añadir observación</span>' +
+                            '</button>' +
+                            '</div>';
+                    }
+
+                    return '<div class="p-2.5 bg-slate-50 dark:bg-slate-700/50 rounded-xl border border-transparent hover:border-brand-200 dark:hover:border-brand-700 transition-colors">' +
+                        '<div class="flex justify-between items-center text-sm">' +
+                        '<label class="flex items-center gap-3 cursor-pointer flex-1 mr-2">' +
+                        '<input type="checkbox" class="chk-d-' + i + ' w-4 h-4 text-brand-600 rounded" data-idx="' + it.idx.join(',') + '" data-monto="' + it.m.toFixed(2) + '" checked onchange="calcD(' + i + ')">' +
+                        '<span class="font-bold text-slate-700 dark:text-slate-300">' + it.prod + '</span>' +
+                        '<span class="text-[10px] bg-slate-200 dark:bg-slate-600 px-1.5 py-0.5 rounded text-slate-500 dark:text-slate-300 font-mono">' + it.fecha + '</span>' +
+                        '</label>' +
+                        '<span class="font-black text-slate-800 dark:text-white">$' + it.m.toFixed(2) + '</span>' +
+                        '</div>' +
+                        notaHTML +
+                        '</div>';
+                }).join('');
+
+                htmlFinal += '<div class="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">' +
+                    '<div class="bg-slate-800 dark:bg-slate-900 text-white p-4 flex justify-between items-start">' +
+                    '<div>' +
+                    '<h3 class="font-bold text-lg leading-tight">' + c + '</h3>' +
+                    '<div class="flex items-center gap-2 mt-1">' +
+                    '<i class="fas fa-phone-alt text-[10px] text-slate-400"></i>' +
+                    '<span class="text-xs text-slate-300 font-mono" id="phone-label-' + i + '">' + (state.clientPhones[c] || 'Sin registrar') + '</span>' +
+                    '<button onclick="editPhone(\'' + cEscaped + '\', ' + i + ')" class="text-brand-400 hover:text-brand-300 transition-colors ml-1" title="Editar Teléfono">' +
+                    '<i class="fas fa-edit text-[12px]"></i>' +
+                    '</button>' +
+                    '</div>' +
+                    '</div>' +
+                    '<span class="font-black text-xl text-brand-400">$' + dc[c].t.toFixed(2) + '</span>' +
+                    '</div>' +
+                    '<div class="p-4 space-y-2.5">' + itemsHTML + '</div>' +
+                    '<div class="p-4 bg-slate-50 dark:bg-slate-800 border-t dark:border-slate-700 flex gap-2">' +
+                    '<button onclick="sendWhatsApp(' + i + ')" class="flex-1 bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-xl shadow-md text-sm transition-colors">' +
+                    '<i class="fab fa-whatsapp mr-1"></i> Recordar' +
+                    '</button>' +
+                    '<button id="btn-cobrar-' + i + '" onclick="trigD(' + i + ')" class="flex-1 bg-brand-500 hover:bg-brand-600 text-white font-bold py-3 rounded-xl shadow-md text-sm transition-colors">' +
+                    'Cobrar ($' + dc[c].t.toFixed(2) + ')' +
+                    '</button>' +
+                    '</div>' +
+                    '</div>';
             }
             document.getElementById('lista-deudores').innerHTML = htmlFinal || '<div class="col-span-full text-center p-10"><p class="font-bold text-slate-500 dark:text-slate-400">No hay deudas registradas.</p></div>';
+        }
+
+        function editDeudaNota(rowIdx, id, cliente, fecha, lugar) {
+            var curNota = (state.pedidosRaw[rowIdx] && state.pedidosRaw[rowIdx][9]) ? state.pedidosRaw[rowIdx][9] : '';
+            var newNota = prompt("Observación / Nota para la venta a " + cliente + ":", curNota);
+            if (newNota !== null) {
+                newNota = newNota.trim();
+                updN(id, newNota, cliente, fecha, lugar);
+                renderDeudas();
+                showToast("Observación guardada", "success");
+            }
         }
 
         function calcD(i) {
