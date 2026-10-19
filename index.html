@@ -62,6 +62,19 @@
             background-color: #475569;
         }
 
+        html.overflow-hidden, body.overflow-hidden {
+            overflow: hidden !important;
+            height: 100% !important;
+            touch-action: none;
+            -ms-overflow-style: none;
+            scrollbar-width: none !important;
+        }
+        html.overflow-hidden::-webkit-scrollbar, body.overflow-hidden::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -1818,66 +1831,66 @@
             <div id="suggestions" class="hidden"></div>
 
             <!-- ENCABEZADO DEL MODAL: BRANDING, STEPS & CONTROLES -->
-            <div class="px-4 sm:px-6 py-3.5 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/90 flex flex-wrap items-center justify-between gap-3 shrink-0">
+            <div class="px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/90 flex items-center justify-between gap-2 shrink-0">
                 <!-- Marca Bethel -->
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-2xl bg-brand-50 dark:bg-brand-900/40 text-brand-500 dark:text-brand-400 flex items-center justify-center text-xl font-black shadow-sm">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-brand-50 dark:bg-brand-900/40 text-brand-500 dark:text-brand-400 flex items-center justify-center text-base sm:text-xl font-black shadow-xs">
                         <i class="fas fa-cash-register"></i>
                     </div>
                     <div>
-                        <h2 class="text-base sm:text-lg font-black text-slate-800 dark:text-white leading-tight">Punto de Venta</h2>
-                        <span class="text-[11px] font-bold text-brand-500 tracking-wide uppercase">Dulce Bethel</span>
+                        <h2 class="text-xs sm:text-base font-black text-slate-800 dark:text-white leading-tight">Punto de Venta</h2>
+                        <span class="hidden sm:block text-[11px] font-bold text-brand-500 tracking-wide uppercase">Dulce Bethel</span>
                     </div>
                 </div>
 
                 <!-- Tabs de Navegación entre Menús (Pasos) -->
-                <div class="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl border border-slate-200/60 dark:border-slate-700">
+                <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl sm:rounded-2xl border border-slate-200/60 dark:border-slate-700">
                     <button type="button" id="pos-tab-menu-cliente" onclick="switchPosMenu('cliente')"
-                        class="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer bg-brand-500 text-white shadow-md shadow-brand-500/25">
+                        class="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-brand-500 text-white shadow-md shadow-brand-500/25">
                         <i class="fas fa-user-circle text-xs"></i>
-                        <span>1. Cliente & Ubicación</span>
+                        <span>1. Cliente<span class="hidden sm:inline"> & Ubicación</span></span>
                     </button>
                     <button type="button" id="pos-tab-menu-catalogo" onclick="switchPosMenu('catalogo')"
-                        class="px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
+                        class="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
                         <i class="fas fa-th-large text-xs"></i>
-                        <span>2. Catálogo & Pedido</span>
+                        <span>2. Pedido<span class="hidden sm:inline"> & Catálogo</span></span>
                         <span id="pos-tab-cart-badge" class="bg-brand-500 text-white text-[10px] font-black px-1.5 py-0.2 rounded-full hidden">0</span>
                     </button>
                 </div>
 
                 <!-- Controles Rápidos a la Derecha -->
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-1.5 sm:gap-2.5">
                     <!-- Toggle Mayorista -->
-                    <div class="flex items-center gap-2 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700" title="Precios al Mayor">
-                        <span class="text-xs font-bold text-slate-600 dark:text-slate-300">Mayor:</span>
-                        <div class="relative inline-block w-8 align-middle select-none">
+                    <div class="flex items-center gap-1 sm:gap-2 bg-slate-50 dark:bg-slate-800 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-slate-200 dark:border-slate-700" title="Precios al Mayor">
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-600 dark:text-slate-300">Mayor:</span>
+                        <div class="relative inline-block w-7 sm:w-8 align-middle select-none">
                             <input type="checkbox" id="toggle-mayor" onchange="togglePosMayorista(this.checked)"
-                                class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-2 appearance-none cursor-pointer" />
-                            <label for="toggle-mayor" class="toggle-label block overflow-hidden h-4 rounded-full cursor-pointer bg-slate-300"></label>
+                                class="toggle-checkbox absolute block w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full bg-white border-2 appearance-none cursor-pointer" />
+                            <label for="toggle-mayor" class="toggle-label block overflow-hidden h-3.5 sm:h-4 rounded-full cursor-pointer bg-slate-300"></label>
                         </div>
                     </div>
 
-                    <!-- Menú WhatsApp -->
+                    <!-- Menú WhatsApp (visible en sm) -->
                     <button type="button" onclick="openMenuModal()" title="Menú del Día por WhatsApp"
-                        class="p-2 rounded-xl bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366]/20 transition-colors border border-[#25D366]/30 text-sm cursor-pointer">
+                        class="hidden sm:flex p-2 rounded-xl bg-[#25D366]/10 text-[#128C7E] hover:bg-[#25D366]/20 transition-colors border border-[#25D366]/30 text-sm cursor-pointer">
                         <i class="fab fa-whatsapp"></i>
                     </button>
 
-                    <!-- Botón Producir -->
+                    <!-- Botón Producir (visible en sm) -->
                     <button type="button" onclick="openProduccionModal()" title="Suma unidades al inventario terminado"
-                        class="p-2 rounded-xl bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 hover:bg-brand-200 transition-colors border border-brand-200 dark:border-brand-700 text-sm cursor-pointer">
+                        class="hidden sm:flex p-2 rounded-xl bg-brand-100 dark:bg-brand-900/30 text-brand-600 dark:text-brand-400 hover:bg-brand-200 transition-colors border border-brand-200 dark:border-brand-700 text-sm cursor-pointer">
                         <i class="fas fa-hammer"></i>
                     </button>
 
-                    <!-- Botón Gestionar Categorías -->
+                    <!-- Botón Gestionar Categorías (visible en md) -->
                     <button type="button" id="btn-gestionar-cat" onclick="openCategoriasModal()" title="Gestionar Categorías"
-                        class="btn-gestionar-cat p-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-brand-600 transition-colors border border-slate-200 dark:border-slate-600 text-sm cursor-pointer">
+                        class="btn-gestionar-cat hidden md:flex p-2 rounded-xl bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-brand-600 transition-colors border border-slate-200 dark:border-slate-600 text-sm cursor-pointer">
                         <i class="fas fa-tags"></i>
                     </button>
 
-                    <!-- Botón Cerrar Modal -->
-                    <button type="button" onclick="closePosModal()"
-                        class="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-700 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer">
+                    <!-- Botón Cerrar Modal: Cierra y Limpia todo -->
+                    <button type="button" onclick="closePosModal()" title="Cerrar y Limpiar"
+                        class="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-red-50 dark:hover:bg-red-950/40 text-slate-400 hover:text-red-500 dark:hover:text-red-400 flex items-center justify-center transition-colors cursor-pointer border border-transparent hover:border-red-200 dark:hover:border-red-800/50">
                         <i class="fas fa-times text-sm"></i>
                     </button>
                 </div>
@@ -1887,120 +1900,121 @@
             <div class="flex-1 overflow-hidden relative">
 
                 <!-- ==================== MENÚ 1: CLIENTE, TELÉFONO, FECHA Y UBICACIÓN ==================== -->
-                <div id="pos-menu-cliente" class="h-full overflow-y-auto custom-scroll p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
-                    <div class="max-w-4xl mx-auto w-full space-y-6">
+                <div id="pos-menu-cliente" class="h-full overflow-y-auto custom-scroll p-3 sm:p-6 lg:p-8 flex flex-col justify-between">
+                    <div class="max-w-4xl mx-auto w-full space-y-4 sm:space-y-6">
                         
                         <!-- Encabezado del Menú 1 -->
-                        <div class="text-center sm:text-left border-b border-slate-100 dark:border-slate-800 pb-4">
-                            <h3 class="text-xl sm:text-2xl font-black text-slate-800 dark:text-white tracking-tight">Datos del Pedido y Entrega</h3>
-                            <p class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Busca el cliente o escribe uno nuevo. Selecciona fecha y ubicación de entrega de forma rápida e intuitiva.</p>
+                        <div class="text-center sm:text-left border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-4">
+                            <h3 class="text-lg sm:text-2xl font-black text-slate-800 dark:text-white tracking-tight">Datos del Pedido y Entrega</h3>
+                            <p class="hidden sm:block text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mt-1">Busca el cliente o escribe uno nuevo. Selecciona fecha y ubicación de entrega de forma rápida e intuitiva.</p>
                         </div>
 
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-3.5 sm:gap-6">
                             
                             <!-- COLUMNA IZQUIERDA: CLIENTE Y CONTACTO -->
-                            <div class="bg-slate-50/70 dark:bg-slate-800/40 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 space-y-4">
-                                <div class="flex items-center gap-2 text-brand-500 dark:text-brand-400 font-black text-sm uppercase tracking-wider mb-1">
-                                    <i class="fas fa-user-circle text-base"></i>
+                            <div class="bg-slate-50/70 dark:bg-slate-800/40 p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-700/80 space-y-3 sm:space-y-4">
+                                <div class="flex items-center gap-2 text-brand-500 dark:text-brand-400 font-black text-xs sm:text-sm uppercase tracking-wider mb-0.5">
+                                    <i class="fas fa-user-circle text-sm sm:text-base"></i>
                                     <span>Identificación del Cliente</span>
                                 </div>
 
                                 <!-- Búsqueda y Nombre del Cliente -->
                                 <div class="relative">
-                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Nombre del Cliente / Empresa</label>
+                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Nombre del Cliente / Empresa</label>
                                     <div class="relative">
-                                        <i class="fas fa-search absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                                        <i class="fas fa-search absolute left-3.5 top-3 text-slate-400 text-xs"></i>
                                         <input type="text" id="pos-cli-nombre" oninput="handlePosClientInput(this.value)"
                                             placeholder="Buscar o escribir nombre..."
                                             autocomplete="off"
-                                            class="w-full pl-9 pr-3.5 py-3 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold shadow-sm transition-all">
+                                            class="w-full pl-9 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold shadow-xs transition-all">
                                     </div>
                                     <!-- Autocomplete Dropdown -->
                                     <div id="pos-cli-suggestions"
                                         class="absolute top-full left-0 right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl mt-1.5 max-h-52 overflow-y-auto hidden z-40 divide-y divide-slate-100 dark:divide-slate-700/60 custom-scroll">
                                     </div>
-                                    <p class="text-[11px] text-slate-400 dark:text-slate-500 mt-1.5 font-medium">Si el cliente ya existe se autocompleta su teléfono. Si no está en el sistema, simplemente escribe sus datos.</p>
+                                    <p class="hidden sm:block text-[11px] text-slate-400 dark:text-slate-500 mt-1 font-medium">Si el cliente ya existe se autocompleta su teléfono. Si no está en el sistema, simplemente escribe sus datos.</p>
                                 </div>
 
                                 <!-- Teléfono WhatsApp -->
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Teléfono (WhatsApp)</label>
+                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">Teléfono (WhatsApp)</label>
                                     <div class="relative">
-                                        <i class="fab fa-whatsapp absolute left-3.5 top-3.5 text-emerald-500 text-base"></i>
+                                        <i class="fab fa-whatsapp absolute left-3.5 top-2.5 text-emerald-500 text-sm sm:text-base"></i>
                                         <input type="tel" id="pos-cli-telefono" oninput="syncPosPhone(this.value)"
                                             placeholder="Ej: 04248520402"
-                                            class="w-full pl-10 pr-3.5 py-3 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold shadow-sm transition-all">
+                                            class="w-full pl-10 pr-3.5 py-2 sm:py-2.5 text-xs sm:text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold shadow-xs transition-all">
                                     </div>
                                 </div>
 
                                 <!-- Notas u Observaciones del Pedido (Rutas y Deudas) -->
                                 <div>
-                                    <div class="flex items-center justify-between mb-1.5">
+                                    <div class="flex items-center justify-between mb-1">
                                         <label for="pos-cli-notas" class="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 cursor-pointer">
-                                            <i class="far fa-sticky-note text-amber-500 text-sm"></i>
-                                            <span>Observaciones / Nota de la Venta</span>
+                                            <i class="far fa-sticky-note text-amber-500 text-xs sm:text-sm"></i>
+                                            <span>Observaciones / Nota</span>
                                         </label>
-                                        <span class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800/60">Visible en Rutas & Deudas</span>
+                                        <span class="text-[9px] sm:text-[10px] text-amber-600 dark:text-amber-400 font-semibold bg-amber-50 dark:bg-amber-950/40 px-1.5 sm:px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800/60">Rutas & Deudas</span>
                                     </div>
                                     <textarea id="pos-cli-notas" rows="2" oninput="syncPosNotas(this.value)"
-                                        placeholder="Ej: Paga el viernes / Cobrar en efectivo / Entregar antes de las 3pm / Dejar con el vigilante..."
-                                        class="w-full px-3.5 py-2.5 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none shadow-sm transition-all"></textarea>
+                                        placeholder="Ej: Paga el viernes / Cobrar en efectivo / Entregar antes de las 3pm..."
+                                        class="w-full px-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none shadow-xs transition-all"></textarea>
                                 </div>
                             </div>
 
                             <!-- COLUMNA DERECHA: FECHA Y UBICACIÓN INTUITIVA -->
-                            <div class="bg-slate-50/70 dark:bg-slate-800/40 p-5 sm:p-6 rounded-3xl border border-slate-200/80 dark:border-slate-700/80 space-y-4">
-                                <div class="flex items-center gap-2 text-brand-500 dark:text-brand-400 font-black text-sm uppercase tracking-wider mb-1">
-                                    <i class="fas fa-map-marked-alt text-base"></i>
+                            <div class="bg-slate-50/70 dark:bg-slate-800/40 p-3.5 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-700/80 space-y-3 sm:space-y-4">
+                                <div class="flex items-center gap-2 text-brand-500 dark:text-brand-400 font-black text-xs sm:text-sm uppercase tracking-wider mb-0.5">
+                                    <i class="fas fa-map-marked-alt text-sm sm:text-base"></i>
                                     <span>Entrega y Ubicación</span>
                                 </div>
 
                                 <!-- Selector Intuitivo de Fecha -->
                                 <div>
-                                    <div class="flex items-center justify-between mb-1.5">
-                                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Fecha del Pedido / Entrega</label>
+                                    <div class="flex items-center justify-between mb-1">
+                                        <label class="text-xs font-bold text-slate-700 dark:text-slate-300">Fecha de Entrega</label>
                                         <!-- Accesos Rápidos de Fecha -->
-                                        <div class="flex items-center gap-1.5">
+                                        <div class="flex items-center gap-1">
                                             <button type="button" id="btn-quick-date-today" onclick="setPosDateQuick(0)"
-                                                class="px-2.5 py-1 rounded-xl text-[11px] font-black transition-all bg-brand-500 text-white shadow-sm cursor-pointer">Hoy</button>
+                                                class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-[11px] font-black transition-all bg-brand-500 text-white shadow-xs cursor-pointer">Hoy</button>
                                             <button type="button" id="btn-quick-date-tomorrow" onclick="setPosDateQuick(1)"
-                                                class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer">Mañana</button>
+                                                class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-[11px] font-bold transition-all bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer">Mañana</button>
                                             <button type="button" id="btn-quick-date-2days" onclick="setPosDateQuick(2)"
-                                                class="px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer">+2 Días</button>
+                                                class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-[11px] font-bold transition-all bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 cursor-pointer">+2 Días</button>
                                         </div>
                                     </div>
                                     <input type="date" id="pos-cli-fecha" onchange="syncPosDate(this.value)"
-                                        class="w-full px-3.5 py-2.5 text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold shadow-sm"
+                                        class="w-full px-3 py-2 text-xs sm:text-sm bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl sm:rounded-2xl focus:ring-2 focus:ring-brand-500 outline-none font-bold shadow-xs"
                                         style="color-scheme: dark;">
                                 </div>
 
                                 <!-- Cuadrícula Intuitiva de Ubicaciones / Rutas -->
                                 <div>
-                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">Selecciona la Ruta / Ubicación:</label>
-                                    <div id="pos-lugar-chips" class="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto custom-scroll pr-1">
+                                    <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">Selecciona la Ruta / Ubicación:</label>
+                                    <div id="pos-lugar-chips" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 max-h-36 sm:max-h-48 overflow-y-auto custom-scroll pr-1">
                                         <!-- Generado dinámicamente por renderPosLugarChips() -->
                                     </div>
 
                                     <!-- Campo para dirección personalizada -->
-                                    <div class="mt-3 relative">
+                                    <div class="mt-2.5 relative">
                                         <i class="fas fa-map-pin absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                                         <input type="text" id="pos-cli-lugar-custom" oninput="handlePosCustomLugar(this.value)"
                                             placeholder="O escribe una dirección o punto exacto..."
-                                            class="w-full pl-8 pr-3 py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold">
+                                            class="w-full pl-8 pr-3 py-1.5 sm:py-2 text-xs bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 dark:text-white rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold">
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Botón de Continuar al Catálogo -->
-                    <div class="max-w-4xl mx-auto w-full pt-6 mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-4">
+                    <!-- Botones de Acción al pie de Menú 1 -->
+                    <div class="max-w-4xl mx-auto w-full pt-3 sm:pt-6 mt-3 sm:mt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
                         <button type="button" onclick="closePosModal()"
-                            class="py-3 px-6 rounded-2xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-sm cursor-pointer">
-                            Cancelar
+                            class="py-2.5 sm:py-3.5 px-4 sm:px-6 rounded-xl sm:rounded-2xl font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-xs sm:text-sm cursor-pointer flex items-center gap-1.5">
+                            <i class="fas fa-times text-xs"></i>
+                            <span>Cancelar</span>
                         </button>
                         <button type="button" onclick="continueToPosCatalog()"
-                            class="py-3.5 px-8 rounded-2xl font-black text-white bg-brand-500 hover:bg-brand-600 active:scale-98 transition-all text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25 cursor-pointer">
+                            class="py-2.5 sm:py-3.5 px-6 sm:px-8 rounded-xl sm:rounded-2xl font-black text-white bg-brand-500 hover:bg-brand-600 active:scale-98 transition-all text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-brand-500/25 cursor-pointer">
                             <span>Continuar al Catálogo</span>
                             <i class="fas fa-arrow-right text-xs"></i>
                         </button>
@@ -2015,79 +2029,79 @@
                         
                         <!-- ALERTA DE STOCK NEGATIVO (SI HAY) -->
                         <div id="stock-warning-banner"
-                            class="hidden m-3 mb-0 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700/50 text-amber-800 dark:text-amber-400 p-3 rounded-2xl shadow-sm flex items-center gap-3 transition-all duration-300">
-                            <i class="fas fa-exclamation-triangle text-xl text-amber-500"></i>
+                            class="hidden m-2 sm:m-3 mb-0 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700/50 text-amber-800 dark:text-amber-400 p-2.5 sm:p-3 rounded-xl sm:rounded-2xl shadow-sm flex items-center gap-2.5 transition-all duration-300">
+                            <i class="fas fa-exclamation-triangle text-lg sm:text-xl text-amber-500 shrink-0"></i>
                             <div class="flex-1 text-xs">
                                 <h4 class="font-bold">¡Atención! Tienes pedidos pendientes por preparar</h4>
-                                <p id="stock-warning-list" class="font-semibold text-amber-700 dark:text-amber-500/80 mt-0.5"></p>
+                                <p id="stock-warning-list" class="font-semibold text-amber-700 dark:text-amber-500/80 mt-0.5 text-[11px]"></p>
                             </div>
                         </div>
 
                         <!-- BARRA SUPERIOR: RESUMEN DE CLIENTE & BOTÓN EDITAR -->
-                        <div class="px-4 py-2.5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 text-xs">
-                            <div class="flex items-center gap-3 overflow-hidden">
+                        <div class="px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs">
+                            <div class="flex items-center gap-2 sm:gap-3 overflow-hidden">
                                 <div class="flex items-center gap-1.5 text-slate-700 dark:text-slate-200 truncate">
                                     <i class="fas fa-user text-brand-500 text-[11px]"></i>
-                                    <span id="pos-summary-name" class="font-bold truncate">Cliente General</span>
+                                    <span id="pos-summary-name" class="font-bold truncate text-xs">Cliente General</span>
                                 </div>
                                 <span class="text-slate-300 dark:text-slate-600">•</span>
+                                <div class="flex items-center gap-1 text-slate-500 dark:text-slate-400">
+                                    <i class="fas fa-map-marker-alt text-brand-500 text-[11px]"></i>
+                                    <span id="pos-summary-lugar" class="font-bold text-slate-700 dark:text-slate-200 text-xs">Porlamar</span>
+                                </div>
+                                <span class="hidden sm:inline text-slate-300 dark:text-slate-600">•</span>
                                 <div class="hidden sm:flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
                                     <i class="fab fa-whatsapp text-emerald-500 text-[11px]"></i>
                                     <span id="pos-summary-tel">Sin teléfono</span>
-                                </div>
-                                <span class="hidden sm:inline text-slate-300 dark:text-slate-600">•</span>
-                                <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                                    <i class="fas fa-map-marker-alt text-brand-500 text-[11px]"></i>
-                                    <span id="pos-summary-lugar" class="font-bold text-slate-700 dark:text-slate-200">Porlamar</span>
                                 </div>
                                 <span class="hidden md:inline text-slate-300 dark:text-slate-600">•</span>
                                 <div class="hidden md:flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
                                     <i class="far fa-calendar-alt text-slate-400 text-[11px]"></i>
                                     <span id="pos-summary-fecha">Hoy</span>
                                 </div>
-                                <div id="pos-summary-nota-container" class="hidden xl:flex items-center gap-1.5 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2.5 py-1 rounded-xl border border-amber-200/80 dark:border-amber-800/60 max-w-[200px] truncate shadow-xs">
+                                <div id="pos-summary-nota-container" class="hidden xl:flex items-center gap-1.5 text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-lg border border-amber-200/80 dark:border-amber-800/60 max-w-[180px] truncate">
                                     <i class="far fa-sticky-note text-amber-500 text-xs shrink-0"></i>
-                                    <span id="pos-summary-nota" class="text-xs font-bold truncate"></span>
+                                    <span id="pos-summary-nota" class="text-[11px] font-bold truncate"></span>
                                 </div>
                             </div>
                             <button type="button" onclick="switchPosMenu('cliente')"
-                                class="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-bold flex items-center gap-1 shrink-0 px-2.5 py-1 rounded-lg bg-brand-50 dark:bg-brand-900/30 hover:bg-brand-100 transition-colors cursor-pointer">
+                                class="text-brand-500 hover:text-brand-600 dark:text-brand-400 font-bold flex items-center gap-1 shrink-0 px-2 py-1 rounded-lg bg-brand-50 dark:bg-brand-900/30 hover:bg-brand-100 transition-colors cursor-pointer text-xs">
                                 <i class="fas fa-edit text-[10px]"></i>
                                 <span>Modificar</span>
                             </button>
                         </div>
 
                         <!-- BARRA DE NAVEGACIÓN DENTRO DEL CATÁLOGO & BÚSQUEDA -->
-                        <div class="p-3 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3 bg-white dark:bg-slate-900">
-                            <div class="flex items-center gap-2">
+                        <div class="p-2.5 sm:p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2.5 bg-white dark:bg-slate-900">
+                            <div class="flex items-center gap-1.5 sm:gap-2">
                                 <button type="button" id="pos-btn-back-categories" onclick="posBackToCategories()"
-                                    class="hidden text-brand-500 hover:text-brand-600 dark:text-brand-400 font-black text-xs sm:text-sm flex items-center gap-1.5 transition-colors cursor-pointer px-2 py-1 rounded-xl bg-brand-50 dark:bg-brand-900/30">
-                                    <i class="fas fa-chevron-left text-xs"></i> <span>Volver a Categorías</span>
+                                    class="hidden text-brand-500 hover:text-brand-600 dark:text-brand-400 font-black text-xs sm:text-sm flex items-center gap-1 transition-colors cursor-pointer px-2 py-1 rounded-xl bg-brand-50 dark:bg-brand-900/30">
+                                    <i class="fas fa-chevron-left text-xs"></i> <span class="hidden sm:inline">Volver a Categorías</span><span class="sm:hidden">Categorías</span>
                                 </button>
-                                <h3 id="pos-header-title" class="text-sm sm:text-base font-black text-slate-800 dark:text-white">
-                                    Selecciona una Categoría
+                                <h3 id="pos-header-title" class="text-xs sm:text-base font-black text-slate-800 dark:text-white truncate">
+                                    Categorías
                                 </h3>
                             </div>
 
                             <!-- Buscador en tiempo real -->
-                            <div class="relative w-44 sm:w-60">
-                                <i class="fas fa-search absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <div class="relative w-36 sm:w-60">
+                                <i class="fas fa-search absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
                                 <input type="text" id="search-prod" onkeyup="handlePosSearch(this.value)"
                                     placeholder="Buscar productos..."
-                                    class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-all">
+                                    class="w-full pl-7 pr-2.5 py-1.5 text-xs bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-brand-500 outline-none transition-all">
                             </div>
                         </div>
 
                         <!-- VISTA 2A: CUADRÍCULA DE CATEGORÍAS -->
-                        <div id="pos-view-categorias" class="flex-1 p-4 sm:p-5 overflow-y-auto custom-scroll">
-                            <div id="pos-cat-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
+                        <div id="pos-view-categorias" class="flex-1 p-2.5 sm:p-5 overflow-y-auto custom-scroll">
+                            <div id="pos-cat-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 sm:gap-4">
                                 <!-- Generado por renderPosCategoriesGrid() -->
                             </div>
                         </div>
 
                         <!-- VISTA 2B: CUADRÍCULA DE PRODUCTOS -->
-                        <div id="pos-view-productos" class="hidden flex-1 p-4 sm:p-5 overflow-y-auto custom-scroll">
-                            <div id="grid-productos" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+                        <div id="pos-view-productos" class="hidden flex-1 p-2.5 sm:p-5 overflow-y-auto custom-scroll">
+                            <div id="grid-productos" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-4">
                                 <!-- Generado por renderPosProducts() -->
                             </div>
                         </div>
@@ -2096,58 +2110,58 @@
                     <!-- LADO DERECHO: TICKET DE VENTA INTEGRADO -->
                     <div class="w-full lg:w-[360px] xl:w-[390px] flex flex-col bg-slate-50/70 dark:bg-slate-850 border-t lg:border-t-0 border-slate-100 dark:border-slate-800 shrink-0">
                         
-                        <!-- Encabezado del Ticket -->
-                        <div class="p-3.5 sm:p-4 border-b border-slate-200/80 dark:border-slate-750 bg-white dark:bg-slate-900 flex items-center justify-between">
+                        <!-- Encabezado del Ticket: Con botón "Vaciar Carrito" -->
+                        <div class="p-2.5 sm:p-3.5 border-b border-slate-200/80 dark:border-slate-750 bg-white dark:bg-slate-900 flex items-center justify-between">
                             <div class="flex items-center gap-2">
-                                <i class="fas fa-receipt text-brand-500 text-base"></i>
-                                <h4 class="font-black text-sm text-slate-800 dark:text-white">Ticket de Venta</h4>
+                                <i class="fas fa-receipt text-brand-500 text-sm sm:text-base"></i>
+                                <h4 class="font-black text-xs sm:text-sm text-slate-800 dark:text-white">Ticket de Venta</h4>
                             </div>
-                            <span id="cart-count-badge" class="text-xs font-black px-2.5 py-0.5 rounded-full bg-brand-50 dark:bg-brand-900/40 text-brand-500 dark:text-brand-400">
-                                0 items
-                            </span>
+                            <div class="flex items-center gap-2">
+                                <button type="button" onclick="clearCart()" title="Vaciar Carrito"
+                                    class="text-[11px] font-bold text-red-500 hover:text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 hover:bg-red-100 dark:hover:bg-red-900/40 px-2 py-0.5 rounded-lg border border-red-200/80 dark:border-red-900/60 flex items-center gap-1 transition-colors cursor-pointer">
+                                    <i class="fas fa-trash-alt text-[9px]"></i>
+                                    <span>Vaciar</span>
+                                </button>
+                                <span id="cart-count-badge" class="text-[11px] font-black px-2 py-0.5 rounded-full bg-brand-50 dark:bg-brand-900/40 text-brand-500 dark:text-brand-400">
+                                    0 items
+                                </span>
+                            </div>
                         </div>
 
-                        <!-- Lista de Ítems en Carrito -->
-                        <div id="cart-items" class="flex-1 overflow-y-auto p-3.5 space-y-2.5 max-h-[220px] lg:max-h-none min-h-[140px] custom-scroll">
+                        <!-- Lista de Ítems en Carrito: Reducida y compacta -->
+                        <div id="cart-items" class="flex-1 overflow-y-auto p-2 sm:p-3 space-y-1.5 sm:space-y-2 max-h-[125px] sm:max-h-[170px] lg:max-h-none min-h-[60px] custom-scroll">
                             <!-- Generado por renderCart() -->
                         </div>
 
-                        <!-- Observaciones / Nota de Venta (Visible en Rutas y Deudas) -->
-                        <div class="px-3.5 py-2.5 bg-slate-100/70 dark:bg-slate-800/70 border-t border-slate-200/80 dark:border-slate-750">
-                            <div class="flex items-center justify-between mb-1.5">
-                                <label for="pos-ticket-notas" class="text-xs font-bold text-slate-700 dark:text-slate-200 flex items-center gap-1.5 cursor-pointer">
-                                    <i class="far fa-sticky-note text-amber-500 text-sm"></i>
-                                    <span>Observaciones de la Venta</span>
-                                </label>
-                                <span class="text-[10px] text-amber-600 dark:text-amber-400 font-semibold bg-amber-50 dark:bg-amber-950/40 px-2 py-0.5 rounded-full border border-amber-200 dark:border-amber-800/60">Rutas & Deudas</span>
-                            </div>
+                        <!-- Observaciones / Nota de Venta (Compacta) -->
+                        <div class="px-2.5 py-1.5 sm:px-3.5 sm:py-2 bg-slate-100/70 dark:bg-slate-800/70 border-t border-slate-200/80 dark:border-slate-750">
                             <div class="relative">
+                                <i class="far fa-sticky-note absolute left-2.5 top-2 text-amber-500 text-xs"></i>
                                 <input type="text" id="pos-ticket-notas" oninput="syncPosNotas(this.value)"
-                                    placeholder="Añadir nota u observación para esta venta..."
-                                    class="w-full pl-3 pr-8 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-semibold transition-all shadow-sm">
-                                <i class="fas fa-edit absolute right-2.5 top-2.5 text-slate-400 text-xs pointer-events-none"></i>
+                                    placeholder="Nota de la venta (Rutas & Deudas)..."
+                                    class="w-full pl-7 pr-3 py-1.5 text-xs bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 dark:text-white rounded-xl focus:ring-2 focus:ring-brand-500 outline-none font-medium transition-all shadow-xs">
                             </div>
                         </div>
 
-                        <!-- Totales y Acción de Pago -->
-                        <div class="p-4 sm:p-5 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
-                            <div class="space-y-1.5 mb-4 text-xs font-semibold text-slate-500 dark:text-slate-400">
-                                <div class="flex justify-between items-center">
-                                    <span>Subtotal USD:</span>
+                        <!-- Totales y Acción de Pago: Compacto y limpio -->
+                        <div class="p-2.5 sm:p-4 border-t border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-sm">
+                            <div class="flex items-center justify-between gap-2 mb-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                <div class="flex items-center gap-1">
+                                    <span>Subtotal:</span>
                                     <span id="cart-subtotal-usd" class="font-bold text-slate-700 dark:text-slate-200">$0.00</span>
                                 </div>
-                                <div class="flex justify-between items-center">
-                                    <span>Total Bs (Tasa BCV):</span>
+                                <div class="flex items-center gap-1">
+                                    <span>BCV:</span>
                                     <span id="cart-total-bs" class="font-bold text-slate-700 dark:text-slate-200">Bs. 0.00</span>
                                 </div>
-                                <div class="flex justify-between items-baseline pt-2 border-t border-slate-100 dark:border-slate-800">
-                                    <span class="text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Total a Pagar</span>
-                                    <span id="cart-total-usd" class="text-2xl font-black text-brand-500 dark:text-brand-400">$0.00</span>
-                                </div>
+                            </div>
+                            <div class="flex justify-between items-baseline pb-2.5 pt-1 border-t border-slate-100 dark:border-slate-800">
+                                <span class="text-xs sm:text-sm font-black text-slate-800 dark:text-white uppercase tracking-wider">Total</span>
+                                <span id="cart-total-usd" class="text-xl sm:text-2xl font-black text-brand-500 dark:text-brand-400">$0.00</span>
                             </div>
 
                             <button onclick="openCheckoutModal('pos')" id="btn-procesar"
-                                class="w-full bg-brand-500 hover:bg-brand-600 active:scale-98 text-white font-black py-3.5 rounded-2xl shadow-lg shadow-brand-500/25 transition-all text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+                                class="w-full bg-brand-500 hover:bg-brand-600 active:scale-98 text-white font-black py-2.5 sm:py-3 rounded-xl sm:rounded-2xl shadow-lg shadow-brand-500/25 transition-all text-xs sm:text-sm flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
                                 disabled>
                                 <i class="fas fa-credit-card text-xs"></i>
                                 <span>Proceder al Pago</span>
@@ -2946,13 +2960,30 @@
         }
 
         function openModal(id) {
-            var m = document.getElementById(id); m.classList.remove('hidden'); void m.offsetWidth; m.classList.remove('opacity-0');
-            var card = m.querySelector('div'); if (card) { card.classList.remove('scale-95'); card.classList.add('scale-100'); }
+            var m = document.getElementById(id);
+            if (!m) return;
+            m.classList.remove('hidden');
+            void m.offsetWidth;
+            m.classList.remove('opacity-0');
+            var card = m.querySelector('div');
+            if (card) { card.classList.remove('scale-95'); card.classList.add('scale-100'); }
+            document.body.classList.add('overflow-hidden');
+            document.documentElement.classList.add('overflow-hidden');
         }
         function closeModal(id) {
-            var m = document.getElementById(id); m.classList.add('opacity-0');
-            var card = m.querySelector('div'); if (card) { card.classList.remove('scale-100'); card.classList.add('scale-95'); }
-            setTimeout(function () { m.classList.add('hidden'); }, 300);
+            var m = document.getElementById(id);
+            if (!m) return;
+            m.classList.add('opacity-0');
+            var card = m.querySelector('div');
+            if (card) { card.classList.remove('scale-100'); card.classList.add('scale-95'); }
+            setTimeout(function () {
+                m.classList.add('hidden');
+                var anyOpen = document.querySelectorAll('[id^="modal-"]:not(.hidden)');
+                if (!anyOpen || anyOpen.length === 0) {
+                    document.body.classList.remove('overflow-hidden');
+                    document.documentElement.classList.remove('overflow-hidden');
+                }
+            }, 300);
         }
 
         function openMenuModal() {
@@ -4343,8 +4374,8 @@
 
             if (!menuCli || !menuCat) return;
 
-            var activeTabClass = "px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-2 cursor-pointer bg-brand-500 text-white shadow-md shadow-brand-500/25";
-            var inactiveTabClass = "px-3.5 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-2 cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white";
+            var activeTabClass = "px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-black transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer bg-brand-500 text-white shadow-md shadow-brand-500/25";
+            var inactiveTabClass = "px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 sm:gap-2 cursor-pointer text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white";
 
             if (menuName === 'cliente') {
                 menuCat.classList.add('hidden');
@@ -4445,7 +4476,33 @@
             }
         }
 
+        function clearCart() {
+            if (!state.carrito || state.carrito.length === 0) return;
+            state.carrito = [];
+            renderCart();
+            renderPosProducts();
+            showToast("Carrito vaciado", "warning");
+        }
+
+        function clearPosForm() {
+            state.carrito = [];
+            if (document.getElementById('pos-cliente')) document.getElementById('pos-cliente').value = 'Cliente General';
+            if (document.getElementById('pos-telefono')) document.getElementById('pos-telefono').value = '';
+            if (document.getElementById('pos-notas')) document.getElementById('pos-notas').value = '';
+            if (document.getElementById('pos-cli-nombre')) document.getElementById('pos-cli-nombre').value = '';
+            if (document.getElementById('pos-cli-telefono')) document.getElementById('pos-cli-telefono').value = '';
+            if (document.getElementById('pos-cli-notas')) document.getElementById('pos-cli-notas').value = '';
+            if (document.getElementById('pos-ticket-notas')) document.getElementById('pos-ticket-notas').value = '';
+            if (document.getElementById('pos-cli-lugar-custom')) document.getElementById('pos-cli-lugar-custom').value = '';
+            setPosDateQuick(0);
+            renderPosLugarChips('Porlamar');
+            updatePosSummaryDisplay();
+            renderCart();
+            posBackToCategories();
+        }
+
         function closePosModal() {
+            clearPosForm();
             closeModal('modal-pos');
         }
 
@@ -4560,12 +4617,10 @@
             if (!itemsContainer) return;
 
             if (state.carrito.length === 0) {
-                itemsContainer.innerHTML = '<div class="flex flex-col items-center justify-center py-10 text-slate-300 dark:text-slate-600 text-center">' +
-                    '<div class="w-14 h-14 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-300 dark:text-slate-500 text-2xl mb-2.5">' +
-                    '<i class="fas fa-shopping-cart"></i>' +
-                    '</div>' +
-                    '<p class="font-bold text-xs sm:text-sm text-slate-400 dark:text-slate-500">El carrito está vacío</p>' +
-                    '<p class="text-[11px] text-slate-400 mt-1">Selecciona productos del catálogo para agregar</p>' +
+                itemsContainer.innerHTML = '<div class="flex flex-col items-center justify-center py-4 sm:py-6 text-slate-300 dark:text-slate-600 text-center">' +
+                    '<i class="fas fa-shopping-basket text-xl mb-1 opacity-40"></i>' +
+                    '<p class="font-bold text-xs text-slate-400 dark:text-slate-500">Carrito vacío</p>' +
+                    '<p class="text-[10px] text-slate-400">Toca productos para agregar</p>' +
                     '</div>';
                 if (btnProcesar) btnProcesar.disabled = true;
             } else {
@@ -4574,27 +4629,27 @@
                     var p = state.productos[item.idOriginal];
                     var price = getProdPrice(p);
                     var totalLine = price * item.cantidad;
-                    return '<div class="bg-white dark:bg-slate-800 p-2.5 sm:p-3 rounded-2xl border border-slate-200/90 dark:border-slate-700/80 shadow-sm transition-all">' +
-                        '<div class="flex items-center justify-between gap-2">' +
-                        '<p class="font-bold text-xs text-slate-800 dark:text-white truncate flex-1">' + p.nombre + '</p>' +
-                        '<div class="flex items-center gap-1.5">' +
-                        '<div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-700/60 rounded-xl px-1.5 py-0.5">' +
-                        '<button type="button" onclick="updateCartQty(' + idx + ', -1)" class="w-6 h-6 rounded-lg text-slate-600 dark:text-slate-300 hover:text-brand-500 flex items-center justify-center font-bold cursor-pointer">' +
-                        '<i class="fas fa-minus text-[9px]"></i>' +
-                        '</button>' +
-                        '<span class="w-5 text-center text-xs font-black text-slate-800 dark:text-white">' + item.cantidad + '</span>' +
-                        '<button type="button" onclick="updateCartQty(' + idx + ', 1)" class="w-6 h-6 rounded-lg text-slate-600 dark:text-slate-300 hover:text-brand-500 flex items-center justify-center font-bold cursor-pointer">' +
-                        '<i class="fas fa-plus text-[9px]"></i>' +
-                        '</button>' +
-                        '</div>' +
-                        '<button type="button" onclick="removeCartItem(' + idx + ')" class="w-6 h-6 text-red-400 hover:text-red-500 flex items-center justify-center cursor-pointer transition-colors" title="Eliminar">' +
-                        '<i class="far fa-trash-alt text-xs"></i>' +
-                        '</button>' +
+                    return '<div class="bg-white dark:bg-slate-800 px-2.5 py-1.5 rounded-xl border border-slate-200/90 dark:border-slate-700/80 shadow-xs flex items-center justify-between gap-2 transition-all">' +
+                        '<div class="min-w-0 flex-1">' +
+                        '<p class="font-bold text-xs text-slate-800 dark:text-white truncate leading-tight">' + p.nombre + '</p>' +
+                        '<div class="flex items-center gap-1.5 mt-0.5">' +
+                        '<span class="text-[10px] text-slate-400">$' + price.toFixed(2) + ' c/u</span>' +
+                        '<span class="text-[10px] font-black text-brand-500 dark:text-brand-400">→ $' + totalLine.toFixed(2) + '</span>' +
                         '</div>' +
                         '</div>' +
-                        '<div class="flex items-center justify-between mt-1 text-xs">' +
-                        '<span class="text-slate-400 text-[10px]">$' + price.toFixed(2) + ' c/u</span>' +
-                        '<span class="text-emerald-600 dark:text-emerald-400 font-black">$' + totalLine.toFixed(2) + '</span>' +
+                        '<div class="flex items-center gap-1 shrink-0">' +
+                        '<div class="flex items-center bg-slate-100 dark:bg-slate-700/80 rounded-lg p-0.5">' +
+                        '<button type="button" onclick="updateCartQty(' + idx + ', -1)" class="w-5 h-5 rounded text-slate-500 dark:text-slate-300 hover:text-brand-500 flex items-center justify-center font-bold cursor-pointer">' +
+                        '<i class="fas fa-minus text-[8px]"></i>' +
+                        '</button>' +
+                        '<span class="w-4 text-center text-xs font-black text-slate-800 dark:text-white leading-none">' + item.cantidad + '</span>' +
+                        '<button type="button" onclick="updateCartQty(' + idx + ', 1)" class="w-5 h-5 rounded text-slate-500 dark:text-slate-300 hover:text-brand-500 flex items-center justify-center font-bold cursor-pointer">' +
+                        '<i class="fas fa-plus text-[8px]"></i>' +
+                        '</button>' +
+                        '</div>' +
+                        '<button type="button" onclick="removeCartItem(' + idx + ')" class="w-5 h-5 text-slate-400 hover:text-red-500 flex items-center justify-center cursor-pointer transition-colors" title="Eliminar">' +
+                        '<i class="far fa-trash-alt text-[10px]"></i>' +
+                        '</button>' +
                         '</div>' +
                         '</div>';
                 }).join('');
