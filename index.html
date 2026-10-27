@@ -4240,14 +4240,14 @@
         }
 
         function syncPosNotas(val) {
-            var v = (val || '').trim();
+            var v = val || '';
             if (document.getElementById('pos-notas')) document.getElementById('pos-notas').value = v;
 
             var cNot = document.getElementById('pos-cli-notas');
-            if (cNot && cNot.value !== val) cNot.value = val;
+            if (cNot && document.activeElement !== cNot && cNot.value !== v) cNot.value = v;
 
             var tNot = document.getElementById('pos-ticket-notas');
-            if (tNot && tNot.value !== val) tNot.value = val;
+            if (tNot && document.activeElement !== tNot && tNot.value !== v) tNot.value = v;
 
             updatePosSummaryDisplay();
         }
@@ -4366,10 +4366,10 @@
             }
 
             var tNot = document.getElementById('pos-ticket-notas');
-            if (tNot && tNot.value !== not) tNot.value = not;
+            if (tNot && document.activeElement !== tNot && tNot.value !== not) tNot.value = not;
 
             var cNot = document.getElementById('pos-cli-notas');
-            if (cNot && cNot.value !== not) cNot.value = not;
+            if (cNot && document.activeElement !== cNot && cNot.value !== not) cNot.value = not;
 
             // Actualizar tickets de venta si existen
             var tNom = document.getElementById('pos-ticket-cliente-display');
@@ -4558,11 +4558,16 @@
         function nuevaVentaDesdeExito() {
             closeModal('modal-pos-success');
             state.carrito = [];
+            if (document.getElementById('pos-cli-nombre')) document.getElementById('pos-cli-nombre').value = '';
             if (document.getElementById('pos-cliente')) document.getElementById('pos-cliente').value = 'Cliente General';
             if (document.getElementById('pos-telefono')) document.getElementById('pos-telefono').value = '';
+            if (document.getElementById('pos-cli-telefono')) document.getElementById('pos-cli-telefono').value = '';
             if (document.getElementById('pos-notas')) document.getElementById('pos-notas').value = '';
             if (document.getElementById('pos-cli-notas')) document.getElementById('pos-cli-notas').value = '';
             if (document.getElementById('pos-ticket-notas')) document.getElementById('pos-ticket-notas').value = '';
+            if (document.getElementById('pos-cli-lugar-custom')) document.getElementById('pos-cli-lugar-custom').value = '';
+            setPosDateQuick(0);
+            renderPosLugarChips('Porlamar');
             updatePosSummaryDisplay();
             renderCart();
             posBackToCategories();
@@ -4573,11 +4578,16 @@
             closeModal('modal-pos-success');
             closeModal('modal-pos');
             state.carrito = [];
+            if (document.getElementById('pos-cli-nombre')) document.getElementById('pos-cli-nombre').value = '';
             if (document.getElementById('pos-cliente')) document.getElementById('pos-cliente').value = 'Cliente General';
             if (document.getElementById('pos-telefono')) document.getElementById('pos-telefono').value = '';
+            if (document.getElementById('pos-cli-telefono')) document.getElementById('pos-cli-telefono').value = '';
             if (document.getElementById('pos-notas')) document.getElementById('pos-notas').value = '';
             if (document.getElementById('pos-cli-notas')) document.getElementById('pos-cli-notas').value = '';
             if (document.getElementById('pos-ticket-notas')) document.getElementById('pos-ticket-notas').value = '';
+            if (document.getElementById('pos-cli-lugar-custom')) document.getElementById('pos-cli-lugar-custom').value = '';
+            setPosDateQuick(0);
+            renderPosLugarChips('Porlamar');
             updatePosSummaryDisplay();
             renderCart();
             posBackToCategories();

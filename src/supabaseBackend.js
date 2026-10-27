@@ -44,26 +44,48 @@ async function db_getBCV() {
   return 0;
 }
 
+async function fetchAllRows(tableName, orderCol = 'id') {
+    let all = [];
+    let from = 0;
+    const step = 1000;
+    while (true) {
+        let query = supabase.from(tableName).select('*');
+        if (orderCol) {
+            query = query.order(orderCol, { ascending: true });
+        }
+        const { data, error } = await query.range(from, from + step - 1);
+        if (error) {
+            console.error(`Error fetching all from ${tableName}:`, error);
+            throw error;
+        }
+        if (!data || data.length === 0) break;
+        all = all.concat(data);
+        if (data.length < step) break;
+        from += step;
+    }
+    return { data: all };
+}
+
 async function db_getData() {
     const b1 = await Promise.all([
         supabase.from('config').select('*'),
         db_getBCV(),
-        supabase.from('productos').select('*').order('id'),
+        fetchAllRows('productos'),
         supabase.from('lugares').select('*').order('id'),
-        supabase.from('clientes').select('*').order('id'),
+        fetchAllRows('clientes'),
         supabase.from('categorias').select('*').order('nombre').then(r => r).catch(() => ({ data: [] }))
     ]);
     const b2 = await Promise.all([
-        supabase.from('pedidos').select('*').order('id'),
-        supabase.from('pagos').select('*').order('id'),
-        supabase.from('gastos').select('*').order('id'),
-        supabase.from('produccion').select('*').order('id'),
-        supabase.from('movimientos').select('*').order('id')
+        fetchAllRows('pedidos'),
+        fetchAllRows('pagos'),
+        fetchAllRows('gastos'),
+        fetchAllRows('produccion'),
+        fetchAllRows('movimientos')
     ]);
     const b3 = await Promise.all([
         supabase.from('materia_prima').select('*').order('id'),
         supabase.from('usuarios').select('*'),
-        supabase.from('historial_mp').select('*').order('id'),
+        fetchAllRows('historial_mp'),
         supabase.from('recetario').select('*').order('id'),
         supabase.from('auditoria').select('*').order('id', { ascending: false }).limit(200)
     ]);
@@ -215,11 +237,17 @@ async function db_saveOrder(form, cart, userId) {
         detallesArr.push(`${cantItem}|${item.nombre}|${precioItem.toFixed(2)}|${totalItem.toFixed(2)}`);
     }
     
-    if(pedPayloads.length > 0) await supabase.from('pedidos').insert(pedPayloads);
+    if(pedPayloads.length > 0) {
+        const { error: pedErr } = await supabase.from('pedidos').insert(pedPayloads);
+        if (pedErr) {
+            console.error("Error insertando pedidos en Supabase:", pedErr);
+            throw new Error(pedErr.message || "Error al guardar el pedido en base de datos");
+        }
+    }
     
     let abonado = parseFloat(form.abonadoUSD||0);
     if(abonado > 0) {
-        await supabase.from('pagos').insert({
+        const { error: pagoErr } = await supabase.from('pagos').insert({
             fecha: now,
             cliente: form.cliente,
             monto_usd: abonado,
@@ -231,6 +259,10 @@ async function db_saveOrder(form, cart, userId) {
             num_entrega: form.numEntrega,
             usuario_id: userId
         });
+        if (pagoErr) {
+            console.error("Error insertando pago en Supabase:", pagoErr);
+            throw new Error(pagoErr.message || "Error al registrar el pago");
+        }
     }
     
     return await db_getData();
