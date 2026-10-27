@@ -66,6 +66,39 @@ async function fetchAllRows(tableName, orderCol = 'id') {
     return { data: all };
 }
 
+async function adjustProductStock(nombre, delta) {
+    const d = parseFloat(delta) || 0;
+    if (d === 0) return;
+    const maxRetries = 10;
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        const { data: prod, error: selErr } = await supabase
+            .from('productos')
+            .select('id, stock')
+            .eq('nombre', nombre)
+            .maybeSingle();
+        if (selErr || !prod) {
+            console.warn(`Producto no encontrado para ajustar stock: ${nombre}`, selErr);
+            return;
+        }
+        const currentStock = parseFloat(prod.stock) || 0;
+        const newStock = currentStock + d;
+        // Control de Concurrencia Optimista (OCC):
+        // Solo actualiza si el stock en la base de datos sigue siendo exactamente el que leímos
+        const { data: updated, error: updErr } = await supabase
+            .from('productos')
+            .update({ stock: newStock })
+            .eq('id', prod.id)
+            .eq('stock', prod.stock)
+            .select();
+        if (!updErr && updated && updated.length > 0) {
+            return; // Actualización atómica exitosa
+        }
+        // Si otro usuario modificó el stock en el mismo instante, esperamos un tiempo aleatorio breve y reintentamos
+        await new Promise(res => setTimeout(res, 15 + Math.random() * 45));
+    }
+    console.error(`Excedido número de reintentos para ajustar stock de: ${nombre}`);
+}
+
 async function db_getData() {
     const b1 = await Promise.all([
         supabase.from('config').select('*'),
@@ -228,11 +261,8 @@ async function db_saveOrder(form, cart, userId) {
             usuario_id: userId
         });
         
-        // Update product stock
-        const {data: prod} = await supabase.from('productos').select('stock').eq('nombre', item.nombre).single();
-        if(prod) {
-            await supabase.from('productos').update({stock: (prod.stock||0) - cantItem}).eq('nombre', item.nombre);
-        }
+        // Update product stock atomically
+        await adjustProductStock(item.nombre, -cantItem);
         
         detallesArr.push(`${cantItem}|${item.nombre}|${precioItem.toFixed(2)}|${totalItem.toFixed(2)}`);
     }
@@ -287,10 +317,7 @@ async function db_deletePedidosBulk(ids, userId) {
             if(row) {
                 pedidosBorrados.push(row);
                 // Restaurar stock
-                const {data: prod} = await supabase.from('productos').select('stock').eq('nombre', row.producto).maybeSingle();
-                if(prod) {
-                    await supabase.from('productos').update({stock: (parseFloat(prod.stock)||0) + parseFloat(row.cantidad||0)}).eq('nombre', row.producto);
-                }
+                await adjustProductStock(row.producto, parseFloat(row.cantidad) || 0);
                 const {data: pagosAsoc} = await supabase.from('pagos').select('*').eq('cliente', row.cliente);
                 if (pagosAsoc) {
                     for (const pago of pagosAsoc) {
@@ -340,8 +367,7 @@ async function db_revertAudit(auditId) {
             };
             await supabase.from('pedidos').insert(payload);
             // Restar stock del producto
-            const { data: prod } = await supabase.from('productos').select('stock').eq('nombre', ped.producto).maybeSingle();
-            if (prod) await supabase.from('productos').update({ stock: (parseFloat(prod.stock)||0) - (parseFloat(ped.cantidad)||0) }).eq('nombre', ped.producto);
+            await adjustProductStock(ped.producto, -(parseFloat(ped.cantidad) || 0));
         }
         await supabase.from('auditoria').delete().eq('id', auditId);
     }
@@ -504,10 +530,7 @@ async function db_saveProduccion(data, userId) {
             usuario_id: userId
         });
         // Sumar stock del producto
-        const { data: prod } = await supabase.from('productos').select('stock').eq('nombre', item.producto).maybeSingle();
-        if (prod) {
-            await supabase.from('productos').update({ stock: (parseFloat(prod.stock)||0) + (parseFloat(item.cantidad)||0) }).eq('nombre', item.producto);
-        }
+        await adjustProductStock(item.producto, parseFloat(item.cantidad) || 0);
         // Descontar materia prima según receta
         const { data: receta } = await supabase.from('recetario').select('*').eq('producto', item.producto);
         if (receta && receta.length > 0) {
