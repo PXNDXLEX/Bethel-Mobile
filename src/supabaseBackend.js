@@ -401,11 +401,15 @@ async function db_updateCell(id, col, value, cliente, fecha, lugar) {
 }
 
 async function db_payDebt(idsStr, montoUSD, ref, nota, bcvRate, numEntrega, userId) {
-    const realIds = String(idsStr).split(',').map(Number).filter(n => !isNaN(n));
+    const realIds = String(idsStr).split(',').map(Number).filter(n => !isNaN(n) && n > 0);
+    if (realIds.length === 0) return await db_getData();
     
     // Fetch all pedidos ordered by id
-    const { data: todos } = await supabase.from('pedidos').select('*').in('id', realIds);
-    if (!todos) return await db_getData();
+    const { data: todos, error: selErr } = await supabase.from('pedidos').select('*').in('id', realIds);
+    if (selErr || !todos) {
+        console.error("Error fetching pedidos in db_payDebt:", selErr);
+        return await db_getData();
+    }
     
     let montoRestante = parseFloat(montoUSD) || 0;
     let clienteName = '';
@@ -417,16 +421,33 @@ async function db_payDebt(idsStr, montoUSD, ref, nota, bcvRate, numEntrega, user
         if (montoRestante > 0 && deudaActual > 0) {
             const aCobrar = Math.min(deudaActual, montoRestante);
             const nuevoAbono = (parseFloat(row.abono) || 0) + aCobrar;
-            const nuevaDeuda = deudaActual - aCobrar;
+            const nuevaDeuda = Math.max(0, deudaActual - aCobrar);
             montoRestante -= aCobrar;
-            await supabase.from('pedidos').update({ abono: nuevoAbono, deuda: nuevaDeuda }).eq('id', row.id);
+
+            // Si el usuario especificó una nota (ej: pago incompleto), adjuntarla a la nota del pedido
+            let updatedNotas = row.notas || '';
+            if (nota && String(nota).trim()) {
+                const nTrim = String(nota).trim();
+                if (!updatedNotas) {
+                    updatedNotas = nTrim;
+                } else if (!updatedNotas.includes(nTrim)) {
+                    updatedNotas = updatedNotas + ' | ' + nTrim;
+                }
+            }
+
+            await supabase.from('pedidos').update({ 
+                abono: nuevoAbono, 
+                deuda: nuevaDeuda,
+                notas: updatedNotas
+            }).eq('id', row.id);
+
             detallesArr.push(row.producto + ' x' + row.cantidad);
         }
     }
     
     const bcv = parseFloat(bcvRate) || 0;
     const finalNota = nota ? (nota + ' | Abono Pedidos: ' + idsStr) : ('Abono Pedidos: ' + idsStr);
-    await supabase.from('pagos').insert({
+    const { error: pagoErr } = await supabase.from('pagos').insert({
         fecha: new Date().toISOString(),
         cliente: clienteName,
         monto_usd: parseFloat(montoUSD) || 0,
@@ -438,6 +459,10 @@ async function db_payDebt(idsStr, montoUSD, ref, nota, bcvRate, numEntrega, user
         num_entrega: numEntrega || '',
         usuario_id: userId || ''
     });
+    if (pagoErr) {
+        console.error("Error insertando pago de deuda en Supabase:", pagoErr);
+        throw new Error(pagoErr.message || "Error al registrar el pago de la deuda");
+    }
     
     return await db_getData();
 }

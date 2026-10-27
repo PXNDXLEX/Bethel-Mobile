@@ -3645,7 +3645,7 @@
 
             state.pedidosRaw.forEach(function (ped) {
                 var deuda = parseFloat(String(ped[12] || 0).replace(',', '.')) || 0;
-                if (deuda > 0.05) {
+                if (deuda > 0.009) {
                     totalDeudaUSD += deuda;
                     var cliente = String(ped[0] || 'Cliente').trim();
                     if (!deudasMap[cliente]) {
@@ -4749,15 +4749,16 @@
 
             document.getElementById('checkout-received').innerText = '$' + rU.toFixed(2);
             var diff = rU - tP;
-            document.getElementById('checkout-status-label').innerText = diff >= -0.05 ? "Vuelto:" : "Falta:";
+            var esVuelto = diff >= -0.005;
+            document.getElementById('checkout-status-label').innerText = esVuelto ? "Vuelto:" : "Falta:";
             document.getElementById('checkout-diff').innerText = '$' + Math.abs(diff).toFixed(2);
-            var colorClass = diff >= -0.05 ? "text-green-500 dark:text-green-400" : "text-brand-500 dark:text-brand-400";
+            var colorClass = esVuelto ? "text-green-500 dark:text-green-400" : "text-brand-500 dark:text-brand-400";
             document.getElementById('checkout-diff').className = "font-black text-xl block leading-none " + colorClass;
 
             var diffBs = document.getElementById('checkout-diff-bs');
             if (diffBs) {
                 diffBs.innerText = 'Bs. ' + (Math.abs(diff) * state.bcv).toFixed(2);
-                var bsColorClass = diff >= -0.05 ? "text-green-400/70" : "text-brand-400/70";
+                var bsColorClass = esVuelto ? "text-green-400/70" : "text-brand-400/70";
                 diffBs.className = "text-[10px] font-bold block mt-1 " + bsColorClass;
             }
         }
@@ -4824,7 +4825,8 @@
                         cName, item.nombre, item.cantidad, posLugar, isoFechaOp,
                         totalItem, item.precio, 'Pendiente', numEntrega, posNotas,
                         state.bcv, abonoItem, totalItem - abonoItem, newPhone,
-                        state.currentUser ? state.currentUser.id : ""
+                        state.currentUser ? state.currentUser.id : "",
+                        null
                     ]);
                     var prod = state.productos.find(function (p) { return p.nombre === item.nombre; });
                     if (prod) prod.stock -= item.cantidad;
@@ -4897,6 +4899,11 @@
                         row[11] = (abonoAnterior + aCobrar).toFixed(2);
                         row[12] = (deudaRow - aCobrar).toFixed(2);
                         montoRestanteOp -= aCobrar;
+                        if (nota && String(nota).trim()) {
+                            var nTrim = String(nota).trim();
+                            if (!row[9]) row[9] = nTrim;
+                            else if (!String(row[9]).includes(nTrim)) row[9] += ' | ' + nTrim;
+                        }
                     }
                 });
 
@@ -5332,7 +5339,7 @@
             var dc = {};
             state.pedidosRaw.forEach(function (p, i) {
                 var r = parseFloat(String(p[12]).replace(',', '.')) || 0;
-                if (r > 0.05) {
+                if (r > 0.009) {
                     var c = String(p[0]).trim();
                     if (!dc[c]) dc[c] = { t: 0, i: [] };
                     var fechaPedido = String(p[4]).split('T')[0];
@@ -5527,14 +5534,14 @@
 
             state.pedidosRaw.forEach(p => {
                 let r = parseFloat(String(p[12]).replace(',', '.')) || 0;
-                if (r > 0.05) {
+                if (r > 0.009) {
                     let c = String(p[0]).trim();
                     clientDebts[c] = (clientDebts[c] || 0) + r;
                 }
             });
 
             for (let c in clientDebts) {
-                if (clientDebts[c] > 0.05) {
+                if (clientDebts[c] > 0.009) {
                     numClientesDeuda++;
                     totalDeudaClientes += clientDebts[c];
                 }
